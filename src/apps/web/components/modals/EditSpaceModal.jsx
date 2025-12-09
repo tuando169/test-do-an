@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { notification } from 'antd';
-import Modal from '@/components/modal';
-import { RoomApi } from '@/api/roomApi';
+import { useState, useEffect } from "react";
+import { notification } from "antd";
+import { RoomApi } from "@/api/roomApi";
+import Modal from "../modal";
 
 export default function EditSpaceModal({
   isVisible,
@@ -12,14 +12,14 @@ export default function EditSpaceModal({
   const [api] = notification.useNotification();
 
   const [form, setForm] = useState({
-    id: '',
-    title: '',
-    description: '',
-    visibility: 'public',
-    thumbnail: '',
+    id: "",
+    title: "",
+    description: "",
+    visibility: "public",
+    thumbnail: "",
   });
 
-  const [thumbnailPreview, setThumbnailPreview] = useState('');
+  const [thumbnailPreview, setThumbnailPreview] = useState("");
 
   // Khi mở modal → load data vào form
   useEffect(() => {
@@ -43,58 +43,58 @@ export default function EditSpaceModal({
       await RoomApi.update(form);
 
       api.success({
-        message: 'Thành công',
-        description: 'Không gian đã được cập nhật.',
+        message: "Thành công",
+        description: "Không gian đã được cập nhật.",
       });
 
       onClose();
-      onSuccess(); // báo parent reload list
+      onSuccess();
     } catch {
       api.error({
-        message: 'Lỗi',
-        description: 'Không thể cập nhật.',
+        message: "Lỗi",
+        description: "Không thể cập nhật.",
       });
     }
   }
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
-      <div className='modalRegister__title'>CHỈNH SỬA KHÔNG GIAN</div>
+      <div className="modalRegister__title">CHỈNH SỬA KHÔNG GIAN</div>
 
-      <form className='modalRegister__form' onSubmit={handleSubmit}>
-        <label className='modalRegister__form__label'>Tên</label>
+      <form className="modalRegister__form" onSubmit={handleSubmit}>
+        <label className="modalRegister__form__label">Tên</label>
         <input
-          type='text'
-          className='modalRegister__form__input'
+          type="text"
+          className="modalRegister__form__input"
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
         />
 
-        <label className='modalRegister__form__label'>Mô tả</label>
+        <label className="modalRegister__form__label">Mô tả</label>
         <textarea
-          className='modalRegister__form__input'
+          className="modalRegister__form__input"
           value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
         />
 
-        <label className='modalRegister__form__label'>Trạng thái</label>
+        <label className="modalRegister__form__label">Trạng thái</label>
         <select
           value={form.visibility}
           onChange={(e) => setForm({ ...form, visibility: e.target.value })}
-          className='modalRegister__form__input'
+          className="modalRegister__form__input"
         >
-          <option value='public'>Công khai</option>
-          <option value='private'>Riêng tư</option>
+          <option value="public">Công khai</option>
+          <option value="private">Riêng tư</option>
         </select>
 
-        <label className='modalRegister__form__label'>Thumbnail</label>
+        <label className="modalRegister__form__label">Thumbnail</label>
         <img
           src={thumbnailPreview}
-          className='w-full h-40 object-cover border mb-3'
+          className="w-full h-40 object-cover border mb-3"
         />
 
         <input
-          type='file'
+          type="file"
           onChange={(e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -104,7 +104,7 @@ export default function EditSpaceModal({
           }}
         />
 
-        <button className='modalRegister__form__button'>CẬP NHẬT</button>
+        <button className="modalRegister__form__button">CẬP NHẬT</button>
       </form>
     </Modal>
   );
