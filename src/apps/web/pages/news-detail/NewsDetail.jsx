@@ -1,61 +1,86 @@
-import { newsFake } from '@/common/constants';
-import { useParams, Link } from 'react-router-dom';
+import { NewsApi } from "@/api/newsApi";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 export default function NewsDetail() {
-  const { id } = useParams();
-  const news = newsFake.find((n) => n.id === Number(id));
+  const { slug } = useParams();
+  const [news, setNews] = useState(null);
 
-  if (!news) {
-    return (
-      <div className='container-main mx-auto py-20'>
-        <h2 className='text-2xl font-bold text-gray-800'>
-          Không tìm thấy bài viết
-        </h2>
-      </div>
-    );
-  }
+  useEffect(() => {
+    async function load() {
+      const data = await NewsApi.getBySlug(slug);
+      setNews(data);
+    }
+    load();
+  }, [slug]);
+
+  if (!news) return <div className="p-10">Đang tải...</div>;
 
   return (
-    <div className='NewsDetail'>
-      {/* TITLE */}
-      <div className='container-main mx-auto pt-10 justify-between items-center'>
-        <div>
-          <h1 className='text-4xl font-bold text-gray-900'>{news.title}</h1>
+    <div className="container-main py-10 flex flex-col max-w-7xl mx-auto">
+      {/* Title */}
+      <h1 className="text-4xl font-extrabold text-gray-900 mb-3">
+        {news.title}
+      </h1>
 
-          <p className='text-gray-500 mt-2'>
-            {new Date(news.date).toLocaleDateString('vi-VN')}
-          </p>
-        </div>
-        <Link to='/news'>
-          <button className='px-6 py-2 bg-[#1e1e1e] text-white uppercase h-fit font-semibold rounded-full hover:bg-[#2a2a2a] transition'>
-            Quay lại
-          </button>
-        </Link>
+      <div className="text-gray-500 text-sm mb-6">
+        Cập nhật: {new Date(news.updated_at).toLocaleDateString("vi-VN")}
       </div>
 
-      {/* CONTENT */}
-      <div className='container-main mx-auto py-10 gap-10'>
-        {/* Thumbnail */}
-        <div
-          className='w-full h-[420px]  overflow-hidden'
-          style={{ border: '2px solid' }}
-        >
-          <img
-            src={news.thumbnail}
-            alt=''
-            className='w-full h-full object-cover'
-          />
-        </div>
+      {/* Thumbnail */}
+      {news.thumbnail && (
+        <img src={news.thumbnail} className="w-full  shadow mb-10" />
+      )}
 
-        {/* Main content */}
-        <div className='text-gray-700 leading-relaxed text-lg whitespace-pre-line'>
-          {news.description}
-          <br />
-          <br />
-          Đây là nội dung demo. Bạn có thể thay thế bằng nội dung thật từ API,
-          hoặc mở rộng đoạn nội dung này để mô phỏng một bài báo chi tiết hơn.
-        </div>
-      </div>
+      {/* Render từng block */}
+      {news.layout_json?.map((block, idx) => {
+        // TEXT BLOCK
+        if (block.type === "text") {
+          return (
+            <p
+              key={idx}
+              className="text-lg text-gray-800 leading-relaxed mb-6 whitespace-pre-line"
+            >
+              {block.content}
+            </p>
+          );
+        }
+
+        // IMAGE BLOCK
+        if (block.type === "image") {
+          return (
+            <div key={idx} className="my-8">
+              {block.content && (
+                <img src={block.content} className="w-full  shadow" />
+              )}
+              {block.caption && (
+                <p className="text-sm text-gray-500 mt-2 italic">
+                  {block.caption}
+                </p>
+              )}
+            </div>
+          );
+        }
+
+        // 3D BLOCK
+        if (block.type === "object3d") {
+          return (
+            <div key={idx} className="my-10">
+              <p className="text-gray-700 font-semibold mb-2">Mô hình 3D:</p>
+              <a
+                href={block.content}
+                target="_blank"
+                rel="noopener"
+                className="text-blue-600 underline"
+              >
+                Nhấn để xem mô hình 3D ({block.content.split("/").pop()})
+              </a>
+            </div>
+          );
+        }
+
+        return null;
+      })}
     </div>
   );
 }

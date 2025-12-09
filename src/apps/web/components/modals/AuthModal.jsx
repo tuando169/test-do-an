@@ -1,23 +1,36 @@
-import { useEffect, useState } from 'react';
-import Modal from '../modal';
-import { AuthApi } from '@/api/authApi';
-import { notification } from 'antd';
+import { useEffect, useState } from "react";
+import Modal from "../modal";
+import { AuthApi } from "@/api/authApi";
+import { notification } from "antd";
 
 export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
   const [api, contextHolder] = notification.useNotification();
 
-  const [mode, setMode] = useState(initMode || 'login'); // login | register
+  const [mode, setMode] = useState(initMode || "login"); // login | register
 
   const [form, setForm] = useState({
-    name: '',
-    role: 'client',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    role: "client",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
   });
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  function handleClose() {
+    setForm({
+      name: "",
+      role: "client",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      phone: "",
+    });
+    onClose();
   }
 
   // ---------------- LOGIN ----------------
@@ -25,18 +38,18 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
     e.preventDefault();
     AuthApi.login(form.email, form.password)
       .then((data) => {
-        localStorage.setItem('user', data.id);
+        localStorage.setItem("user", data.id);
         if (onSuccess) onSuccess(data.id);
         api.success({
-          title: 'Đăng nhập thành công',
-          description: 'Chào mừng bạn quay lại!',
+          title: "Đăng nhập thành công",
+          description: "Chào mừng bạn quay lại!",
         });
-        onClose();
+        handleClose();
       })
       .catch(() => {
         api.error({
-          title: 'Đăng nhập thất bại',
-          description: 'Sai email hoặc mật khẩu',
+          title: "Đăng nhập thất bại",
+          description: "Sai email hoặc mật khẩu",
         });
       });
   }
@@ -46,7 +59,7 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
       api.error({
-        title: 'Mật khẩu xác nhận không trùng',
+        title: "Mật khẩu xác nhận không trùng",
       });
       return;
     }
@@ -58,16 +71,15 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
         email: form.email,
         password: form.password,
       });
-
       api.success({
-        title: 'Đăng ký thành công',
-        description: 'Hãy đăng nhập để tiếp tục',
+        title: "Đăng ký thành công",
+        description: "Hãy đăng nhập để tiếp tục",
       });
 
-      setMode('login');
+      setMode("login");
     } catch {
       api.error({
-        title: 'Đăng ký thất bại',
+        title: "Đăng ký thất bại",
       });
     }
   }
@@ -76,114 +88,123 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
   }, [initMode]);
 
   return (
-    <Modal isVisible={isVisible} onClose={onClose}>
+    <Modal isVisible={isVisible} onClose={handleClose}>
       {contextHolder}
 
-      {mode === 'login' && (
-        <div className='w-[500px]'>
-          <h2 className='text-xl font-bold text-center mb-4 text-[#2e2e2e]'>
+      {mode === "login" && (
+        <div className="w-[500px]">
+          <h2 className="text-xl font-bold text-center mb-4 text-[#2e2e2e]">
             ĐĂNG NHẬP
           </h2>
 
-          <form className='flex flex-col gap-3' onSubmit={handleLogin}>
+          <form className="flex flex-col gap-3" onSubmit={handleLogin}>
             <label>Email</label>
             <input
-              name='email'
+              name="email"
               required
-              className='border p-3  w-full'
+              className="border p-3  w-full"
               value={form.email}
               onChange={handleChange}
             />
 
             <label>Mật khẩu</label>
             <input
-              type='password'
-              name='password'
+              type="password"
+              name="password"
               required
-              className='border p-3  w-full'
+              className="border p-3  w-full"
               value={form.password}
               onChange={handleChange}
             />
 
-            <button className='primary-button'>ĐĂNG NHẬP</button>
+            <button className="primary-button">ĐĂNG NHẬP</button>
           </form>
 
-          <hr className='w-full bg-[#2e2e2e] my-3' />
+          <hr className="w-full bg-[#2e2e2e] my-3" />
 
-          <div className='text-center'>Bạn chưa có tài khoản?</div>
+          <div className="text-center">Bạn chưa có tài khoản?</div>
           <div
-            onClick={() => setMode('register')}
-            className='secondary-button mt-3'
+            onClick={() => setMode("register")}
+            className="secondary-button mt-3"
           >
             ĐĂNG KÝ
           </div>
         </div>
       )}
 
-      {mode === 'register' && (
-        <div className='w-[500px]'>
-          <h2 className='text-xl font-bold text-center mb-4 text-[#2e2e2e]'>
+      {mode === "register" && (
+        <div className="w-[500px]">
+          <h2 className="text-xl font-bold text-center mb-4 text-[#2e2e2e]">
             ĐĂNG KÝ
           </h2>
 
-          <form className='flex flex-col gap-3' onSubmit={handleRegister}>
+          <form className="flex flex-col gap-3" onSubmit={handleRegister}>
             <label>Tên của bạn</label>
             <input
-              name='name'
-              className='border p-3  w-full'
+              name="name"
+              className="border p-3  w-full"
               value={form.name}
               onChange={handleChange}
             />
 
             <label>Vai trò</label>
             <select
-              name='role'
-              className='border p-3  w-full'
+              name="role"
+              className="border p-3  w-full"
               value={form.role}
               onChange={handleChange}
             >
-              <option value='client'>Người dùng</option>
-              <option value='designer'>Nhà thiết kế</option>
+              <option value="client">Người dùng</option>
+              <option value="designer">Nhà thiết kế</option>
             </select>
+
+            <label>Số điện thoại</label>
+            <input
+              name="phone"
+              required
+              className="border p-3  w-full"
+              value={form.phone}
+              onChange={handleChange}
+            />
 
             <label>Email</label>
             <input
-              name='email'
+              name="email"
               required
-              className='border p-3  w-full'
+              className="border p-3  w-full"
               value={form.email}
               onChange={handleChange}
             />
 
             <label>Mật khẩu</label>
             <input
-              type='password'
-              name='password'
+              type="password"
+              name="password"
               required
-              className='border p-3  w-full'
+              className="border p-3  w-full"
               value={form.password}
               onChange={handleChange}
             />
 
             <label>Xác nhận mật khẩu</label>
             <input
-              type='password'
-              name='confirmPassword'
+              type="password"
+              name="confirmPassword"
               required
-              className='border p-3  w-full'
+              className="border p-3  w-full"
               value={form.confirmPassword}
               onChange={handleChange}
             />
 
-            <button className='primary-button'>ĐĂNG KÝ</button>
+            <button className="primary-button">ĐĂNG KÝ</button>
           </form>
 
-          <hr className='w-full bg-[#2e2e2e] my-3' />
+          <hr className="w-full bg-[#2e2e2e] my-3" />
 
-          <div className='text-center'>Đã có tài khoản?</div>
+          <div className="text-center">Đã có tài khoản?</div>
           <div
-            onClick={() => setMode('login')}
-            className='secondary-button mt-3'
+            onClick={() => setMode("login")}
+            className="secondary-button mt-3"
           >
             ĐĂNG NHẬP
           </div>

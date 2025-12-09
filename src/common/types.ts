@@ -1,3 +1,5 @@
+import { NewsItemTypeEnum } from "./constants";
+
 export interface UserData {
   id: string;
   email: string;
@@ -67,30 +69,40 @@ export interface NewsData {
   id: string;
   owner_id: string;
 
+  thumbnail: string;
   title?: string;
   slug: string;
   description?: string;
 
-  layout_json: Record<string, any>;
+  layout_json: {
+    blocks: Array<{
+      type: NewsItemTypeEnum;
+      content: string;
+    }>;
+  };
 
   visibility: string;
 
   created_at: string;
   updated_at: string;
 }
-
-export interface NewsItemData {
+export interface NewsUploadData {
   id: string;
 
-  magazine_id: string;
-  item_type: string;
+  thumbnail: File;
+  title?: string;
+  slug: string;
+  description?: string;
 
-  ref_id?: string;
-  sort_index?: number;
+  layout_json: Array<{
+    type: NewsItemTypeEnum;
+    content: string | File;
+  }>;
 
-  props_json?: Record<string, any>;
+  visibility: string;
 
   created_at: string;
+  updated_at: string;
 }
 
 export interface ImageData {

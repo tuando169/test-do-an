@@ -67,7 +67,7 @@ export default function PickTemplateModal({
             <div
               key={tpl.id}
               onClick={() => toggle(tpl.id)}
-              className="relative border rounded overflow-hidden cursor-pointer bg-white transition hover:shadow"
+              className="relative border overflow-hidden cursor-pointer bg-white transition hover:shadow"
             >
               <img
                 src={tpl.thumbnail}
@@ -82,7 +82,7 @@ export default function PickTemplateModal({
 
               {/* CHECK ICON */}
               {isSelected && (
-                <div className="absolute top-2 right-2 bg-[#2e2e2e] text-white p-1 rounded">
+                <div className="absolute top-2 right-2 bg-[#2e2e2e] text-white p-1">
                   <MdCheck size={18} />
                 </div>
               )}
@@ -92,9 +92,7 @@ export default function PickTemplateModal({
                 target="_blank"
                 onClick={(e) => e.stopPropagation()}
               >
-                <p className="bg-[#2e2e2e] text-white w-full py-2 text-center hover:opacity-90">
-                  Khám phá
-                </p>
+                <p className="primary-button">Khám phá</p>
               </a>
             </div>
           );
@@ -109,7 +107,7 @@ export default function PickTemplateModal({
 
       {/* SUBMIT BUTTON */}
       <button
-        className="modalRegister__form__button mt-4"
+        className="secondary-button w-full mt-4"
         onClick={handlePickTemplate}
       >
         LẤY TẤT CẢ KHÔNG GIAN ĐÃ CHỌN

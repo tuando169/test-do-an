@@ -10,13 +10,17 @@ import {
   MdCheck,
   MdVisibility,
   MdSearch,
+  MdDelete,
 } from "react-icons/md";
 import Modal from "../../components/modal/index";
 import PickTemplateModal from "./modals/PickTemplateModal";
 import EditSpaceModal from "../../components/modals/EditSpaceModal";
+import { useNavigate } from "react-router-dom";
 
 export default function ManageSpace() {
   const [api, contextHolder] = notification.useNotification();
+  const navigate = useNavigate();
+
   const [thumbnailPreview, setThumbnailPreview] = useState("");
 
   const [spaces, setSpaces] = useState([]);
@@ -119,6 +123,7 @@ export default function ManageSpace() {
       id: space.id,
       title: space.title,
       owner_id: space.owner_id,
+      slug: space.slug,
       visibility: space.visibility,
       thumbnail: space.thumbnail,
       description: space.description,
@@ -166,8 +171,12 @@ export default function ManageSpace() {
         onSubmit={pickTemplateSuccess}
       />
 
-      <EditSpaceModal isVisible={showEditModal} onClose={() => setShowCreate(false)} onSubmit={handleUpdateSpace} space={editForm} />
-
+      <EditSpaceModal
+        isVisible={showEditModal}
+        onClose={() => setShowCreate(false)}
+        onSubmit={handleUpdateSpace}
+        space={editForm}
+      />
 
       {/* CREATE FROM TEMPLATE MODAL */}
       <Modal isVisible={showCreate} onClose={() => setShowCreate(false)}>
@@ -256,7 +265,7 @@ export default function ManageSpace() {
         </h1>
 
         {/* ⭐ TAB UI */}
-        <div className="flex border-b mb-6 items-center">
+        <div className="flex border-b mb-6 items-end">
           {/* TAB 1 */}
           <button
             onClick={() => setTab("Exhibition")}
@@ -282,142 +291,85 @@ export default function ManageSpace() {
           >
             KHÔNG GIAN MẪU
           </button>
-          {tab === "template" && (
-            <div className="flex ml-auto">
-              <button
-                onClick={openCreate}
-                className="flex items-center gap-2 bg-[#2e2e2e] text-white px-4 py-2 hover:opacity-80"
-              >
-                <MdAdd size={20} /> Lấy thêm không gian mẫu
-              </button>
-            </div>
-          )}
-          {tab === "template" ? (
-            userRole === RoleEnum.Admin ||
-            (userRole === RoleEnum.Designer && (
-              <div className="flex ml-auto">
+          <div className="ml-auto flex items-center gap-3">
+            {tab === "template" && (
+              <div className="flex ">
                 <button
-                  onClick={openCreate}
-                  className="flex items-center gap-2 bg-[#2e2e2e] text-white px-4 py-2 hover:opacity-80"
+                  onClick={() => setModalOpen(true)}
+                  className="flex items-center gap-2 secondary-button"
                 >
-                  <MdAdd size={20} /> Tạo không gian mẫu mới
+                  <MdAdd size={20} /> Lấy không gian mẫu về kho
                 </button>
               </div>
-            ))
-          ) : (
-            <div className="flex ml-auto gap-3">
+            )}
+            {tab === "template" ? (
+              userRole === RoleEnum.Admin ||
+              (userRole === RoleEnum.Designer && (
+                <div className="flex ml-auto">
+                  <button
+                    onClick={openCreate}
+                    className="flex items-center gap-2 primary-button"
+                  >
+                    <MdAdd size={20} /> Tạo không gian mẫu
+                  </button>
+                </div>
+              ))
+            ) : (
               <button
-                onClick={() => setTab("template")}
-                className="flex items-center gap-2 bg-white border-2 border-[#2e2e2e] text-[#2e2e2e] px-4 py-2 hover:!bg-[#2e2e2e] hover:text-white transition-all"
-              >
-                Tạo không gian từ mẫu
-              </button>
-              <button
-                onClick={openCreate}
-                className="flex items-center gap-2 bg-[#2e2e2e] text-white px-4 py-2 border-2 border-[#2e2e2e] hover:!bg-white hover:!text-[#2e2e2e] transition-all"
+                onClick={() => navigate("/create-space")}
+                className="flex items-center gap-2 primary-button"
               >
                 <MdAdd size={20} /> Tạo không gian
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* TABLE */}
         <div className="border border-gray-300 overflow-hidden">
           {/* CARD GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {filteredSpaces.map((space) => (
               <div
                 key={space.id}
-                className="border rounded shadow-sm hover:shadow-md transition overflow-hidden bg-white"
+                className="border-8 border-transparent hover:border-[#2e2e2e] shadow-md p-4 transition cursor-pointer flex flex-col"
               >
-                {/* Thumbnail */}
-                <img
-                  src={space.thumbnail}
-                  className="w-full h-40 object-cover"
-                  alt={space.title}
-                />
+                {/* PREVIEW */}
+                <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden mb-4">
+                  <img
+                    src={space.thumbnail}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
 
-                <div className="p-4 text-[#2e2e2e]">
-                  {/* Title */}
-                  <h3 className="font-bold text-lg truncate">{space.title}</h3>
+                {/* TITLE */}
+                <div className="text-lg font-bold text-[#2e2e2e] truncate">
+                  {space.title}
+                </div>
 
-                  {/* Description */}
-                  <p className="text-sm text-gray-600 line-clamp-2 my-1">
-                    {space.description}
-                  </p>
-
-                  {/* Meta info */}
-                  <div className="text-sm mt-2">
-                    <p>
-                      <span className="font-semibold">Nghệ sĩ: </span>
-                      {space.author}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Hiển thị: </span>
-                      {space.visibility}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Loại: </span>
-                      {space.type}
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex justify-end gap-3 mt-4">
-                    {/* VIEW */}
-                    <button
-                      className="text-orange-600 hover:text-orange-800"
-                      onClick={() =>
-                        window.open(`/exhibition/${space.slug}`, "_blank")
-                      }
-                    >
-                      <MdVisibility size={22} />
+                {/* ACTIONS */}
+                <div className="grid grid-cols-2 gap-2 mt-auto pt-4">
+                  <button
+                    className="secondary-button flex gap-2 justify-center"
+                    onClick={() => window.open("exhibition/" + space.slug)}
+                  >
+                    <MdVisibility size={22} /> Xem
+                  </button>
+                  <button
+                    className="secondary-button flex gap-2 justify-center"
+                    onClick={() => openEdit(space)}
+                  >
+                    <MdEdit size={22} /> Chỉnh sửa
+                  </button>
+                  {(userRole === RoleEnum.Admin ||
+                    userRole == RoleEnum.Designer) && (
+                    <button className="secondary-button flex gap-2 justify-center">
+                      <MdAdd size={22} /> Tạo phòng
                     </button>
-
-                    {/* TEMPLATE ACTIONS */}
-                    {tab === "template" ? (
-                      <>
-                        <button
-                          className="text-green-600 hover:text-green-800"
-                          onClick={() => openCreate(space)}
-                        >
-                          <MdAdd size={22} />
-                        </button>
-                        {(userRole === RoleEnum.Admin ||
-                          userRole === RoleEnum.Designer) && (
-                          <>
-                            <button
-                              className="text-gray-600 hover:text-gray-800"
-                              onClick={() =>
-                                window.open(
-                                  `/exhibition-edit/${space.slug}`,
-                                  "_blank"
-                                )
-                              }
-                            >
-                              <MdSearch size={22} />
-                            </button>
-
-                            <button
-                              className="text-blue-600 hover:text-blue-800"
-                              onClick={() => openEdit(space)}
-                            >
-                              <MdEdit size={22} />
-                            </button>
-                          </>
-                        )}
-                      </>
-                    ) : (
-                      /* EDIT (for exhibition items) */
-                      <button
-                        className="text-blue-600 hover:text-blue-800"
-                        onClick={() => openEdit(space)}
-                      >
-                        <MdEdit size={22} />
-                      </button>
-                    )}
-                  </div>
+                  )}
+                  <button className="secondary-button flex gap-2 justify-center">
+                    <MdDelete size={22} /> Xóa
+                  </button>
                 </div>
               </div>
             ))}

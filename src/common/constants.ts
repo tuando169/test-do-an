@@ -7,7 +7,11 @@ export enum RoleEnum {
   Client = "client",
   Guest = "guest",
 }
-
+export enum NewsItemTypeEnum {
+  Image = "image",
+  Object3D = "object3d",
+  Text = "text",
+}
 export const apiEndpoints = {
   template: {
     getAll: `${BASE_URL}/template`,
@@ -68,39 +72,16 @@ export const apiEndpoints = {
     update: `${BASE_URL}/texture`,
     deleteById: (id: string) => `${BASE_URL}/texture/${id}`,
   },
+  news: {
+    create: `${BASE_URL}/news`,
+    getAll: `${BASE_URL}/news`,
+    updateById: (id: string) => `${BASE_URL}/news/${id}`,
+    deleteById: (id: string) => `${BASE_URL}/news/${id}`,
+  },
+  newsItem: {
+    create: `${BASE_URL}/news-item`,
+    getAll: `${BASE_URL}/news-item`,
+    updateById: (id: string) => `${BASE_URL}/news-item/${id}`,
+    deleteById: (id: string) => `${BASE_URL}/news-item/${id}`,
+  },
 };
-
-export const newsFake = [
-  {
-    id: 1,
-    title: "Triển lãm nghệ thuật 3D mở cửa trở lại",
-    description:
-      "Không gian triển lãm 3D phiên bản mới mang đến trải nghiệm chân thực và sống động hơn bao giờ hết.",
-    thumbnail: "/images/news1.jpg",
-    date: "2025-01-21",
-  },
-  {
-    id: 2,
-    title: "Cập nhật tính năng: xây gallery chỉ với 3 bước",
-    description:
-      "Người dùng giờ có thể tạo triển lãm của riêng mình nhanh hơn với công cụ smart builder.",
-    thumbnail: "/images/news2.jpg",
-    date: "2025-01-18",
-  },
-  {
-    id: 3,
-    title: "Sự kiện nghệ thuật xuân 2025",
-    description:
-      "Hơn 50 nghệ sĩ tham gia trưng bày tác phẩm mới nhất tại sự kiện ArtSpring 2025.",
-    thumbnail: "/images/news3.jpg",
-    date: "2025-01-10",
-  },
-  {
-    id: 4,
-    title: "Ra mắt tính năng xem VR",
-    description:
-      "Trải nghiệm không gian triển lãm qua kính VR, mang lại cảm giác chân thực như đang đứng tại phòng trưng bày.",
-    thumbnail: "/images/news4.jpg",
-    date: "2025-01-05",
-  },
-];

@@ -1,8 +1,7 @@
-import axiosClient from '../common/axiosClient';
-import { setCookie, getCookie, deleteAllCookies } from '../common/cookies';
-import { apiEndpoints } from '@/common/constants';
+import axiosClient from "../common/axiosClient";
+import { setCookie, getCookie, deleteAllCookies } from "../common/cookies";
+import { apiEndpoints } from "@/common/constants";
 
-// ====== TYPES ======
 export interface SignupResponse {
   success: boolean;
   message?: string;
@@ -33,18 +32,12 @@ export interface RefreshResponse {
   };
 }
 
-// ====== INTERNAL STATE ======
 let currentUser: any = null;
 let hasLoggedOut = false;
 let isRefreshing = false;
 let refreshPromise: Promise<string> | null = null;
 
-// ==========================================================
-//                      AUTH API OBJECT
-// ==========================================================
-
 export const AuthApi = {
-  /** --------------------- SIGN UP --------------------- */
   async signup(payload: SignupPayload): Promise<void> {
     try {
       const res = await axiosClient.post(apiEndpoints.auth.signup, payload);
@@ -54,13 +47,12 @@ export const AuthApi = {
       const message =
         err.response?.data?.message ||
         err.message ||
-        'Đăng ký thất bại, vui lòng thử lại';
+        "Đăng ký thất bại, vui lòng thử lại";
 
       throw new Error(message);
     }
   },
 
-  /** --------------------- LOGIN ------------------------ */
   async login(email: string, password: string): Promise<any> {
     const res = await axiosClient.post(apiEndpoints.auth.login, {
       email,
@@ -71,8 +63,8 @@ export const AuthApi = {
     const accessToken = data?.session?.access_token;
     const refreshToken = data?.session?.refresh_token;
 
-    setCookie('access_token', accessToken, 1);
-    setCookie('refresh_token', refreshToken, 7);
+    setCookie("access_token", accessToken, 1);
+    setCookie("refresh_token", refreshToken, 7);
 
     hasLoggedOut = false;
     return data.user;
@@ -80,11 +72,11 @@ export const AuthApi = {
 
   /** ------------------ GET TOKEN ----------------------- */
   getAccessToken(): string | null {
-    return getCookie('access_token');
+    return getCookie("access_token");
   },
 
   getRefreshToken(): string | null {
-    return getCookie('refresh_token');
+    return getCookie("refresh_token");
   },
 
   getUserInfo(): any {
@@ -96,7 +88,7 @@ export const AuthApi = {
     const refreshToken = AuthApi.getRefreshToken();
     if (!refreshToken) {
       AuthApi.forceLogout();
-      throw new Error('Không có refresh token — cần đăng nhập lại');
+      throw new Error("Không có refresh token — cần đăng nhập lại");
     }
 
     if (isRefreshing && refreshPromise) return refreshPromise;
@@ -109,10 +101,10 @@ export const AuthApi = {
         });
         const data: RefreshResponse = res.data;
 
-        if (!data.success) throw new Error('Làm mới token thất bại');
+        if (!data.success) throw new Error("Làm mới token thất bại");
 
         const newToken = data?.data?.session?.access_token;
-        setCookie('access_token', newToken, 1);
+        setCookie("access_token", newToken, 1);
 
         return newToken;
       } catch (err) {
@@ -132,13 +124,13 @@ export const AuthApi = {
     let token = AuthApi.getAccessToken();
     if (!token) {
       AuthApi.forceLogout();
-      throw new Error('Không có access token — cần đăng nhập lại');
+      throw new Error("Không có access token — cần đăng nhập lại");
     }
 
     try {
       const res = await axiosClient({
         url,
-        method: options.method || 'GET',
+        method: options.method || "GET",
         headers: {
           Authorization: `Bearer ${token}`,
           ...(options.headers || {}),
@@ -154,7 +146,7 @@ export const AuthApi = {
 
           return await axiosClient({
             url,
-            method: options.method || 'GET',
+            method: options.method || "GET",
             headers: {
               Authorization: `Bearer ${newToken}`,
               ...(options.headers || {}),
@@ -164,7 +156,7 @@ export const AuthApi = {
         } catch {
           AuthApi.forceLogout();
           throw new Error(
-            'Phiên đăng nhập đã hết hạn — vui lòng đăng nhập lại.'
+            "Phiên đăng nhập đã hết hạn — vui lòng đăng nhập lại."
           );
         }
       }
@@ -176,7 +168,7 @@ export const AuthApi = {
   /** ------------------ INIT CURRENT USER --------------- */
   async initCurrentUser(): Promise<any> {
     try {
-      const res = await axiosClient.get(apiEndpoints.user.getById(''));
+      const res = await axiosClient.get(apiEndpoints.user.getById(""));
       currentUser = res.data || null;
       return currentUser;
     } catch {
@@ -201,10 +193,9 @@ export const AuthApi = {
   forceLogout() {
     if (hasLoggedOut) return;
     hasLoggedOut = true;
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
     deleteAllCookies();
     currentUser = null;
-
-    console.warn('Token không hợp lệ — đã xóa toàn bộ cookie');
+    console.warn("Token không hợp lệ — đã xóa toàn bộ cookie");
   },
 };

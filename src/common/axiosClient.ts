@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { AuthApi } from '@/api/authApi';
+import axios from "axios";
+import { AuthApi } from "@/api/authApi";
 
 const axiosClient = axios.create({});
 

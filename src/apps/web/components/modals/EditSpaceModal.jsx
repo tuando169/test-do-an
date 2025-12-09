@@ -15,19 +15,21 @@ export default function EditSpaceModal({
     id: "",
     title: "",
     description: "",
+    slug: "",
     visibility: "public",
     thumbnail: "",
   });
 
   const [thumbnailPreview, setThumbnailPreview] = useState("");
 
-  // Khi mở modal → load data vào form
+  // Load data khi mở modal
   useEffect(() => {
     if (!space) return;
 
     setForm({
       id: space.id,
       title: space.title,
+      slug: space.slug,
       description: space.description,
       visibility: space.visibility,
       thumbnail: space.thumbnail,
@@ -59,52 +61,86 @@ export default function EditSpaceModal({
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
-      <div className="modalRegister__title">CHỈNH SỬA KHÔNG GIAN</div>
+      <div className="text-2xl font-bold text-gray-800 mb-4 text-center ">
+        Chỉnh sửa không gian
+      </div>
 
-      <form className="modalRegister__form" onSubmit={handleSubmit}>
-        <label className="modalRegister__form__label">Tên</label>
-        <input
-          type="text"
-          className="modalRegister__form__input"
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-        />
+      <form onSubmit={handleSubmit} className="space-y-4 w-[500px]">
+        {/* Tên */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Tên không gian
+          </label>
+          <input
+            type="text"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:ring focus:ring-black/20 outline-none"
+          />
+        </div>
 
-        <label className="modalRegister__form__label">Mô tả</label>
-        <textarea
-          className="modalRegister__form__input"
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-        />
+        {/* Mô tả */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Mô tả</label>
+          <textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            className="w-full border border-gray-300 rounded px-3 py-2 h-28 focus:ring focus:ring-black/20 outline-none"
+          />
+        </div>
 
-        <label className="modalRegister__form__label">Trạng thái</label>
-        <select
-          value={form.visibility}
-          onChange={(e) => setForm({ ...form, visibility: e.target.value })}
-          className="modalRegister__form__input"
-        >
-          <option value="public">Công khai</option>
-          <option value="private">Riêng tư</option>
-        </select>
+        {/* Trạng thái */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Trạng thái hiển thị
+          </label>
+          <select
+            value={form.visibility}
+            onChange={(e) => setForm({ ...form, visibility: e.target.value })}
+            className="w-full border border-gray-300 rounded px-3 py-2 bg-white cursor-pointer focus:ring focus:ring-black/20 outline-none"
+          >
+            <option value="public">Công khai</option>
+            <option value="private">Riêng tư</option>
+          </select>
+        </div>
 
-        <label className="modalRegister__form__label">Thumbnail</label>
-        <img
-          src={thumbnailPreview}
-          className="w-full h-40 object-cover border mb-3"
-        />
+        {/* Thumbnail */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Thumbnail
+          </label>
 
-        <input
-          type="file"
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+          <img
+            src={thumbnailPreview}
+            className="w-full h-40 object-cover border rounded mb-3"
+          />
 
-            setForm({ ...form, thumbnail: file });
-            setThumbnailPreview(URL.createObjectURL(file));
-          }}
-        />
+          <input
+            type="file"
+            className="block w-full text-sm text-gray-700"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (!file) return;
 
-        <button className="modalRegister__form__button">CẬP NHẬT</button>
+              setForm({ ...form, thumbnail: file });
+              setThumbnailPreview(URL.createObjectURL(file));
+            }}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <button type="submit" className=" primary-button mt-4">
+            Cập nhật
+          </button>
+          <button
+            className=" secondary-button mt-4"
+            onClick={() =>
+              (window.location.href = `exhibition-edit/` + form.slug)
+            }
+          >
+            Sửa phòng 3D
+          </button>
+        </div>
       </form>
     </Modal>
   );
