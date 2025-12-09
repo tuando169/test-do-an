@@ -22,6 +22,7 @@ import ManageResource from './apps/web/pages/manage-resource/ManageResource';
 import PricingPage from './apps/web/pages/pricing-page/PricingPage';
 import ManageUser from './apps/web/pages/manage-user/ManageUser';
 import ManageNews from './apps/web/pages/manage-news/ManageNews';
+import CreateSpace from './apps/web/pages/create-space/CreateSpace';
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomeClient /> },
       { path: '/listspace', element: <WebListSpace /> },
+      { path: '/create-space', element: <CreateSpace /> },
       { path: '/about', element: <WebAboutUs /> },
       { path: '/contact', element: <WebContact /> },
       { path: '/space/:prop', element: <WebSpace /> },

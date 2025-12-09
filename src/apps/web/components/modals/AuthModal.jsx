@@ -25,7 +25,11 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
     AuthApi.login(form.email, form.password)
       .then((data) => {
         localStorage.setItem('user', data.id);
-        if (onSuccess) onSuccess();
+        if (onSuccess) onSuccess(data.id);
+        api.success({
+          title: 'Đăng nhập thành công',
+          description: 'Chào mừng bạn quay lại!',
+        });
         onClose();
       })
       .catch(() => {
@@ -79,10 +83,11 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
             ĐĂNG NHẬP
           </h2>
 
-          <div className='flex flex-col gap-3'>
+          <form className='flex flex-col gap-3' onSubmit={handleLogin}>
             <label>Email</label>
             <input
               name='email'
+              required
               className='border p-3  w-full'
               value={form.email}
               onChange={handleChange}
@@ -92,15 +97,14 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
             <input
               type='password'
               name='password'
+              required
               className='border p-3  w-full'
               value={form.password}
               onChange={handleChange}
             />
 
-            <button onClick={handleLogin} className='primary-button'>
-              ĐĂNG NHẬP
-            </button>
-          </div>
+            <button className='primary-button'>ĐĂNG NHẬP</button>
+          </form>
 
           <hr className='w-full bg-[#2e2e2e] my-3' />
 
@@ -120,7 +124,7 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
             ĐĂNG KÝ
           </h2>
 
-          <div className='flex flex-col gap-3'>
+          <form className='flex flex-col gap-3' onSubmit={handleRegister}>
             <label>Tên của bạn</label>
             <input
               name='name'
@@ -143,6 +147,7 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
             <label>Email</label>
             <input
               name='email'
+              required
               className='border p-3  w-full'
               value={form.email}
               onChange={handleChange}
@@ -152,6 +157,7 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
             <input
               type='password'
               name='password'
+              required
               className='border p-3  w-full'
               value={form.password}
               onChange={handleChange}
@@ -161,15 +167,14 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
             <input
               type='password'
               name='confirmPassword'
+              required
               className='border p-3  w-full'
               value={form.confirmPassword}
               onChange={handleChange}
             />
 
-            <button onClick={handleRegister} className='primary-button'>
-              ĐĂNG KÝ
-            </button>
-          </div>
+            <button className='primary-button'>ĐĂNG KÝ</button>
+          </form>
 
           <hr className='w-full bg-[#2e2e2e] my-3' />
 

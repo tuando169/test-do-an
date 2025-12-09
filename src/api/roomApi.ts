@@ -64,7 +64,7 @@ export const RoomApi = {
   },
 
   // Tạo phòng
-  async create(payload: RoomUploadData) {
+  async create(payload: RoomUploadData): Promise<RoomData> {
     try {
       const rooms = await RoomApi.getAll();
       const same = rooms.filter((r) => r.title?.startsWith(payload.title!));
@@ -82,7 +82,7 @@ export const RoomApi = {
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
 
-      const finalSlug = `${localStorage.getItem('userId')}-${slugBase}`;
+      const finalSlug = `${localStorage.getItem('user')}-${slugBase}`;
       const formData = new FormData();
 
       formData.append('title', payload.title!);
@@ -93,6 +93,7 @@ export const RoomApi = {
 
       if (payload.thumbnail) formData.append('thumbnail', payload.thumbnail);
       if (payload.type) formData.append('type', payload.type);
+      console.log(payload, formData);
 
       const res = await axiosClient.post(apiEndpoints.room.create, formData);
       return res.data;
@@ -103,8 +104,8 @@ export const RoomApi = {
   },
 
   // Lấy phòng theo slug
-  async getOneBySlug(slug: string) {
-    const list = await RoomApi.getAll();
+  async getOnePublicBySlug(slug: string) {
+    const list = await RoomApi.getPublicRoomList();
     const room = list.find((r) => r.slug === slug);
     return room;
   },

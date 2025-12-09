@@ -7,7 +7,7 @@
 .primary-button {
   background-color: #2e2e2e;
   color: white;
-  padding: 12px 0;
+  padding: 12px 24px;
   transition: all 0.3s ease;
   border: 2px solid #2e2e2e;
   text-align: center;
@@ -22,7 +22,7 @@
 .secondary-button {
   background-color: white;
   color: #2e2e2e;
-  padding: 12px 0;
+  padding: 12px 24px;
   transition: all 0.3s ease;
   border: 2px solid #2e2e2e;
   text-align: center;

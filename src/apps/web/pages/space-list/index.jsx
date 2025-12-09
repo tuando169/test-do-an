@@ -4,36 +4,29 @@ import { MdAdd, MdArrowOutward } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { RoomApi } from '@/api/roomApi';
+import AuthModal from '../../components/modals/AuthModal';
 
 function ListSpace() {
   const [publicRooms, setPublicRooms] = useState([]);
-  const [templateRooms, setTemplateRooms] = useState([]);
 
-  // Trạng thái từ khóa tìm kiếm
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [tab, setTab] = useState('');
-  const [isShowTab, setIsShowTab] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  // Danh sách được lọc
   const filteredSpaces = publicRooms.filter((khongGian) => {
-    // Lọc theo tên
     const matchTitle = khongGian.title
       .toLowerCase()
       .includes(searchKeyword.toLowerCase());
 
-    // Lọc theo tab
-    const matchTab =
-      tab === 'template'
-        ? khongGian.type === 'template'
-        : khongGian.type !== 'template';
-
-    return matchTitle && matchTab;
+    return matchTitle;
   });
 
-  async function checkUser() {
+  function handleCreateClick() {
     const userId = localStorage.getItem('user');
-    if (userId) setIsShowTab(true);
-    else setIsShowTab(false);
+
+    if (!userId) {
+      setShowLoginPopup(true);
+      return;
+    }
   }
 
   useEffect(() => {
@@ -46,7 +39,6 @@ function ListSpace() {
       }
     };
     fetchData();
-    checkUser();
   }, []);
 
   return (
@@ -69,8 +61,8 @@ function ListSpace() {
                   <FaSearch />
                 </div>
               </div>
-              <div className='ListSpace__inner__header__button'>
-                <p className=''>TẠO KHÔNG GIAN</p>
+              <div className='relative ml-4' onClick={handleCreateClick}>
+                <div className='primary-button'>TẠO KHÔNG GIAN</div>
               </div>
             </div>
             <input
@@ -81,39 +73,11 @@ function ListSpace() {
             />
             <input type='radio' name='khonggian' id='khonggiansangtao' />
 
-            <div
-              className='ListSpace__inner__tab '
-              style={{ alignItems: 'end' }}
-            >
-              <label
-                htmlFor='khonggiantrungbay'
-                className='ListSpace__inner__tab__item1'
-                onClick={() => setTab('trungbay')}
-              >
-                KHÔNG GIAN TRƯNG BÀY
-              </label>
-              <label
-                htmlFor='khonggiansangtao'
-                className='ListSpace__inner__tab__item2'
-                onClick={() => setTab('template')}
-              >
-                KHÔNG GIAN MẪU
-              </label>
-              <div className='flex ml-auto'>
-                <button className='flex items-center gap-2 bg-[#2e2e2e] text-white px-4 py-2 hover:opacity-80'>
-                  <MdAdd size={20} /> TẠO KHÔNG GIAN TỪ MẪU
-                </button>
-              </div>
-            </div>
             <div className='ListSpace__inner__content'>
               <div className='row'>
                 {filteredSpaces.map((khongGian) => (
                   <Link
-                    to={
-                      tab == 'template'
-                        ? `/exhibition-edit/${khongGian?.slug}`
-                        : `/space/${khongGian.slug}`
-                    }
+                    to={`/space/${khongGian.slug}`}
                     className='col-md-6'
                     key={khongGian.id}
                   >
@@ -146,9 +110,9 @@ function ListSpace() {
                         }}
                       ></div>
                       <div className='ListSpace__inner__content__box__button'>
-                        <Link>
+                        <Link to={`/space/${khongGian.slug}`}>
                           <div className='ListSpace__inner__content__box__button__text'>
-                            {tab === 'template' ? ' TẠO TỪ MẪU' : ' CHI TIẾT'}
+                            CHI TIẾT
                           </div>
                           <div className='ListSpace__inner__content__box__button__icon'>
                             <MdArrowOutward />
@@ -163,6 +127,14 @@ function ListSpace() {
           </div>
         </div>
       </div>
+      <AuthModal
+        isVisible={showLoginPopup}
+        onClose={() => setShowLoginPopup(false)}
+        initMode='login'
+        onSuccess={() => {
+          setShowLoginPopup(false);
+        }}
+      />
     </>
   );
 }

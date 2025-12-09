@@ -143,7 +143,7 @@ export default function ManageResource() {
             ${tab === 'image' ? 'bg-[#2e2e2e] text-white' : 'text-[#2e2e2e]'}
           `}
         >
-          Thư Viện Ảnh
+          Thư Viện Tranh
         </button>
 
         <button

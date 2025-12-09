@@ -127,6 +127,8 @@ function LayoutDefault() {
       onOk() {
         AuthApi.logout();
         setCurrentUser(null);
+        setUserId(null);
+        setForce(force + 1);
         navigate('/');
         api.success({
           title: 'Đăng xuất',
@@ -158,6 +160,10 @@ function LayoutDefault() {
     fetchCurrentUser();
     fetchSpaces();
   }, []);
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, [userId]);
 
   useEffect(() => {
     filterMenu();
@@ -474,12 +480,8 @@ function LayoutDefault() {
           setShowModalRegister(false);
         }}
         initMode={showModalRegister ? 'register' : 'login'}
-        onSuccess={() => {
-          api.success({
-            title: 'Đăng nhập thành công',
-            description: 'Chào mừng bạn quay lại!',
-          });
-          fetchCurrentUser();
+        onSuccess={(userId) => {
+          setUserId(userId);
         }}
       />
     </>

@@ -61,7 +61,7 @@ function Space() {
     const fetchData = async () => {
       setKhongGian(null);
       try {
-        const data = await RoomApi.getOneBySlug(prop);
+        const data = await RoomApi.getOnePublicBySlug(prop);
         setKhongGian(data);
       } catch (err) {
         console.error('Lỗi khi tải danh sách exhibition:', err);

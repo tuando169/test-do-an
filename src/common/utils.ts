@@ -5,8 +5,8 @@ const permissionMapping = new Map<string, string[]>([
     RoleEnum.Admin,
     ['/manage/user', '/manage/news', '/manage', '/manage/space'],
   ],
-  [RoleEnum.Designer, ['/manage', '/manage/space']],
-  [RoleEnum.Client, ['/manage', '/manage/space']],
+  [RoleEnum.Designer, ['/manage', '/manage/space', '/manage/resource']],
+  [RoleEnum.Client, ['/manage', '/manage/space', '/manage/resource']],
   [
     RoleEnum.Guest,
     ['/', '/listspace', '/news', '/about', '/contact', '/guide', '/info'],

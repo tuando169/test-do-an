@@ -4,12 +4,6 @@ import { ImCross } from 'react-icons/im';
 export default function Modal({ isVisible, onClose, children }) {
   const modalRef = useRef(null);
 
-  const handleClickOutside = (e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
-      onClose();
-    }
-  };
-
   return (
     <div
       className={`
@@ -22,7 +16,6 @@ export default function Modal({ isVisible, onClose, children }) {
             : 'opacity-0 pointer-events-none'
         }
       `}
-      onClick={handleClickOutside}
     >
       {/* Overlay */}
       <div

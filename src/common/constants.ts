@@ -1,7 +1,5 @@
-import { get } from 'node_modules/axios/index.cjs';
-
-// const BASE_URL = 'http://localhost:8000';
-const BASE_URL = "https://3d-gallery-be.vercel.app";
+const BASE_URL = 'http://localhost:8000';
+// const BASE_URL = "https://3d-gallery-be.vercel.app";
 
 export enum RoleEnum {
   Admin = 'admin',
