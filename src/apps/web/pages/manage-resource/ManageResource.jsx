@@ -3,14 +3,19 @@ import { ImageApi } from "@/api/imageApi";
 import { Object3dApi } from "@/api/object3dApi";
 import { useEffect, useState } from "react";
 import { MdDelete, MdEdit, MdAdd, MdClose } from "react-icons/md";
-import ModalCreateResource from "./modals/CreateMediaModel";
+import ModalCreateResource from "./modals/CreateMediaModal";
 import { Modal as ModalAnt, notification } from "antd";
+import { TextureApi } from "@/api/textureApi";
+import { UserApi } from "@/api/userApi";
+import { RoleEnum } from "@/common/constants";
 
 export default function ManageResource() {
   const [api, contextHolder] = notification.useNotification();
 
   const [tab, setTab] = useState("image");
+  const [userRole, setUserRole] = useState(null);
 
+  const [textures, setTextures] = useState([]);
   const [images, setImages] = useState([]);
   const [objects, setObjects] = useState([]);
   const [audios, setAudios] = useState([]);
@@ -23,11 +28,19 @@ export default function ManageResource() {
     file_url: "",
     file: null,
     room_id: "",
+    alb: "",
+    nor: "",
+    orm: "",
+    texture_for: "",
   });
 
   const loadImages = async () => {
     const data = await ImageApi.getList();
     setImages(data.sort((a, b) => a.title.localeCompare(b.title)));
+  };
+  const loadTextures = async () => {
+    const data = await TextureApi.getAll();
+    setTextures(data.sort((a, b) => a.title.localeCompare(b.title)));
   };
 
   const loadObjects = async () => {
@@ -41,6 +54,16 @@ export default function ManageResource() {
   };
 
   const deleteItem = async (id, type) => {
+    if (type === "texture") {
+      await TextureApi.delete(id);
+      setTextures(textures.filter((item) => item.id !== id));
+      api.success({
+        title: "Thành công",
+        description: "Xóa texture thành công",
+      });
+      return;
+    }
+
     if (type === "image") {
       await ImageApi.delete(id);
       setImages(images.filter((item) => item.id !== id));
@@ -74,10 +97,18 @@ export default function ManageResource() {
     loadImages();
     loadObjects();
     loadAudio();
+    loadTextures();
+  }
+
+  async function fetchUserRole() {
+    const userId = localStorage.getItem("user");
+    const data = await UserApi.getById(userId);
+    setUserRole(data.role);
   }
 
   useEffect(() => {
     fetchData();
+    fetchUserRole();
   }, []);
 
   useEffect(() => {
@@ -86,23 +117,36 @@ export default function ManageResource() {
 
   useEffect(() => {
     fetchDisplayData();
-  }, [images, objects, audios]);
+  }, [images, objects, audios, textures]);
 
   function fetchDisplayData() {
     if (tab === "image") setDisplayData(images);
     else if (tab === "object") setDisplayData(objects);
-    else setDisplayData(audios);
+    else if (tab === "audio") setDisplayData(audios);
+    else if (tab === "texture") setDisplayData(textures);
   }
 
   // ========== POPUP ==========
   const openEdit = (item) => {
-    setForm({
-      id: item.id,
-      title: item.title,
-      file_url: item.file_url,
-      file: null,
-      room_id: item.room_id,
-    });
+    if (tab === "texture") {
+      setForm({
+        id: item.id,
+        title: item.title,
+        alb: item.alb_url,
+        nor: item.nor_url,
+        orm: item.orm_url,
+        texture_for: item.texture_for,
+      });
+    } else
+      setForm({
+        id: item.id,
+        title: item.title,
+        file_url: item.file_url,
+        file: null,
+        room_id: item.room_id,
+      });
+    console.log("form", form);
+
     setModalOpen(true);
   };
 
@@ -112,6 +156,10 @@ export default function ManageResource() {
       url: "",
       file: null,
       room_id: "",
+      alb: "",
+      nor: "",
+      orm: "",
+      texture_for: "",
     });
     setModalOpen(true);
   };
@@ -166,6 +214,15 @@ export default function ManageResource() {
           >
             Thư Viện Audio
           </button>
+          {userRole == RoleEnum.Admin && (
+            <button
+              onClick={() => setTab("texture")}
+              className={`px-6 py-2 font-semibold tracking-wide 
+  ${tab === "texture" ? "bg-[#2e2e2e] text-white" : "text-[#2e2e2e]"}`}
+            >
+              Thư Viện Texture
+            </button>
+          )}
 
           <button
             onClick={openCreate}
@@ -211,6 +268,42 @@ export default function ManageResource() {
                   >
                     <source src={item.file_url} />
                   </audio>
+                )}
+                {tab === "texture" && (
+                  <div className="w-full h-full flex  overflow-hidden shadow-md cursor-pointer">
+                    {/* Albedo */}
+                    <div
+                      className="w-1/3 h-full hover:brightness-75 transition-all"
+                      onClick={() => window.open(item.alb_url)}
+                    >
+                      <img
+                        src={item.alb_url}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* Normal */}
+                    <div
+                      className="w-1/3 h-full hover:brightness-75 transition-all"
+                      onClick={() => window.open(item.nor_url)}
+                    >
+                      <img
+                        src={item.nor_url}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* ORM */}
+                    <div
+                      className="w-1/3 h-full hover:brightness-75 transition-all"
+                      onClick={() => window.open(item.orm_url)}
+                    >
+                      <img
+                        src={item.orm_url}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
 

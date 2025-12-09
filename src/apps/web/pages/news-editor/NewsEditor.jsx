@@ -2,17 +2,17 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { notification, Modal } from "antd";
 import { NewsApi } from "@/api/newsApi";
-import slugify from "slugify";
 
 export default function NewsEditor() {
   const { slug, mode } = useParams();
 
   const readonly = mode === "view"; // <--- CHẾ ĐỘ READONLY
 
-  const [api] = notification.useNotification();
+  const [api, contextHolder] = notification.useNotification();
   const isEdit = !!slug && !readonly;
+  const [saving, setSaving] = useState(false);
 
-  const [thumbnailPreview, setThumbnailPreview] = useState("");
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
 
   const [news, setNews] = useState({
     id: "",
@@ -89,62 +89,39 @@ export default function NewsEditor() {
   };
 
   // ==========================
-  // BUILD FORM DATA
-  // ==========================
-  function buildFormData() {
-    const form = new FormData();
-
-    form.append("title", news.title);
-    form.append("description", news.description);
-    form.append("visibility", news.visibility);
-
-    const finalSlug =
-      news.slug || slugify(news.title, { lower: true, strict: true });
-
-    form.append("slug", finalSlug);
-
-    if (news.thumbnail instanceof File) {
-      form.append("thumbnail", news.thumbnail);
-    }
-
-    const layoutToSend = news.layout_json.map((block) => ({
-      type: block.type,
-      content: typeof block.content === "string" ? block.content : "",
-    }));
-
-    form.append("layout_json", JSON.stringify(layoutToSend));
-
-    news.layout_json.forEach((block, idx) => {
-      if (block.content instanceof File) {
-        form.append(`items[${idx}]`, block.content);
-      }
-    });
-
-    return form;
-  }
-
-  // ==========================
   // SAVE NEWS
   // ==========================
   async function save() {
     try {
-      const form = buildFormData();
+      setSaving(true); // BẮT ĐẦU LOAD
 
       if (isEdit) {
-        await NewsApi.update(news.id, form);
-        api.success({ message: "Cập nhật thành công!" });
+        await NewsApi.update(news.id, news);
+        api.success({
+          title: "Cập nhật thành công!",
+          description: "Tin tức đã được cập nhật.",
+        });
       } else {
-        await NewsApi.create(form);
-        api.success({ message: "Tạo mới thành công!" });
+        await NewsApi.create(news);
+        api.success({
+          title: "Tạo mới thành công!",
+          description: "Tin tức đã được tạo.",
+        });
       }
     } catch (err) {
       console.error(err);
-      api.error({ message: "Lỗi khi lưu" });
+      api.error({
+        title: "Lỗi khi lưu",
+        description: "Đã có lỗi xảy ra khi lưu tin tức.",
+      });
+    } finally {
+      setSaving(false); // KẾT THÚC LOAD
     }
   }
 
   return (
     <div className="container-main flex flex-col py-10 max-w-5xl mx-auto">
+      {contextHolder}
       <h1 className="text-3xl font-bold mb-6">
         {readonly
           ? "Xem tin tức"
@@ -235,7 +212,7 @@ export default function NewsEditor() {
                 {block.preview || block.content ? (
                   <img
                     src={block.preview || block.content}
-                    className="w-full h-56 object-cover rounded mb-3"
+                    className="w-full h-56 object-cover  mb-3"
                   />
                 ) : null}
 
@@ -310,8 +287,24 @@ export default function NewsEditor() {
 
       {/* SAVE BUTTON */}
       {!readonly && (
-        <button onClick={save} className="w-full bg-black text-white py-2 mt-6">
-          {isEdit ? "LƯU THAY ĐỔI" : "TẠO MỚI"}
+        <button
+          onClick={save}
+          disabled={saving}
+          className={`w-full py-2 mt-6 text-white 
+    ${
+      saving ? "bg-gray-500 cursor-not-allowed" : "bg-black hover:bg-gray-800"
+    }`}
+        >
+          {saving ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ĐANG LƯU...
+            </div>
+          ) : isEdit ? (
+            "LƯU THAY ĐỔI"
+          ) : (
+            "TẠO MỚI"
+          )}
         </button>
       )}
     </div>

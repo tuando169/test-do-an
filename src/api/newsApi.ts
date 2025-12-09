@@ -26,11 +26,18 @@ function buildNewsFormData(data: NewsUploadData) {
       return;
     }
 
-    // IMAGE / 3D
-    layoutJsonToSend.push({
-      type: block.type,
-      content: "", // BE không dùng, FE không dùng
-    });
+    // IMAGE / 3!
+    if (typeof block.content !== "string")
+      layoutJsonToSend.push({
+        type: block.type,
+        content: "",
+      });
+    else {
+      layoutJsonToSend.push({
+        type: block.type,
+        content: block.content,
+      });
+    }
 
     if (block.content instanceof File) {
       form.append(`items[${idx}]`, block.content);
@@ -53,16 +60,9 @@ export const NewsApi = {
   },
 
   async update(id, data) {
-    const form = new FormData();
-    form.append("title", data.title);
-    form.append("description", data.description);
-    form.append("visibility", data.visibility);
-    form.append("slug", data.slug);
-    form.append("layout_json", JSON.stringify(data.layout_json));
+    console.log(data);
 
-    if (data.thumbnail instanceof File) {
-      form.append("thumbnail", data.thumbnail);
-    }
+    const form = buildNewsFormData(data);
 
     const res = await axiosClient.patch(apiEndpoints.news.updateById(id), form);
     return res.data;

@@ -482,9 +482,6 @@ function LayoutDefault() {
         initMode={showModalRegister ? "register" : "login"}
         onSuccess={(userId) => {
           setUserId(userId);
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
         }}
       />
     </>

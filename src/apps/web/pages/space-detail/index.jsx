@@ -5,12 +5,26 @@ import Home_Section2 from "../../components/recommend-spaces";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { RoomApi } from "@/api/roomApi";
+import { UserApi } from "@/api/userApi";
+import { RoleEnum } from "@/common/constants";
 
 function Space() {
   const { prop } = useParams(); // Lấy prop từ URL
 
   // Tìm thông tin không gian theo prop
   const [khongGian, setKhongGian] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+
+  async function fetchUserRole() {
+    const userId = localStorage.getItem("user");
+    const data = await UserApi.getById(userId);
+
+    setUserRole(data.role);
+  }
+
+  useEffect(() => {
+    fetchUserRole();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +43,6 @@ function Space() {
     return <div className="text-center mt-5">Đang tải không gian!</div>;
   }
 
-  // Tách description bằng dấu `/`
   const descriptionParts = (khongGian?.description || "").split("/");
 
   return (
@@ -47,7 +60,7 @@ function Space() {
               style={{ boxShadow: "0 0 28px black" }}
             >
               <div className="absolute top-0 left-0 w-full h-full bg-white opacity-80"></div>
-              <div className="relative w-[520px]">
+              <div className="relative w-[540px]">
                 <div className="font-bold text-[80px]">{khongGian?.title}</div>
                 <div className="Space__inner__info text-xl gap-5">
                   <div className="flex flex-col gap-2 font-semibold">
@@ -76,25 +89,27 @@ function Space() {
                   </div>
                 </div>
                 <div className="flex gap-3 mt-4">
-                  <Link to={`/exhibition-edit/${khongGian?.slug}`} className="">
-                    <div className="Space__inner__button__inner">
-                      <div className="Space__inner__button__inner__text uppercase">
-                        Chỉnh sửa KHÔNG GIAN
-                      </div>
-                      <div className="Space__inner__button__inner__icon">
-                        <MdArrowOutward />
-                      </div>
-                    </div>
-                  </Link>
+                  {userRole == RoleEnum.Admin ||
+                    (khongGian?.owner_id == localStorage.getItem("user") && (
+                      <Link
+                        to={`/exhibition-edit/${khongGian?.slug}`}
+                        className=""
+                      >
+                        <div className="flex gap-1 secondary-button items-center">
+                          <div className=" uppercase">Chỉnh sửa KHÔNG GIAN</div>
+                          <div className="Space__inner__button__inner__icon">
+                            <MdArrowOutward />
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
                   <Link
                     to={`/exhibition/${khongGian?.slug}`}
                     className="ml-auto"
                   >
-                    <div className="flex gap-2 py-3 px-6 items-center bg-[#2e2e2e] hover:bg-red-500">
-                      <p className=" uppercase text-white ">
-                        KHÁM PHÁ KHÔNG GIAN
-                      </p>
-                      <div className="text-white ">
+                    <div className="flex gap-1 primary-button items-center">
+                      <p className=" uppercase  ">KHÁM PHÁ KHÔNG GIAN</p>
+                      <div className=" ">
                         <MdArrowOutward />
                       </div>
                     </div>

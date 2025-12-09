@@ -9,7 +9,8 @@ export default function EditSpaceModal({
   space,
   onSuccess,
 }) {
-  const [api] = notification.useNotification();
+  const [api, contextHolder] = notification.useNotification();
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     id: "",
@@ -20,7 +21,7 @@ export default function EditSpaceModal({
     thumbnail: "",
   });
 
-  const [thumbnailPreview, setThumbnailPreview] = useState("");
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
 
   // Load data khi mở modal
   useEffect(() => {
@@ -40,33 +41,56 @@ export default function EditSpaceModal({
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setLoading(true);
 
-    try {
-      await RoomApi.update(form);
+    RoomApi.update(form)
+      .then(() => {
+        api.success({
+          title: "Thành công",
+          description: "Không gian đã được cập nhật.",
+        });
 
-      api.success({
-        message: "Thành công",
-        description: "Không gian đã được cập nhật.",
+        onClose();
+        onSuccess();
+      })
+      .catch(() => {})
+      .finally(() => {
+        setLoading(false);
       });
+  }
 
-      onClose();
-      onSuccess();
-    } catch {
-      api.error({
-        message: "Lỗi",
-        description: "Không thể cập nhật.",
-      });
-    }
+  function handleClose() {
+    setForm({
+      id: "",
+      title: "",
+      description: "",
+      slug: "",
+      visibility: "public",
+      thumbnail: "",
+    });
+    setThumbnailPreview(null);
+    onClose();
   }
 
   return (
-    <Modal isVisible={isVisible} onClose={onClose}>
+    <Modal isVisible={isVisible} onClose={handleClose}>
+      {contextHolder}
+      {loading && (
+        <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-50">
+          <div className="animate-spin w-10 h-10 border-4 border-gray-300 border-t-[#2e2e2e] rounded-full"></div>
+        </div>
+      )}
+
       <div className="text-2xl font-bold text-gray-800 mb-4 text-center ">
         Chỉnh sửa không gian
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 w-[500px]">
-        {/* Tên */}
+      <form
+        onSubmit={handleSubmit}
+        className={`space-y-4 w-[500px] ${
+          loading ? "opacity-50 pointer-events-none" : ""
+        }`}
+      >
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Tên không gian
@@ -79,7 +103,6 @@ export default function EditSpaceModal({
           />
         </div>
 
-        {/* Mô tả */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">Mô tả</label>
           <textarea
@@ -89,7 +112,6 @@ export default function EditSpaceModal({
           />
         </div>
 
-        {/* Trạng thái */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Trạng thái hiển thị
@@ -104,16 +126,17 @@ export default function EditSpaceModal({
           </select>
         </div>
 
-        {/* Thumbnail */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Thumbnail
           </label>
 
-          <img
-            src={thumbnailPreview}
-            className="w-full h-40 object-cover border rounded mb-3"
-          />
+          {thumbnailPreview && (
+            <img
+              src={thumbnailPreview}
+              className="w-full h-40 object-cover border  mb-3"
+            />
+          )}
 
           <input
             type="file"
@@ -135,7 +158,7 @@ export default function EditSpaceModal({
           <button
             className=" secondary-button mt-4"
             onClick={() =>
-              (window.location.href = `exhibition-edit/` + form.slug)
+              (window.location.href = `/exhibition-edit/` + form.slug)
             }
           >
             Sửa phòng 3D

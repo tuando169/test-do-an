@@ -69,7 +69,7 @@ export const apiEndpoints = {
     getOne: (id: string) => `${BASE_URL}/texture/${id}`,
     getPublic: `${BASE_URL}/texture/public`,
     create: `${BASE_URL}/texture`,
-    update: `${BASE_URL}/texture`,
+    updateById: (id: string) => `${BASE_URL}/texture/${id}`,
     deleteById: (id: string) => `${BASE_URL}/texture/${id}`,
   },
   news: {

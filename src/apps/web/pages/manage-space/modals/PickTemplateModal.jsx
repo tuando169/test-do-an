@@ -17,6 +17,8 @@ export default function PickTemplateModal({
 
   async function fetchPublicTemplates() {
     const templates = await RoomApi.getPublicTemplateList();
+    console.log(templates, ownedSpaces);
+
     setTemplates(
       templates.filter((tpl) => !ownedSpaces.find((s) => s.id === tpl.id))
     );
@@ -51,7 +53,7 @@ export default function PickTemplateModal({
 
   useEffect(() => {
     fetchPublicTemplates();
-  }, []);
+  }, [ownedSpaces]);
 
   return (
     <Modal isVisible={isVisible} onClose={handleClose}>

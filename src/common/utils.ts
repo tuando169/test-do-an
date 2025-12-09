@@ -1,15 +1,21 @@
-import { RoleEnum } from './constants';
+import { RoleEnum } from "./constants";
 
 const permissionMapping = new Map<string, string[]>([
   [
     RoleEnum.Admin,
-    ['/manage/user', '/manage/news', '/manage', '/manage/space'],
+    [
+      "/manage/user",
+      "/manage/news",
+      "/manage",
+      "/manage/space",
+      "/manage/resource",
+    ],
   ],
-  [RoleEnum.Designer, ['/manage', '/manage/space', '/manage/resource']],
-  [RoleEnum.Client, ['/manage', '/manage/space', '/manage/resource']],
+  [RoleEnum.Designer, ["/manage", "/manage/space", "/manage/resource"]],
+  [RoleEnum.Client, ["/manage", "/manage/space", "/manage/resource"]],
   [
     RoleEnum.Guest,
-    ['/', '/listspace', '/news', '/about', '/contact', '/guide', '/info'],
+    ["/", "/listspace", "/news", "/about", "/contact", "/guide", "/info"],
   ],
 ]);
 

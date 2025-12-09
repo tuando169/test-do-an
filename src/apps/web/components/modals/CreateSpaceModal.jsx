@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { notification } from 'antd';
-import { RoomApi } from '@/api/roomApi';
-import Modal from '../modal';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai'; // Import icon loading (nếu bạn có react-icons)
+import { useState, useEffect } from "react";
+import { notification } from "antd";
+import { RoomApi } from "@/api/roomApi";
+import Modal from "../modal";
+import { AiOutlineLoading3Quarters } from "react-icons/ai"; // Import icon loading (nếu bạn có react-icons)
 // Hoặc nếu không muốn import icon, mình dùng CSS thuần bên dưới
 
 export default function CreateSpaceModal({
@@ -15,16 +15,16 @@ export default function CreateSpaceModal({
   const [isLoading, setIsLoading] = useState(false); // 1. State loading
 
   const [form, setForm] = useState({
-    title: '',
-    description: '',
-    visibility: 'public',
-    type: '',
-    thumbnail: '',
+    title: "",
+    description: "",
+    visibility: "public",
+    type: "",
+    thumbnail: "",
     room_json: {},
-    owner_id: '',
+    owner_id: "",
   });
 
-  const [thumbnailPreview, setThumbnailPreview] = useState('');
+  const [thumbnailPreview, setThumbnailPreview] = useState("");
 
   // Autofill nếu tạo từ template
   useEffect(() => {
@@ -32,11 +32,11 @@ export default function CreateSpaceModal({
 
     setForm({
       title: `Bản sao của ${template.title}`,
-      description: template.description || '',
-      visibility: 'public',
-      thumbnail: '',
+      description: template.description || "",
+      visibility: "public",
+      thumbnail: "",
       room_json: template.room_json,
-      type: '',
+      type: "",
       owner_id: template.owner_id,
     });
   }, [template]);
@@ -54,8 +54,8 @@ export default function CreateSpaceModal({
       });
 
       api.success({
-        message: 'Thành công',
-        description: 'Đã tạo không gian.',
+        message: "Thành công",
+        description: "Đã tạo không gian.",
       });
 
       onSuccess();
@@ -63,8 +63,8 @@ export default function CreateSpaceModal({
     } catch (err) {
       console.error(err);
       api.error({
-        message: 'Lỗi',
-        description: 'Không thể tạo không gian. Vui lòng thử lại.',
+        message: "Lỗi",
+        description: "Không thể tạo không gian. Vui lòng thử lại.",
       });
     } finally {
       setIsLoading(false); // Kết thúc loading dù thành công hay thất bại
@@ -73,14 +73,14 @@ export default function CreateSpaceModal({
 
   function handleClose() {
     setForm({
-      title: '',
-      description: '',
-      visibility: 'public',
-      type: '',
-      thumbnail: '',
+      title: "",
+      description: "",
+      visibility: "public",
+      type: "",
+      thumbnail: "",
       room_json: {},
     });
-    setThumbnailPreview('');
+    setThumbnailPreview("");
     setIsLoading(false);
     onClose();
   }
@@ -89,73 +89,73 @@ export default function CreateSpaceModal({
     <Modal isVisible={isVisible} onClose={handleClose}>
       {contextHolder}
       {/* TITLE */}
-      <div className='text-2xl font-semibold text-[#2e2e2e] w-[500px] mb-4'>
+      <div className="text-2xl font-semibold text-[#2e2e2e] w-[500px] mb-4">
         TẠO KHÔNG GIAN
         {template?.title && (
-          <span className=''>
-            {' '}
-            từ <span className='underline'>{template.title}</span>
+          <span className="">
+            {" "}
+            từ <span className="underline">{template.title}</span>
           </span>
         )}
       </div>
       {/* FORM */}
-      <form className='flex flex-col w-full mt-4' onSubmit={handleSubmit}>
+      <form className="flex flex-col w-full mt-4" onSubmit={handleSubmit}>
         {/* Tên */}
-        <label aria-required className=' mb-2'>
+        <label aria-required className=" mb-2">
           Tên
         </label>
         <input
-          type='text'
+          type="text"
           required
           disabled={isLoading}
-          className='bg-gray-200 p-3 mb-4 text-[16px] outline-none w-full disabled:opacity-60'
+          className="bg-gray-200 p-3 mb-4 text-[16px] outline-none w-full disabled:opacity-60"
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
         />
 
         {/* Mô tả */}
-        <label className=' mb-2'>Mô tả</label>
+        <label className=" mb-2">Mô tả</label>
         <textarea
           disabled={isLoading}
-          className='bg-gray-200 p-3 mb-4 text-[16px] outline-none w-full min-h-[100px] disabled:opacity-60'
+          className="bg-gray-200 p-3 mb-4 text-[16px] outline-none w-full min-h-[100px] disabled:opacity-60"
           value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
         />
-        <label className=' mb-2'>Danh mục</label>
+        <label className=" mb-2">Danh mục</label>
         <input
-          type='text'
+          type="text"
           disabled={isLoading}
-          className='bg-gray-200 p-3 mb-4 text-[16px] outline-none w-full disabled:opacity-60'
+          className="bg-gray-200 p-3 mb-4 text-[16px] outline-none w-full disabled:opacity-60"
           value={form.type}
           onChange={(e) => setForm({ ...form, type: e.target.value })}
         />
 
         {/* Hiển thị */}
-        <label className=' mb-2'>Hiển thị</label>
+        <label className=" mb-2">Hiển thị</label>
         <select
           disabled={isLoading}
           value={form.visibility}
           onChange={(e) => setForm({ ...form, visibility: e.target.value })}
-          className='bg-gray-200 p-3 mb-4 text-[16px] outline-none w-full disabled:opacity-60'
+          className="bg-gray-200 p-3 mb-4 text-[16px] outline-none w-full disabled:opacity-60"
         >
-          <option value='public'>Công khai</option>
-          <option value='private'>Riêng tư</option>
+          <option value="public">Công khai</option>
+          <option value="private">Riêng tư</option>
         </select>
 
         {/* Thumbnail */}
-        <label className=' mb-2'>Thumbnail</label>
+        <label className=" mb-2">Thumbnail</label>
 
         {(thumbnailPreview || form.thumbnail) && (
           <img
             src={thumbnailPreview || form.thumbnail}
-            className='w-full h-40 object-cover border mb-3'
-            alt='Thumbnail'
+            className="w-full h-40 object-cover border mb-3"
+            alt="Thumbnail"
           />
         )}
 
         <input
-          key={thumbnailPreview}
-          type='file'
+          key={form.title}
+          type="file"
           required
           disabled={isLoading}
           onChange={(e) => {
@@ -165,21 +165,21 @@ export default function CreateSpaceModal({
               setForm({ ...form, thumbnail: file });
             }
           }}
-          className='mb-4 disabled:opacity-60'
+          className="mb-4 disabled:opacity-60"
         />
 
         {/* BUTTON SUBMIT */}
         <button
           className={`primary-button mt-2 flex justify-center items-center gap-2 transition-all ${
-            isLoading ? 'opacity-70 cursor-not-allowed' : ''
+            isLoading ? "opacity-70 cursor-not-allowed" : ""
           }`}
           disabled={isLoading}
         >
           {isLoading && (
             // Icon loading (Spin)
-            <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           )}
-          {isLoading ? 'ĐANG TẠO...' : 'TẠO KHÔNG GIAN'}
+          {isLoading ? "ĐANG TẠO..." : "TẠO KHÔNG GIAN"}
         </button>
       </form>
     </Modal>

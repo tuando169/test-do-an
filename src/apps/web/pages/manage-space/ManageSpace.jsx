@@ -1,7 +1,7 @@
 import { RoomApi } from "@/api/roomApi";
 import { UserApi } from "@/api/userApi";
 import { RoleEnum } from "@/common/constants";
-import { notification } from "antd";
+import { notification, Modal as ModalAnt } from "antd";
 import { useEffect, useState } from "react";
 import {
   MdEdit,
@@ -21,7 +21,7 @@ export default function ManageSpace() {
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
 
-  const [thumbnailPreview, setThumbnailPreview] = useState("");
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
 
   const [spaces, setSpaces] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -58,7 +58,7 @@ export default function ManageSpace() {
         title: `Bản sao của ${tpl.title}`,
         owner_id: tpl.owner_id,
         visibility: tpl.visibility || "public",
-        thumbnail: tpl.thumbnail,
+        thumbnail: "",
         description: tpl.description || "",
         room_json: tpl.room_json,
       });
@@ -133,23 +133,8 @@ export default function ManageSpace() {
   };
 
   const handleUpdateSpace = async () => {
-    try {
-      await RoomApi.update(editForm);
-
-      api.success({
-        message: "Cập nhật thành công",
-        description: "Thông tin không gian đã được cập nhật.",
-      });
-
-      setShowEditModal(false);
-      loadSpaces();
-    } catch (err) {
-      console.error(err);
-      api.error({
-        message: "Lỗi cập nhật",
-        description: "Không thể cập nhật không gian.",
-      });
-    }
+    setShowEditModal(false);
+    loadSpaces();
   };
 
   const pickTemplateSuccess = () => {
@@ -161,9 +146,39 @@ export default function ManageSpace() {
   const filteredSpaces = spaces.filter((s) =>
     tab == "template" ? s.type === "template" : s.type !== "template"
   );
+  const handleDelete = async (spaceId) => {
+    ModalAnt.confirm({
+      title: "Xóa không gian?",
+      content:
+        "Bạn có chắc chắn muốn xóa không gian này? Hành động này không thể hoàn tác.",
+      okText: "Xóa",
+      cancelText: "Hủy",
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await RoomApi.delete(spaceId);
+
+          api.success({
+            message: "Đã xóa",
+            description: "Không gian đã được xóa thành công.",
+          });
+
+          loadSpaces(); // refresh list
+        } catch (error) {
+          console.error(error);
+          api.error({
+            message: "Lỗi",
+            description: "Không thể xóa không gian.",
+          });
+        }
+      },
+    });
+  };
 
   return (
     <>
+      {contextHolder}
+
       <PickTemplateModal
         isVisible={modalOpen}
         ownedSpaces={spaces}
@@ -173,7 +188,7 @@ export default function ManageSpace() {
 
       <EditSpaceModal
         isVisible={showEditModal}
-        onClose={() => setShowCreate(false)}
+        onClose={() => setShowEditModal(false)}
         onSubmit={handleUpdateSpace}
         space={editForm}
       />
@@ -258,7 +273,6 @@ export default function ManageSpace() {
       </Modal>
 
       <div className="container-main flex-col py-10">
-        {contextHolder}
         {/* TITLE */}
         <h1 className="text-3xl font-bold text-[#2e2e2e] uppercase mb-6">
           Quản Lý Không Gian
@@ -333,6 +347,7 @@ export default function ManageSpace() {
               <div
                 key={space.id}
                 className="border-8 border-transparent hover:border-[#2e2e2e] shadow-md p-4 transition cursor-pointer flex flex-col"
+                onClick={() => navigate("/space/" + space.slug)}
               >
                 {/* PREVIEW */}
                 <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden mb-4">
@@ -348,28 +363,45 @@ export default function ManageSpace() {
                 </div>
 
                 {/* ACTIONS */}
-                <div className="grid grid-cols-2 gap-2 mt-auto pt-4">
-                  <button
-                    className="secondary-button flex gap-2 justify-center"
-                    onClick={() => window.open("exhibition/" + space.slug)}
-                  >
-                    <MdVisibility size={22} /> Xem
-                  </button>
-                  <button
-                    className="secondary-button flex gap-2 justify-center"
-                    onClick={() => openEdit(space)}
-                  >
-                    <MdEdit size={22} /> Chỉnh sửa
-                  </button>
-                  {(userRole === RoleEnum.Admin ||
-                    userRole == RoleEnum.Designer) && (
-                    <button className="secondary-button flex gap-2 justify-center">
-                      <MdAdd size={22} /> Tạo phòng
+                <div className="flex flex-col gap-2 mt-auto pt-4">
+                  {/* HÀNH ĐỘNG CHO TEMPLATE */}
+                  {tab === "template" && (
+                    <button
+                      className="primary-button flex gap-2 justify-center"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openCreate(space);
+                      }}
+                    >
+                      <MdAdd size={20} /> Tạo phòng
                     </button>
                   )}
-                  <button className="secondary-button flex gap-2 justify-center">
-                    <MdDelete size={22} /> Xóa
-                  </button>
+
+                  {/* EDIT + DELETE */}
+                  {(space.owner_id == localStorage.getItem("user") ||
+                    userRole == RoleEnum.Admin) && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        className="secondary-button flex gap-2 justify-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEdit(space);
+                        }}
+                      >
+                        <MdEdit size={20} /> Chỉnh sửa
+                      </button>
+
+                      <button
+                        className="secondary-button flex gap-2 justify-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(space.id);
+                        }}
+                      >
+                        <MdDelete size={20} /> Xóa
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

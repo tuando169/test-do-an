@@ -49,7 +49,7 @@ export default function ManageNews() {
 
           <button
             onClick={() => (window.location.href = "/news-editor")}
-            className="flex items-center gap-2 bg-[#2e2e2e] text-white px-4 py-2 mb-4 hover:opacity-80"
+            className="flex items-center gap-2 primary-button"
           >
             <MdAdd size={20} /> Thêm tin tức
           </button>
@@ -83,16 +83,20 @@ export default function ManageNews() {
             <div className="grid grid-cols-2 gap-2 px-5 pb-4">
               <button
                 className="secondary-button"
-                onClick={() => handleDelete(news.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(news.id);
+                }}
               >
                 Xoá
               </button>
 
               <button
                 className="primary-button"
-                onClick={() =>
-                  (window.location.href = `/news-editor/${news.slug}`)
-                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.location.href = `/news-editor/${news.slug}`;
+                }}
               >
                 Chỉnh sửa
               </button>
