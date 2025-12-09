@@ -28,7 +28,7 @@ function Home() {
       <div className="Web__home">
         <div className="Web__home__sectionMain">
           <img
-            src="/web/kg.jpg"
+            src="/Web/kg.jpg"
             alt="VR Gallery"
             className="Web__home__sectionMain__video"
           />
