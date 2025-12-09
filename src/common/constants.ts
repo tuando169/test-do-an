@@ -1,5 +1,7 @@
-const BASE_URL = 'http://localhost:8000';
-// const BASE_URL = "https://3d-gallery-be.vercel.app";
+import { update } from 'three/examples/jsm/libs/tween.module.js';
+
+// const BASE_URL = 'http://localhost:8000';
+const BASE_URL = "https://3d-gallery-be.vercel.app";
 
 export enum RoleEnum {
   Admin = 'admin',
@@ -42,13 +44,22 @@ export const apiEndpoints = {
   image: {
     create: `${BASE_URL}/image`,
     getAll: `${BASE_URL}/image`,
-    update: `${BASE_URL}/image`,
+    getOne: (id: string) => `${BASE_URL}/image/${id}`,
+    updateById: (id: string) => `${BASE_URL}/image/${id}`,
     deleteById: (id: string) => `${BASE_URL}/image/${id}`,
+  },
+  audio: {
+    create: `${BASE_URL}/audio`,
+    getAll: `${BASE_URL}/audio`,
+    getOne: (id: string) => `${BASE_URL}/audio/${id}`,
+    updateById: (id: string) => `${BASE_URL}/audio/${id}`,
+    deleteById: (id: string) => `${BASE_URL}/audio/${id}`,
   },
   object3d: {
     create: `${BASE_URL}/object3d`,
     getAll: `${BASE_URL}/object3d`,
-    update: `${BASE_URL}/object3d`,
+    getOne: (id: string) => `${BASE_URL}/object3d/${id}`,
+    updateById: (id: string) => `${BASE_URL}/object3d/${id}`,
     deleteById: (id: string) => `${BASE_URL}/object3d/${id}`,
   },
   texture: {
