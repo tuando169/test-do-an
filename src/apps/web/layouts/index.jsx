@@ -16,8 +16,8 @@ import { AuthApi } from '@/api/authApi';
 import { UserApi } from '@/api/userApi';
 import { checkRoutePermission } from '@/common/utils';
 import { RoleEnum } from '@/common/constants';
-import Modal from '../components/Modal/index';
 import { Modal as ModalAnt, notification } from 'antd';
+import AuthModal from '../components/modals/AuthModal';
 
 function LayoutDefault() {
   const menuConfig = [
@@ -82,17 +82,8 @@ function LayoutDefault() {
   const { pathname } = useLocation();
   const [showModalRegister, setShowModalRegister] = useState(false);
   const [showModalLogin, setShowModalLogin] = useState(false);
-  const [showModalForget, setShowModalForget] = useState(false);
-
-  const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
-  const [registerForm, setRegisterForm] = useState({
-    name: '',
-    role: 'client',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
+
   function filterMenu() {
     const userRole = currentUser?.role || RoleEnum.Guest;
 
@@ -120,45 +111,6 @@ function LayoutDefault() {
     setShowModalLogin(true);
     setShowModalRegister(false);
     setNavToggle((prevData) => !prevData);
-  };
-
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleLogin = async (event) => {
-    event.preventDefault();
-
-    const { email, password } = formData;
-
-    try {
-      const data = await AuthApi.login(email, password);
-      setCurrentUser(data);
-
-      setShowModalLogin(false);
-
-      localStorage.setItem('user', data.id);
-      setUserId(data.id);
-      fetchCurrentUser();
-      setForce((prev) => prev + 1);
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-      api.success({
-        title: 'Đăng nhập thành công',
-        description: `Chào mừng đến với VExpo!`,
-      });
-    } catch (err) {
-      console.error(err);
-      api.error({
-        title: 'Đăng nhập thất bại',
-        description: 'Vui lòng kiểm tra lại email và mật khẩu',
-      });
-    }
   };
 
   const [navToggle, setNavToggle] = useState(false);
@@ -213,52 +165,6 @@ function LayoutDefault() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [pathname]);
-
-  async function handleRegister(e) {
-    e.preventDefault();
-
-    const { name, role, email, password, confirmPassword } = registerForm;
-
-    // Validate đơn giản
-    if (!name || !email || !password) {
-      return api.error({
-        message: 'Thiếu thông tin',
-        description: 'Vui lòng điền đầy đủ các trường',
-      });
-    }
-
-    if (password !== confirmPassword) {
-      return api.error({
-        message: 'Mật khẩu không khớp',
-        description: 'Vui lòng kiểm tra lại mật khẩu',
-      });
-    }
-
-    try {
-      await AuthApi.signup({
-        name,
-        role,
-        email,
-        password,
-      });
-
-      api.success({
-        message: 'Đăng ký thành công',
-        description: 'Bạn có thể đăng nhập ngay!',
-      });
-
-      // Đóng modal đăng ký, mở modal đăng nhập
-      setShowModalRegister(false);
-      setShowModalLogin(true);
-    } catch (err) {
-      console.error(err);
-
-      api.error({
-        message: 'Đăng ký thất bại',
-        description: err?.response?.data?.message || 'Vui lòng thử lại',
-      });
-    }
-  }
 
   return (
     <>
@@ -560,160 +466,18 @@ function LayoutDefault() {
         </footer>
       </div>
 
-      <Modal
-        isVisible={showModalRegister}
-        onClose={() => setShowModalRegister(false)}
-      >
-        <div className='modalRegister__title'>ĐĂNG KÝ</div>
-        <form className='modalRegister__form'>
-          <label className='modalRegister__form__label'>Tên của bạn</label>
-          <input
-            type='text'
-            className='modalRegister__form__input'
-            value={registerForm.name}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, name: e.target.value })
-            }
-          />
-          <label className='modalRegister__form__label'>Vai trò</label>
-          <select
-            className='modalRegister__form__input'
-            value={registerForm.role}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, role: e.target.value })
-            }
-          >
-            <option value='client'>Người dùng bình thường</option>
-            <option value='designer'>Nhà thiết kế</option>
-          </select>
-          <label className='modalRegister__form__label'>Email đăng ký</label>
-          <input
-            type='text'
-            className='modalRegister__form__input'
-            value={registerForm.email}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, email: e.target.value })
-            }
-          />
-
-          <label className='modalRegister__form__label'>Mật khẩu</label>
-          <input
-            type='password'
-            className='modalRegister__form__input'
-            value={registerForm.password}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, password: e.target.value })
-            }
-          />
-          <label className='modalRegister__form__label'>
-            Xác nhận mật khẩu
-          </label>
-          <input
-            type='password'
-            className='modalRegister__form__input'
-            value={registerForm.confirmPassword}
-            onChange={(e) =>
-              setRegisterForm({
-                ...registerForm,
-                confirmPassword: e.target.value,
-              })
-            }
-          />
-          <button
-            className='modalRegister__form__button'
-            onClick={handleRegister}
-          >
-            ĐĂNG KÝ
-          </button>
-        </form>
-        <WebLine />
-        {/* <div className='modalRegister__oath'>
-          <div className='modalRegister__oath__text'>Đăng ký thông qua</div>
-          <div className='modalRegister__oath__logo'>
-            <div className='modalRegister__oath__logo__item'>
-              <img src='/SocialIcon/google.svg' />
-            </div>
-            <div className='modalRegister__oath__logo__item'>
-              <img src='/SocialIcon/facebook.svg' />
-            </div>
-          </div>
-        </div> */}
-        {/* <WebLine /> */}
-        <div className='modalRegister__have'>Bạn đã có tài khoản?</div>
-        <div className='modalRegister__login' onClick={handleLoginClick}>
-          ĐĂNG NHẬP
-        </div>
-      </Modal>
-      <Modal
-        isVisible={showModalLogin}
-        onClose={() => setShowModalLogin(false)}
-      >
-        <div className='modalRegister__title'>ĐĂNG NHẬP</div>
-        <form className='modalRegister__form' onSubmit={handleLogin}>
-          <label className='modalRegister__form__label'>Email đăng ký</label>
-          <input
-            type='text'
-            name='email'
-            placeholder='hongnhung.minha@gmail.com'
-            className='modalRegister__form__input'
-            value={formData.email} // Giá trị từ state
-            onChange={handleInputChange} // Lắng nghe thay đổi
-          />
-          <label className='modalRegister__form__label'>Mật khẩu</label>
-          <input
-            type='password'
-            name='password'
-            placeholder='Nhập mật khẩu'
-            className='modalRegister__form__input'
-            value={formData.password} // Giá trị từ state
-            onChange={handleInputChange} // Lắng nghe thay đổi
-          />
-          {/* <div
-            className='modalRegister__form__Userforget'
-            onClick={handleForgetClick}
-          >
-            Quên mật khẩu
-          </div> */}
-          <button className='modalRegister__form__button'>ĐĂNG NHẬP</button>
-        </form>
-        <WebLine />
-        {/* <div className='modalRegister__oath'>
-          <div className='modalRegister__oath__text'>Đăng nhập thông qua</div>
-          <div className='modalRegister__oath__logo'>
-            <div className='modalRegister__oath__logo__item'>
-              <img src='/SocialIcon/google.svg' />
-            </div>
-            <div className='modalRegister__oath__logo__item'>
-              <img src='/SocialIcon/facebook.svg' />
-            </div>
-          </div>
-        </div>
-        <WebLine /> */}
-        <div className='modalRegister__have'>Bạn chưa có tài khoản?</div>
-        <div className='modalRegister__login' onClick={handleRegisterClick}>
-          ĐĂNG KÝ TÀI KHOẢN
-        </div>
-      </Modal>
-      <Modal
-        isVisible={showModalForget}
-        onClose={() => setShowModalForget(false)}
-      >
-        <div className='modalRegister__title'>LẤY LẠI MẬT KHẨU</div>
-        <form className='modalRegister__form'>
-          <label className='modalRegister__form__label'>
-            EMAIL BẠN ĐÃ ĐĂNG KÝ
-          </label>
-          <input
-            type='text'
-            name='email'
-            placeholder='hongnhung.minha@gmail.com'
-            className='modalRegister__form__input'
-          />
-          <button className='modalRegister__form__button'>
-            XÁC NHẬN EMAIL
-          </button>
-        </form>
-      </Modal>
+      <AuthModal
+        isVisible={showModalRegister || showModalLogin}
+        onClose={() => {
+          setShowModalLogin(false);
+          setShowModalRegister(false);
+        }}
+        initMode={showModalRegister ? 'register' : 'login'}
+        onSuccess={(user) => {
+          setCurrentUser(user);
+          setForce((prev) => prev + 1);
+        }}
+      />
     </>
   );
 }
