@@ -25,7 +25,7 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
     AuthApi.login(form.email, form.password)
       .then((data) => {
         localStorage.setItem('user', data.id);
-        if (onSuccess) onSuccess(data);
+        if (onSuccess) onSuccess();
         onClose();
       })
       .catch(() => {

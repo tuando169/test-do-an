@@ -13,6 +13,7 @@
   text-align: center;
   cursor: pointer;
 }
+
 .primary-button:hover {
   background-color: white;
   color: #2e2e2e;

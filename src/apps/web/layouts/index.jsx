@@ -150,6 +150,7 @@ function LayoutDefault() {
     if (userId) {
       const data = await UserApi.getById(userId);
       setCurrentUser(data);
+      setForce(force + 1);
     }
   }
 
@@ -160,7 +161,7 @@ function LayoutDefault() {
 
   useEffect(() => {
     filterMenu();
-  }, [currentUser]);
+  }, [force]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -214,7 +215,7 @@ function LayoutDefault() {
 
                 <div key={force} className='Web__header__inner__extend'>
                   {currentUser ? (
-                    <div key={force} className='relative group'>
+                    <div className='relative group'>
                       {/* Trigger */}
                       <div className='font-semibold py-1 cursor-pointer'>
                         {currentUser.name}
@@ -473,13 +474,12 @@ function LayoutDefault() {
           setShowModalRegister(false);
         }}
         initMode={showModalRegister ? 'register' : 'login'}
-        onSuccess={(user) => {
+        onSuccess={() => {
           api.success({
             title: 'Đăng nhập thành công',
             description: 'Chào mừng bạn quay lại!',
           });
-          setCurrentUser(user);
-          setForce((prev) => prev + 1);
+          fetchCurrentUser();
         }}
       />
     </>
