@@ -175,7 +175,7 @@ function LayoutDefault() {
             <div className='container-main'>
               <div className='Web__header__inner'>
                 <Link to={'/'} className='Web__header__inner__logo'>
-                  VEXPO
+                  <img src='/logo.jpg' alt='VEXPO' className='h-6' />
                 </Link>
                 <div className='Web__header__inner__menu'>
                   <ul className='nav-menu'>
@@ -474,6 +474,10 @@ function LayoutDefault() {
         }}
         initMode={showModalRegister ? 'register' : 'login'}
         onSuccess={(user) => {
+          api.success({
+            title: 'Đăng nhập thành công',
+            description: 'Chào mừng bạn quay lại!',
+          });
           setCurrentUser(user);
           setForce((prev) => prev + 1);
         }}

@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Modal from '../modal';
-import WebLine from '../web-line';
 import { AuthApi } from '@/api/authApi';
 import { notification } from 'antd';
 
@@ -23,22 +22,18 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
 
   // ---------------- LOGIN ----------------
   async function handleLogin() {
-    try {
-      const data = await AuthApi.login(form.email, form.password);
-
-      localStorage.setItem('user', data.id);
-      if (onSuccess) onSuccess(data);
-      api.success({
-        title: 'Đăng nhập thành công',
-        description: 'Chào mừng bạn quay lại!',
+    AuthApi.login(form.email, form.password)
+      .then((data) => {
+        localStorage.setItem('user', data.id);
+        if (onSuccess) onSuccess(data);
+        onClose();
+      })
+      .catch(() => {
+        api.error({
+          title: 'Đăng nhập thất bại',
+          description: 'Sai email hoặc mật khẩu',
+        });
       });
-      onClose();
-    } catch {
-      api.error({
-        title: 'Đăng nhập thất bại',
-        description: 'Sai email hoặc mật khẩu',
-      });
-    }
   }
 
   // ---------------- REGISTER ----------------
@@ -51,7 +46,7 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
     }
 
     try {
-      await AuthApi.register({
+      await AuthApi.signup({
         name: form.name,
         role: form.role,
         email: form.email,
@@ -70,13 +65,16 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
       });
     }
   }
+  useEffect(() => {
+    if (initMode) setMode(initMode);
+  }, [initMode]);
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
       {contextHolder}
 
       {mode === 'login' && (
-        <div className='w-full'>
+        <div className='w-[500px]'>
           <h2 className='text-xl font-bold text-center mb-4 text-[#2e2e2e]'>
             ĐĂNG NHẬP
           </h2>
@@ -99,20 +97,17 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
               onChange={handleChange}
             />
 
-            <button
-              onClick={handleLogin}
-              className='bg-[#2e2e2e] text-white py-3  mt-2 hover:opacity-90'
-            >
+            <button onClick={handleLogin} className='primary-button'>
               ĐĂNG NHẬP
             </button>
           </div>
 
-          <WebLine />
+          <hr className='w-full bg-[#2e2e2e] my-3' />
 
-          <div className='text-center mt-3'>Bạn chưa có tài khoản?</div>
+          <div className='text-center'>Bạn chưa có tài khoản?</div>
           <div
             onClick={() => setMode('register')}
-            className='text-center font-semibold text-[#2e2e2e] cursor-pointer mt-1'
+            className='secondary-button mt-3'
           >
             ĐĂNG KÝ
           </div>
@@ -120,7 +115,7 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
       )}
 
       {mode === 'register' && (
-        <div>
+        <div className='w-[500px]'>
           <h2 className='text-xl font-bold text-center mb-4 text-[#2e2e2e]'>
             ĐĂNG KÝ
           </h2>
@@ -171,20 +166,17 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
               onChange={handleChange}
             />
 
-            <button
-              onClick={handleRegister}
-              className='bg-[#2e2e2e] text-white py-3  mt-2 hover:opacity-90'
-            >
+            <button onClick={handleRegister} className='primary-button'>
               ĐĂNG KÝ
             </button>
           </div>
 
-          <WebLine />
+          <hr className='w-full bg-[#2e2e2e] my-3' />
 
-          <div className='text-center mt-3'>Đã có tài khoản?</div>
+          <div className='text-center'>Đã có tài khoản?</div>
           <div
             onClick={() => setMode('login')}
-            className='text-center font-semibold text-[#2e2e2e] cursor-pointer mt-1'
+            className='secondary-button mt-3'
           >
             ĐĂNG NHẬP
           </div>
