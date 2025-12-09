@@ -108,10 +108,9 @@ export interface ImageData {
   created_at: string;
 }
 
-export interface ImageUploadData {
+export interface MediaUploadData {
   title: string;
-  width?: number;
-  height?: number;
+  file: File;
   description?: string;
   room_id?: string;
 }

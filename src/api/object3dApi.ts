@@ -1,20 +1,42 @@
 import { apiEndpoints } from '@/common/constants.js';
 import axiosClient from '../common/axiosClient.js';
+import { MediaUploadData } from '@/common/types.js';
 
 export const Object3dApi = {
-  async create(file: File) {
+  async create(data: MediaUploadData): Promise<void> {
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', data.file);
+      formData.append('title', data.title);
+      formData.append('room_id', data.room_id);
 
       const res = await axiosClient.post(
         apiEndpoints.object3d.create,
         formData
       );
-      const data = res.data;
-      return data;
-    } catch (err) {
-      console.error('ObjectApi.upload error:', err);
+
+      return res.data;
+    } catch (err: any) {
+      console.error('MediaApi.upload error:', err);
+      throw err;
+    }
+  },
+
+  async update(id: string, data: MediaUploadData): Promise<void> {
+    try {
+      const formData = new FormData();
+      formData.append('file', data.file);
+      formData.append('title', data.title);
+      formData.append('room_id', data.room_id);
+
+      const res = await axiosClient.patch(
+        apiEndpoints.object3d.updateById(id),
+        formData
+      );
+
+      return res.data;
+    } catch (err: any) {
+      console.error('MediaApi.upload error:', err);
       throw err;
     }
   },
@@ -36,8 +58,7 @@ export const Object3dApi = {
         apiEndpoints.object3d.deleteById(id)
       );
 
-      const data = res.data;
-      return data;
+      return Promise.resolve();
     } catch (err) {
       throw err;
     }

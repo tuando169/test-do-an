@@ -27,6 +27,8 @@ function ListSpace() {
       setShowLoginPopup(true);
       return;
     }
+
+    window.location.href = '/create-space';
   }
 
   useEffect(() => {

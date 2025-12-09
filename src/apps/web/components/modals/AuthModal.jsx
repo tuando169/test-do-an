@@ -21,7 +21,8 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
   }
 
   // ---------------- LOGIN ----------------
-  async function handleLogin() {
+  async function handleLogin(e) {
+    e.preventDefault();
     AuthApi.login(form.email, form.password)
       .then((data) => {
         localStorage.setItem('user', data.id);
@@ -41,7 +42,8 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
   }
 
   // ---------------- REGISTER ----------------
-  async function handleRegister() {
+  async function handleRegister(e) {
+    e.preventDefault();
     if (form.password !== form.confirmPassword) {
       api.error({
         title: 'Mật khẩu xác nhận không trùng',

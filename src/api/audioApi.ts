@@ -2,7 +2,7 @@ import { apiEndpoints } from '@/common/constants';
 import axiosClient from '../common/axiosClient';
 import { MediaUploadData } from '@/common/types';
 
-export const ImageApi = {
+export const AudioApi = {
   async create(data: MediaUploadData): Promise<void> {
     try {
       const formData = new FormData();
@@ -10,15 +10,14 @@ export const ImageApi = {
       formData.append('title', data.title);
       formData.append('room_id', data.room_id);
 
-      const res = await axiosClient.post(apiEndpoints.image.create, formData);
+      const res = await axiosClient.post(apiEndpoints.audio.create, formData);
 
       return res.data;
     } catch (err: any) {
       console.error('MediaApi.upload error:', err);
-      return Promise.reject(err);
+      throw err;
     }
   },
-
   async update(id: string, data: MediaUploadData): Promise<void> {
     try {
       const formData = new FormData();
@@ -27,7 +26,7 @@ export const ImageApi = {
       formData.append('room_id', data.room_id);
 
       const res = await axiosClient.patch(
-        apiEndpoints.image.updateById(id),
+        apiEndpoints.audio.updateById(id),
         formData
       );
 
@@ -37,10 +36,9 @@ export const ImageApi = {
       throw err;
     }
   },
-
   async getList() {
     try {
-      const res = await axiosClient.get(apiEndpoints.image.getAll);
+      const res = await axiosClient.get(apiEndpoints.audio.getAll);
       return res.data || [];
     } catch (err: any) {
       console.error('MediaApi.getList error:', err);
@@ -51,7 +49,7 @@ export const ImageApi = {
   async delete(mediaId: string) {
     try {
       const res = await axiosClient.delete(
-        apiEndpoints.image.deleteById(mediaId)
+        apiEndpoints.audio.deleteById(mediaId)
       );
 
       return Promise.resolve();
