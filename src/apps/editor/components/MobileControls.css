@@ -1,0 +1,289 @@
+/* Mobile Controls Styles */
+.mobile-controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 50%; /* chỉ chiếm nửa trái màn hình */
+  height: 50%; /* đủ để joystick thoải mái */
+  pointer-events: none; /* để con có thể bật pointer-events riêng */
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding: 20px;
+  box-sizing: border-box;
+  isolation: isolate;
+}
+
+/* Movement Joystick */
+.mobile-joystick-container {
+  position: absolute;
+  left: 20px;
+  bottom: 40px;
+  pointer-events: auto; /* joystick vẫn hoạt động */
+}
+
+.mobile-joystick {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none !important;
+  user-select: none;
+  pointer-events: auto;
+  z-index: 10;
+  will-change: transform; /* ✅ thêm GPU layer */
+  transform: translateZ(0); /* ✅ ép compositing */
+  box-shadow: none;
+}
+canvas {
+  touch-action: none;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.mobile-joystick-knob {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  transition: none;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.mobile-joystick, .mobile-joystick-knob {
+  will-change: transform;
+  transform: translateZ(0);
+  contain: layout paint size style;
+  transform: translate3d(0, 0, 0);
+}
+
+
+.mobile-joystick-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Look/Camera Control Area */
+.mobile-look-container {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-look-area {
+  width: 140px;
+  height: 140px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  user-select: none;
+  position: relative;
+}
+
+.mobile-look-indicator {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.mobile-look-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  transition: transform 0.1s ease-out;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-look-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Action Buttons */
+.mobile-buttons {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.mobile-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  color: white;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  user-select: none;
+}
+
+.mobile-btn:hover,
+.mobile-btn:active {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.mobile-btn-audio.muted {
+  background: rgba(255, 0, 0, 0.3);
+  border-color: rgba(255, 0, 0, 0.5);
+}
+
+/* Instructions */
+.mobile-instructions {
+  position: fixed;
+  bottom: 220px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1001;
+}
+
+.mobile-instruction-text {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .mobile-controls {
+    padding: 15px;
+  }
+  
+  .mobile-joystick {
+    width: 140px;
+    height: 140px;
+  }
+  
+  .mobile-joystick-knob {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .mobile-look-area {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .mobile-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
+  }
+  
+  .mobile-buttons {
+    top: 15px;
+    right: 15px;
+    gap: 10px;
+  }
+  
+  .mobile-instructions {
+    bottom: 200px;
+  }
+  
+  .mobile-instruction-text {
+    font-size: 10px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-height: 600px) {
+  .mobile-instructions {
+    bottom: 180px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  .mobile-controls {
+    padding: 10px;
+  }
+  
+  .mobile-joystick {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .mobile-joystick-knob {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .mobile-look-area {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .mobile-instructions {
+    bottom: 140px;
+  }
+}
+
+/* Hide controls when not on mobile */
+@media (min-width: 769px) and (pointer: fine) {
+  .mobile-controls {
+    display: none !important;
+  }
+}

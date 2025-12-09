@@ -1,0 +1,423 @@
+.overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: transparent;
+    z-index: 20;
+}
+
+.overlay.panel-open {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    animation: fadeInOverlay 0.3s ease;
+}
+
+.overlay.tour-overlay {
+    z-index: 20;
+    background: transparent;
+}
+
+.overlay.tour-overlay.panel-open {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Wrapper căn giữa */
+.image-info-wrapper {
+    position: fixed;
+    top: 8%; 
+    left: 50%;
+    transform: translate(-50%, 0);
+    z-index: 22;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Nút info - Modern gradient design */
+.info-btn {
+    width: 64px; 
+    height: 64px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-size: 24px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 22;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.info-btn:hover {
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.6);
+}
+
+.info-btn:hover::before {
+    opacity: 1;
+}
+
+.info-btn.active { 
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    animation: pulseGlow 2s infinite;
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+}
+
+@keyframes pulseGlow {
+    0% { 
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 12px 35px rgba(255, 107, 107, 0.8);
+        transform: scale(1.05);
+    }
+    100% { 
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+        transform: scale(1);
+    }
+}
+
+/* Panel - Modern glass morphism design */
+.image-info-panel {
+  width: min(85vw, 1200px);
+  height: min(80vh, 700px);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  z-index: 21;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: slideInPanel 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideInPanel {
+  from { 
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8) translateY(30px);
+  }
+  to { 
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) translateY(0);
+  }
+}
+
+.image-preview {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.image-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.image-preview img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+  z-index: 1;
+  position: relative;
+}
+
+.image-preview img:hover {
+  transform: scale(1.02);
+}
+
+.image-details {
+  width: 50%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.image-details-content {
+  padding: 40px 36px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(103, 126, 234, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+.image-details-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.image-details-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.image-details-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.image-details-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6b4190 100%);
+}
+
+.image-details::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-radius: 0 2px 2px 0;
+}
+
+.image-details h2 {
+  margin: 0 0 12px 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1a202c;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.image-details h4 {
+  margin: 0 0 20px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.image-details p {
+  margin: 0 0 24px 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #374151;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 4px solid #e2e8f0;
+  font-family: 'Georgia', serif;
+}
+
+/* ===== 🎧 AUDIO TIMELINE - Modern Player Design ===== */
+
+.audio-timeline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(103, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 1px solid rgba(103, 126, 234, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 8px 20px rgba(103, 126, 234, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.audio-timeline:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 25px rgba(103, 126, 234, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.audio-controls {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 15px rgba(103, 126, 234, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.audio-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.audio-btn:hover {
+  transform: scale(1.1) translateY(-1px);
+  box-shadow: 0 8px 25px rgba(103, 126, 234, 0.6);
+}
+
+.audio-btn:hover::before {
+  opacity: 1;
+}
+
+.audio-btn:active {
+  transform: scale(0.95);
+}
+
+.audio-btn svg {
+  z-index: 1;
+  position: relative;
+}
+
+/* Progress bar area - Enhanced design */
+.audio-progress-bar {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.audio-progress-bar:hover {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.audio-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 10px rgba(103, 126, 234, 0.5);
+}
+
+.audio-progress-bar:hover .audio-progress-fill {
+  box-shadow: 0 0 15px rgba(103, 126, 234, 0.8);
+}
+
+/* Optional time text */
+.audio-time {
+  font-size: 13px;
+  color: #64748b;
+  min-width: 60px;
+  text-align: right;
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .image-info-panel {
+    width: 95vw;
+    height: 85vh;
+    flex-direction: column;
+  }
+  
+  .image-preview,
+  .image-details {
+    width: 100%;
+  }
+  
+  .image-preview {
+    height: 40%;
+  }
+  
+  .image-details {
+    height: 60%;
+  }
+  
+  .image-details-content {
+    padding: 24px 20px;
+  }
+  
+  .image-details h2 {
+    font-size: 1.8rem;
+  }
+  
+  .audio-timeline {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  
+  .audio-btn {
+    width: 38px;
+    height: 38px;
+  }
+}

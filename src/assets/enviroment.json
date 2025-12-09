@@ -1,0 +1,48 @@
+{
+  "skySettingMode": "preset",
+  "groundSettingMode": "ground",
+  "selectedHdri": "sunset",
+  "selectedGroundTexture": {
+    "id": "terrazzo",
+    "alb": "/textures/terrazzo/tex_terrazzo_alb.jpg",
+    "nor": "/textures/terrazzo/tex_terrazzo_nor.jpg",
+    "orm": "/textures/terrazzo/tex_terrazzo_orm.jpg",
+    "image": "/hdri/hdri.jpg"
+  },
+  "sky": {
+    "distance": 989000,
+    "sunPosition": [
+      100,
+      -8,
+      447
+    ],
+    "inclination": 0,
+    "azimuth": 0,
+    "turbidity": 9.7,
+    "rayleigh": 3.7,
+    "mieCoefficient": 0.04,
+    "mieDirectionalG": 0.9600000000000001,
+    "exposure": 0
+  },
+  "ground": {
+    "blur": [
+      8,
+      4
+    ],
+    "resolution": 256,
+    "mixBlur": 0.69,
+    "mixStrength": 1.5,
+    "roughness": 1.23,
+    "depthScale": 0.21000000000000002,
+    "minDepthThreshold": 1.24,
+    "maxDepthThreshold": 1.2,
+    "metalness": 0.1,
+    "color": "#d6f5f3"
+  },
+  "bloom": {
+    "enabled": false,
+    "luminanceThreshold": 1,
+    "luminanceSmoothing": 0.9,
+    "intensity": 1.5
+  }
+}

@@ -1,0 +1,125 @@
+body, html, * {
+  font-family: 'Roboto', sans-serif !important;
+}
+
+.popUpMove__content__content__inner{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.popUpMove__content__content__inner img{
+    width: auto;
+    height: 100px;
+}
+.popUpMove__content__content__inner__text{
+    text-align: start;
+}
+.button1{
+    color: white !important;
+    transition: all ease-in 0.2s !important;
+    margin-bottom: 12px !important;
+    width: 100%;
+    background-color: black !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0px !important;
+    padding: 10px !important;
+}
+.button1:hover{
+    color: black !important;
+    background-color: white !important;
+    transition: all ease-in 0.2s !important;
+}
+.button2{
+    padding: 4px 16px !important;
+    border-radius: 0px !important;
+    color: black !important;
+    background-color: white !important;
+    transition: all ease-in 0.2s !important;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px !important;
+}
+.button2:hover{
+    color: white !important;
+    background-color: black !important;
+    transition: all ease-in 0.2s !important;
+}
+.minh{
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: black;
+    width: 100%;
+    height: 100%;
+}
+
+.popUpMove__content{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0px 32px;
+}
+.popUpMove__image{
+    width: 100%;
+    height: 40%;
+}
+
+.popUpMove__image img{
+    width: 100%;
+    height: auto;
+}
+.popUpMove__content1{
+    width: 48%;
+}
+.popUpMove__content2{
+    width: 48%;
+}
+.popUpMove__content3{
+    width: 48%;
+}
+.popUpMove__content4{
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: start;
+}
+
+.popUpMove__content{
+    width: 100%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.title{
+}
+
+.description{
+    font-weight: 600;
+}
+
+.date{
+    font-size: 12px;
+}
+
+@media(max-width: 970px){
+    .popUpMove__content1{
+        width: 100%;
+    }
+    .popUpMove__content2{
+        width: 100%;
+    }
+    .popUpMove__content3{
+        width: 100%;
+    }
+    .popUpMove__content4{
+        width: 100%;
+    }
+}

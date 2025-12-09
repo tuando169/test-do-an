@@ -1,0 +1,19 @@
+/* EditorLayout.css */
+
+/* Đảm bảo toàn bộ root chain có chiều cao thật */
+body.editor-mode html, 
+body.editor-mode body,
+body.editor-mode #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent scrolling */
+}
+
+/* Layout Editor chiếm full viewport */
+.editor-layout, 
+.editor-layout main {
+  width: 100%;
+  height: 100vh; /* 👈 dùng vh thay vì % */
+  overflow: hidden;
+}

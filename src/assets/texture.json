@@ -1,0 +1,48 @@
+{
+  "ground": [
+        {
+            "id": "groundTexture-1",
+            "name": "groundTexture-1",
+            "alb": "/textures/concrete/tex_concrete_alb.jpg",
+            "nor": "/textures/concrete/tex_concrete_nor.jpg",
+            "orm": "/textures/concrete/tex_concrete_orm.jpg"
+        },
+        {
+            "id": "groundTexture-2",
+            "name": "groundTexture-2",
+            "alb": "/textures/terrazzo/tex_terrazzo_alb.jpg",
+            "nor": "/textures/terrazzo/tex_terrazzo_nor.jpg",
+            "orm": "/textures/terrazzo/tex_terrazzo_orm.jpg"
+        }
+    ],
+    "wall": [
+        {
+            "id": "wallTexture-1",
+            "name": "wallTexture-1",
+            "alb": "/textures/default/tex_default_alb.jpg",
+            "nor": "/textures/default/tex_default_nor.jpg",
+            "orm": "/textures/default/tex_default_orm.jpg"
+        },
+        {
+            "id": "wallTexture-2",
+            "name": "wallTexture-2",
+            "alb": "/textures/concrete/tex_concrete_alb.jpg",
+            "nor": "/textures/concrete/tex_concrete_nor.jpg",
+            "orm": "/textures/concrete/tex_concrete_orm.jpg"
+        },
+        {
+            "id": "wallTexture-3",
+            "name": "wallTexture-3",
+            "alb": "/textures/terrazzo/tex_terrazzo_alb.jpg",
+            "nor": "/textures/terrazzo/tex_terrazzo_nor.jpg",
+            "orm": "/textures/terrazzo/tex_terrazzo_orm.jpg"
+        },
+        {
+            "id": "wallTexture-4",
+            "name": "wallTexture-4",
+            "alb": "/textures/plastered_wall/tex_wall_plastered_alb.png",
+            "nor": "/textures/plastered_wall/tex_wall_plastered_nor.png",
+            "orm": "/textures/plastered_wall/tex_wall_plastered_orm.png"
+        }
+    ]
+}

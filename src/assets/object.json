@@ -1,0 +1,1011 @@
+{
+  "isPreset": true,
+  "objects": [
+    {
+      "id": "spawn-1",
+      "type": "spawn",
+      "position": [
+        5.75,
+        0.2,
+        20.25
+      ],
+      "rotation": [
+        -89.99999999999993,
+        1.90833280887811e-14,
+        60.000000000000234
+      ],
+      "scale": [
+        1.5,
+        1.5,
+        1.5
+      ]
+    },
+    {
+      "id": "wall-1757902588957",
+      "type": "wall",
+      "position": [
+        0,
+        -0.010000000000000083,
+        14.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.7,
+        1.7,
+        1.7
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "src": "/models/room1.glb",
+      "hdri": "/textures/room/exr_room1_texture_compressed.webp"
+    },
+    {
+      "id": "image-1759285429392",
+      "type": "image",
+      "position": [
+        -9.517490832010905,
+        1.9203320165944948,
+        7.7356087318568765
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "src": "/images/1.jpg",
+      "alt": "Anna Bilińska",
+      "title": "Bên Bờ Biển",
+      "scale": [
+        4,
+        4,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white",
+      "tourMarkerId": "tourmarker-image-1759285429392",
+      "description": "Khi Anna Bilińska — sinh ra trên lãnh thổ nay thuộc Ukraina, khi đó là một phần của Đế quốc Nga — cùng mẹ và các anh chị em chuyển đến Warsaw, bà bắt đầu theo học các lớp vẽ tư nhân. Tài năng của bà giúp gia đình có thêm thu nhập nhờ việc bán những bức vẽ và chân dung nhỏ. Ở tuổi 28, bà cùng một người bạn thực hiện chuyến du ngoạn vòng quanh châu Âu — có thể xem như “Grand Tour” của bà — ghé thăm Vienna, Salzburg, Berlin, Rome và Paris. Khi đến Paris, Bilińska nhận ra rằng điều bà khao khát nhất là theo đuổi hội họa. Bà chuyển đến sống tại nhà một người bạn ở đó. Vào cuối thế kỷ 19, phụ nữ vẫn chưa được phép theo học tại các học viện mỹ thuật công lập, nên Bilińska đã ghi danh vào Académie Julian — một học viện tư nhân nhưng vô cùng danh giá — vào năm 1882. Do phụ nữ không được học chung với nam giới trong các xưởng vẽ vì có người mẫu khỏa thân, nên Bilińska chỉ có thể thực hành cùng các nữ đồng nghiệp của mình."
+    },
+    {
+      "id": "image-1759285764318",
+      "type": "image",
+      "position": [
+        -9.517490832010905,
+        1.995148372217677,
+        2.4774927863982885
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "src": "/images/0.jpg",
+      "alt": "Anna Bilińska",
+      "title": "Mourning Years",
+      "description": "Emmeline Dean và Anna Bilińska có lẽ đã gặp nhau ở Paris vào năm 1884, khi cả hai cùng theo học một khóa mỹ thuật dành cho phụ nữ. Dean đã cho Bilińska xem một bộ váy tang điển hình, bởi trong năm đó cha của cô qua đời, để lại cô trong cảnh túng thiếu. Cũng trong năm ấy, người bạn đã cùng Bilińska du ngoạn khắp châu Âu cũng qua đời. Tuy nhiên, người bạn này đã dành lại cho Bilińska một khoản trợ cấp nhỏ trong di chúc để bà có thể tiếp tục sinh sống tại Paris. Đáng buồn thay, thời kỳ đau buồn của bà vẫn chưa kết thúc. Một năm sau, vị hôn phu của bà, Wojciech Grabowski, cũng qua đời. Trong nỗi tuyệt vọng sâu sắc, Bilińska đã đến Normandy vào các năm 1885 và 1886, tại đó bà vẽ phác và sáng tác nhiều bức tranh phong cảnh.",
+      "scale": [
+        4.375,
+        4.375,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white",
+      "tourMarkerId": "tourmarker-image-1759285764318"
+    },
+    {
+      "id": "image-1759286867749",
+      "type": "image",
+      "position": [
+        -9.517490832010905,
+        1.872685723551147,
+        -2.492992824032166
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "src": "/images/2.jpg",
+      "alt": "Anna Bilińska",
+      "title": "Chân dung tự họa của Anna Bilińska-Bohdanowiczowa",
+      "scale": [
+        4.5,
+        4.5,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white",
+      "tourMarkerId": "tourmarker-image-1759286867749",
+      "description": "Bilińska trưng bày bức Chân dung tự họa của mình tại Paris Salon và đã giành giải thưởng. Đây là một thành công lớn, bởi vào thời điểm đó, phụ nữ hiếm khi nhận được sự công nhận tại các triển lãm nghệ thuật quan trọng. Ban giám khảo bị ấn tượng bởi kỹ năng và chiều sâu cảm xúc mà bà thể hiện trong tác phẩm. Chiếc váy đen trong bức tranh gợi ý rằng Bilińska vẫn đang để tang cho những người thân yêu đã mất. Chiến thắng tại cuộc thi danh giá này đã mở ra cho bà cánh cửa sự nghiệp quốc tế, và các tác phẩm của Bilińska bắt đầu được triển lãm khắp châu Âu, thậm chí đến cả Hoa Kỳ. Thành công ấy cũng thu hút sự chú ý của giới thượng lưu Paris và mang đến cho bà nhiều khách hàng mới. Trong giai đoạ sau đó, Anna Bilińska nhận được nhiều đơn đặt hàng vẽ chân dung từ những người thuộc tầng lớp xã hội cao. Đồng thời, bà còn vẽ các bức tranh phấn nhỏ về trẻ em vùng Lyon, cũng như chân dung của những người nhập cư Ba Lan tại Paris — những bức này sau đó bà thường tặng lại cho người được vẽ hoặc gia đình họ. Ngoài ra, Bilińska còn làm công việc giám hộ tại Académie Julian, phụ trách việc vận hành xưởng mỹ thuật nữ và chăm sóc, hướng dẫn các sinh viên trẻ."
+    },
+    {
+      "id": "wall-1759288817276",
+      "type": "wall",
+      "position": [
+        -3.38,
+        1.5,
+        18.75
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        6.71,
+        8.48,
+        0.82
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759288906600",
+      "type": "wall",
+      "position": [
+        -3.39,
+        3.4000000000000004,
+        18.75
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        8.46,
+        7.21,
+        0.34
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759291317368",
+      "type": "wall",
+      "position": [
+        0.92,
+        2.75,
+        3.68
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        6.71,
+        8.48,
+        0.82
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759291407503",
+      "type": "wall",
+      "position": [
+        0.91,
+        3.4000000000000004,
+        3.68
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        8.46,
+        7.21,
+        0.34
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759291458290",
+      "type": "wall",
+      "position": [
+        -7.71,
+        2.75,
+        5.42
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        6.71,
+        8.48,
+        0.82
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759291533809",
+      "type": "wall",
+      "position": [
+        -7.71,
+        3.4000000000000004,
+        5.43
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        8.46,
+        7.21,
+        0.34
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759291997813",
+      "type": "wall",
+      "position": [
+        -11.06,
+        6,
+        32.37
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        12.75,
+        12,
+        1.625
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759292177105",
+      "type": "wall",
+      "position": [
+        14.5,
+        6,
+        32.37
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        6,
+        12,
+        1.625
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759292267794",
+      "type": "wall",
+      "position": [
+        -17.05,
+        6,
+        10.36
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        44.375,
+        12,
+        1.625
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759292380880",
+      "type": "wall",
+      "position": [
+        17.05,
+        6,
+        11
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        44.375,
+        12,
+        1.625
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759292487160",
+      "type": "wall",
+      "position": [
+        -0.25,
+        6,
+        -11.82
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        33.25,
+        12,
+        1.625
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759292585016",
+      "type": "wall",
+      "position": [
+        -4.82,
+        1.5,
+        36.69
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        7.090000000000001,
+        20.910000000000004,
+        0.335
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759292704015",
+      "type": "wall",
+      "position": [
+        16.84,
+        1.5,
+        36.74
+      ],
+      "rotation": [
+        0,
+        -90,
+        0
+      ],
+      "scale": [
+        7.090000000000001,
+        20.910000000000004,
+        0.35500000000000004
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759292758056",
+      "type": "wall",
+      "position": [
+        6,
+        1.4800000000000004,
+        40.02
+      ],
+      "rotation": [
+        0,
+        -3.81666561775622e-14,
+        0
+      ],
+      "scale": [
+        22.375,
+        20.910000000000004,
+        0.375
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "wall-1759292813756",
+      "type": "wall",
+      "position": [
+        -0.24,
+        11.75,
+        13.5
+      ],
+      "rotation": [
+        -89.99999999999999,
+        0,
+        0
+      ],
+      "scale": [
+        34.625,
+        52.75,
+        -0.1499999999999999
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "transparent": true
+    },
+    {
+      "id": "image-1761114407653",
+      "type": "image",
+      "src": "/images/3.jpg",
+      "alt": "Anna Bilińska",
+      "title": "Chân dung tự họa của Anna Bilińska-Bohdanowicz",
+      "position": [
+        -4.548179881328658,
+        1.947447168906269,
+        -5.056771770361532
+      ],
+      "rotation": [
+        0,
+        -0.000011739746433277,
+        0
+      ],
+      "scale": [
+        3.625,
+        3.625,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white",
+      "tourMarkerId": "tourmarker-image-1761114407653",
+      "description": "Năm 1892, Anna Bilińska kết hôn với bác sĩ người Ba Lan Antoni Bohdanowicz và cùng ông trở về Ba Lan. Bà ấp ủ kế hoạch đầy tham vọng là thành lập một trường mỹ thuật dành cho phụ nữ tại Warsaw, nhằm giúp những nữ họa sĩ trẻ có cơ hội được đào tạo bài bản như bà từng mong muốn. Tuy nhiên, bi kịch lại đến bất ngờ: chỉ vài tháng sau lễ cưới, Anna Bilińska qua đời vì bệnh tim, để lại bức Chân dung tự họa này còn dang dở. Đến năm 1928, chồng bà — Antoni Bohdanowicz — đã tự bỏ tiền xuất bản một cuốn hồi ký về vợ, trong đó ông sưu tầm các bài báo, thư từ của nữ họa sĩ và những bức ảnh tư liệu quý giá, nhằm tưởng nhớ tài năng và cuộc đời ngắn ngủi nhưng rực rỡ của Anna Bilińska."
+    },
+    {
+      "id": "image-1761114433565",
+      "type": "image",
+      "src": "/images/4.jpg",
+      "alt": "Anna Bilińska",
+      "title": "A Negress",
+      "position": [
+        -1.7155902282804931,
+        1.948846204601114,
+        2.492550824677611
+      ],
+      "rotation": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        3.5,
+        3.5,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white",
+      "description": "Ngay cả sau khi Anna Bilińska qua đời, các tác phẩm của bà vẫn không được yên ổn. Trong Chiến tranh Thế giới thứ hai, hai bức tranh của bà đã bị thất lạc, trong đó có bức chân dung nổi tiếng phía trên (Self-Portrait). Kể từ năm 1945, Bộ Văn hóa và Di sản Ba Lan đã không ngừng tìm kiếm tung tích của cả hai tác phẩm này. Mãi đến năm 2012, bức Self-Portrait mới xuất hiện trở lại trong một cuộc đấu giá tại Villa Grisebach ở Berlin, và được chính phủ Ba Lan mua lại, đưa về quê hương của họa sĩ. Bức còn lại — Portrait of an Italian Woman (Chân dung một phụ nữ Ý) — vẫn đang mất tích cho đến nay. Vì vậy, nếu bạn tình cờ thấy một bức chân dung mang phong cách của Bilińska đâu đó — hãy để mắt thật kỹ nhé!"
+    }
+  ],
+  "images": [
+    {
+      "id": "spider",
+      "src": "/images/spider.jpg",
+      "alt": "Spiders",
+      "title": "Spider Picture"
+    },
+    {
+      "id": "cell",
+      "src": "/images/cell.jpg",
+      "alt": "Cell",
+      "title": "Cell"
+    },
+    {
+      "id": "image-1748225092658",
+      "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKi6hUPkerFKU0z3ngLkYSMTq249AgdYawyg&s",
+      "alt": "jackson",
+      "title": "jackson"
+    },
+    {
+      "id": "image-1748396402469",
+      "src": "https://collectionapi.metmuseum.org/api/collection/v1/iiif/488978/preview",
+      "alt": "Jackson Pollock",
+      "title": "Painting"
+    },
+    {
+      "id": "image-1748404577442",
+      "src": "/images/knave.webp",
+      "alt": "Knave",
+      "title": "OSR"
+    },
+    {
+      "id": "image-1748406325983",
+      "src": "/images/forest.jpg",
+      "alt": "Random Pic",
+      "title": "Forest"
+    },
+    {
+      "id": "image-1748406325984",
+      "src": "/images/calvacade.jfif",
+      "alt": "Joni Mabe",
+      "title": "Calvacade"
+    },
+    {
+      "id": "image-1748406325985",
+      "src": "/images/starry.jpg",
+      "alt": "Van Gogh",
+      "title": "Starry Night"
+    },
+    {
+      "id": "image-1748406325986",
+      "src": "/images/nature.jpg",
+      "alt": "Random Guy",
+      "title": "Nature"
+    },
+    {
+      "id": "image-1748406325987",
+      "src": "/images/pond.jpg",
+      "alt": "A big pond",
+      "title": "Pond"
+    },
+    {
+      "id": "image-1748406325988",
+      "src": "/images/rochester.jfif",
+      "alt": "1800s Rochester Map",
+      "title": "Rochester"
+    },
+    {
+      "id": "image-1748406325989",
+      "src": "/images/egg.webp",
+      "alt": "A lot of eggs",
+      "title": "Eggs"
+    },
+    {
+      "id": "image-1748406325990",
+      "src": "/images/dh1.jfif",
+      "alt": "Tranh Dân Gian",
+      "title": "Đông Hồ 1",
+      "description": "hi"
+    },
+    {
+      "id": "image-1748406325991",
+      "src": "/images/dh2.jpg",
+      "alt": "Tranh Dân Gian",
+      "title": "Đông Hồ 2",
+      "description": "Bức tranh Đông Hồ này thể hiện nét đẹp văn hóa truyền thống với những họa tiết đặc trưng và màu sắc sinh động, mang đậm dấn ấn nghệ thuật dân gian Việt Nam."
+    },
+    {
+      "id": "image-1748406325992",
+      "src": "/images/dh3.jpg",
+      "alt": "Tranh Dân Gian",
+      "title": "Đông Hồ 3"
+    },
+    {
+      "id": "image-1748406325993",
+      "src": "/images/wm.jpg",
+      "alt": "Ảnh Chụp",
+      "title": "Kháng Chiến"
+    },
+    {
+      "id": "image-1748406325994",
+      "src": "/images/pn.webp",
+      "alt": "Phụ Nữ Việt Nam",
+      "title": "Phụ Nữ"
+    },
+    {
+      "id": "image-1750041796674",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Untitled_%28point_de_vue%29%2C_Ni%C3%A9pce_1827_%E2%80%94_HRC_2020_%28cropped%29.jpg/1070px-Untitled_%28point_de_vue%29%2C_Ni%C3%A9pce_1827_%E2%80%94_HRC_2020_%28cropped%29.jpg",
+      "alt": "Oldest camera picture",
+      "title": "Point de vue du Gras"
+    },
+    {
+      "id": "image-1750041913093",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Gustave_Le_Gray_-_Brig_upon_the_Water_-_Google_Art_Project.jpg/500px-Gustave_Le_Gray_-_Brig_upon_the_Water_-_Google_Art_Project.jpg",
+      "alt": "Gustave Le Gray",
+      "title": "The Brig"
+    },
+    {
+      "id": "image-1750042012535",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Oscar-gustave-rejlander_two_ways_of_life.jpg/500px-Oscar-gustave-rejlander_two_ways_of_life.jpg",
+      "alt": "Oscar Gustave Rejlander",
+      "title": "Two Ways of Life"
+    },
+    {
+      "id": "image-1750042524402",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Nadar_2.jpg/960px-Nadar_2.jpg",
+      "alt": "Nadar",
+      "title": "Sarah Bernhardt"
+    },
+    {
+      "id": "image-1750042611797",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Call%2C_I_Follow%2C_I_Follow%2C_Let_Me_Die%2C_by_Julia_Margaret_Cameron.jpg/960px-Call%2C_I_Follow%2C_I_Follow%2C_Let_Me_Die%2C_by_Julia_Margaret_Cameron.jpg",
+      "alt": "Julia Margaret Cameron",
+      "title": "Call, I Follow, I Follow, Let Me Die"
+    },
+    {
+      "id": "image-1750044010900",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Steichen_flatiron.jpg/960px-Steichen_flatiron.jpg",
+      "alt": "Edward Steichen",
+      "title": "Steichen Flatiron"
+    },
+    {
+      "id": "image-1750044083129",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/ThePondMoonlight.jpg/1095px-ThePondMoonlight.jpg",
+      "alt": "The Pond—Moonlight",
+      "title": "Edward Steichen"
+    },
+    {
+      "id": "image-1750044111709",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/An_Oasis_in_the_Badlands%2C_South_Dakota_%285711515700%29.jpg/1170px-An_Oasis_in_the_Badlands%2C_South_Dakota_%285711515700%29.jpg",
+      "alt": "Edward S. Curtis",
+      "title": "An Oasis in the Badlands"
+    },
+    {
+      "id": "image-1750044233286",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/BML_Le_Lointain_partie_1_31_128037_Le_Triomphe.jpg/584px-BML_Le_Lointain_partie_1_31_128037_Le_Triomphe.jpg",
+      "alt": "Robert E. Perry",
+      "title": "The North Pole"
+    },
+    {
+      "id": "image-1750046426989",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Pencil_hst_big.jpg/1212px-Pencil_hst_big.jpg",
+      "alt": "Hubble Space Telescope / NASA",
+      "title": "The Pencil Nebula"
+    },
+    {
+      "id": "image-1750046501924",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Challenger_explosion.jpg/1110px-Challenger_explosion.jpg",
+      "alt": "Michele McDonald",
+      "title": "Challenger Disaster"
+    },
+    {
+      "id": "image-1750047703876",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/36/PIA00563-Viking1-FirstColorImage-19760721.jpg",
+      "alt": "Viking 1",
+      "title": "The Red Planet"
+    },
+    {
+      "id": "image-1750048694502",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Eagle_nebula_pillars.jpg/1216px-Eagle_nebula_pillars.jpg",
+      "alt": "Hubble Space Telescope / NASA",
+      "title": "Pillars of Creation"
+    },
+    {
+      "id": "image-1750049027682",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Beauty_Out_of_Damage%2C_1993.jpg/500px-Beauty_Out_of_Damage%2C_1993.jpg",
+      "alt": "Matuschka",
+      "title": "Beauty Out of Damage"
+    },
+    {
+      "id": "image-1750049383440",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/USAF_F-16A_F-15C_F-15E_Desert_Storm_edit2.jpg/1280px-USAF_F-16A_F-15C_F-15E_Desert_Storm_edit2.jpg",
+      "alt": "David Turnley",
+      "title": "Operation Desert Storm"
+    },
+    {
+      "id": "image-1750049551717",
+      "src": "https://api.time.com/wp-content/uploads/2023/11/time-top-100-photos-2023-023.jpg?quality=75&w=828",
+      "alt": "",
+      "title": "Wyra'whaw"
+    },
+    {
+      "id": "image-1750057596083",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/La_Promenade%2C_by_Pierre-Auguste_Renoir.jpg/960px-La_Promenade%2C_by_Pierre-Auguste_Renoir.jpg",
+      "alt": "Pierre-Auguste Renoir",
+      "title": "La Promenade"
+    },
+    {
+      "id": "image-1750057983028",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1164px-Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+      "alt": "Vincent van Gogh",
+      "title": "Starry Night"
+    },
+    {
+      "id": "image-1750058201685",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Pierre-Auguste_Renoir%2C_French_-_The_Grands_Boulevards_-_Google_Art_Project.jpg/1104px-Pierre-Auguste_Renoir%2C_French_-_The_Grands_Boulevards_-_Google_Art_Project.jpg",
+      "alt": "Pierre-Auguste Renoir",
+      "title": "The Grands Boulevards"
+    },
+    {
+      "id": "image-1750058692948",
+      "src": "https://upload.wikimedia.org/wikipedia/en/b/bc/Le_Pho_Maternity.jpg?20181123060207",
+      "alt": "Lê Phổ",
+      "title": "Maternité"
+    },
+    {
+      "id": "image-1750059003755",
+      "src": "https://upload.wikimedia.org/wikipedia/en/e/ec/Gap_Nhau_by_Mai_Van_Hien.jpg?20181123060423",
+      "alt": "Mai Văn Hiến",
+      "title": "Gặp Nhau"
+    },
+    {
+      "id": "image-1750059474774",
+      "src": "https://upload.wikimedia.org/wikipedia/en/9/98/Choi_o_an_quan-Nguyen_Phan_Chanh.jpg?20181123060613",
+      "alt": "Nguyễn Phan Chánh",
+      "title": "Chơi ô ăn quan"
+    },
+    {
+      "id": "image-1750060071121",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/X%C3%A3-X%E1%BB%87_et_L%C3%BD-To%C3%A9t.jpg/1200px-X%C3%A3-X%E1%BB%87_et_L%C3%BD-To%C3%A9t.jpg",
+      "alt": "Lý Toét",
+      "title": "Xã Xệ"
+    },
+    {
+      "id": "image-1750060183013",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Hai_thieu_nu_va_em_be.JPG/960px-Hai_thieu_nu_va_em_be.JPG",
+      "alt": "Tô Ngọc Vân",
+      "title": "Deux Jeunes filles et un enfants"
+    },
+    {
+      "id": "image-1750060316532",
+      "src": "https://upload.wikimedia.org/wikipedia/en/8/88/Female_Militia_in_the_Sea_Tran_Van_Can.jpg?20181123060332",
+      "alt": "Trần Văn Cẩn",
+      "title": "Female Militia in the Sea"
+    },
+    {
+      "id": "image-1750060577799",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f7/T%E1%BB%83_T%C6%B0%E1%BB%9Bng_Nguy%E1%BB%85n_Qu%C3%A1n_Nho2.jpg",
+      "alt": "",
+      "title": "Tể Tướng Nguyễn Quán Nho"
+    },
+    {
+      "id": "image-1750060699048",
+      "src": "https://upload.wikimedia.org/wikipedia/en/3/3f/Nguyen_Gia_Tri_Women_in_the_Garden.jpg?20181123060319",
+      "alt": "Nguyễn Gia Trí",
+      "title": "Thiếu nữ trong vườn"
+    },
+    {
+      "id": "image-1750060748463",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/G%C3%A1nh_h%C3%A1t_Nam_%C4%90%E1%BB%8Bnh_trong_l%E1%BB%85_T%E1%BB%A9_tu%E1%BA%A7n_%C4%90%E1%BA%A1i_kh%C3%A1nh_c%E1%BB%A7a_Ho%C3%A0ng_%C4%91%E1%BA%BF_Kh%E1%BA%A3i_%C4%90%E1%BB%8Bnh_%281924%29.jpg/500px-G%C3%A1nh_h%C3%A1t_Nam_%C4%90%E1%BB%8Bnh_trong_l%E1%BB%85_T%E1%BB%A9_tu%E1%BA%A7n_%C4%90%E1%BA%A1i_kh%C3%A1nh_c%E1%BB%A7a_Ho%C3%A0ng_%C4%91%E1%BA%BF_Kh%E1%BA%A3i_%C4%90%E1%BB%8Bnh_%281924%29.jpg",
+      "alt": "",
+      "title": "Tuồng"
+    },
+    {
+      "id": "image-1750060904413",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/97/Dong_Ho_painting_-_Ly_Ngu_vong_nguyet.jpg",
+      "alt": "Tranh Đông Hồ",
+      "title": "Cá Chép"
+    },
+    {
+      "id": "image-1750061115078",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/22/La_Tonkinoise_Et_La_Vieille_Sage.jpg",
+      "alt": "Nhất Linh",
+      "title": "La Tonkinoise Et La Vieille Sage"
+    },
+    {
+      "id": "image-1750061166668",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/03/Thapdiemdiemvoua.jpg",
+      "alt": "",
+      "title": "Diêm Vương"
+    },
+    {
+      "id": "image-1750061179290",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/af/Thapdiemdiemvoug.jpg",
+      "alt": "",
+      "title": "Diêm Vương"
+    },
+    {
+      "id": "image-1750061188242",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Thapdiemdiemvouc.jpg",
+      "alt": "",
+      "title": "Diêm Vương"
+    },
+    {
+      "id": "image-1750061199413",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/48/Thapdiemdiemvup.jpg",
+      "alt": "",
+      "title": "Diêm Vương"
+    },
+    {
+      "id": "image-1750061306384",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Portrait_of_Mr._Trinh_Dinh_Kien%2C_18th_century%2C_Vietnam_National_Museum_of_Fine_Arts_-_Hanoi%2C_Vietnam.jpg",
+      "alt": "",
+      "title": "Trịnh Đình Kiên"
+    },
+    {
+      "id": "image-1750061355329",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Nguyen_Trai.jpg/800px-Nguyen_Trai.jpg",
+      "alt": "",
+      "title": "Nguyễn Trãi"
+    },
+    {
+      "id": "image-1750063351957",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Raco-Boutang.jpg/500px-Raco-Boutang.jpg",
+      "alt": "Louis Boutan",
+      "title": "Portrait of Emil Racoviță"
+    },
+    {
+      "id": "image-17500633519587",
+      "src": "/images/bird.mp4",
+      "alt": "Bird",
+      "title": "Bird"
+    },
+    {
+      "src": "/images/0.jpg",
+      "alt": "Anna Bilińska",
+      "title": "Mourning Years",
+      "description": "Emmeline Dean và Anna Bilińska có lẽ đã gặp nhau ở Paris vào năm 1884, khi cả hai cùng theo học một khóa mỹ thuật dành cho phụ nữ. Dean đã cho Bilińska xem một bộ váy tang điển hình, bởi trong năm đó cha của cô qua đời, để lại cô trong cảnh túng thiếu. Cũng trong năm ấy, người bạn đã cùng Bilińska du ngoạn khắp châu Âu cũng qua đời. Tuy nhiên, người bạn này đã dành lại cho Bilińska một khoản trợ cấp nhỏ trong di chúc để bà có thể tiếp tục sinh sống tại Paris. Đáng buồn thay, thời kỳ đau buồn của bà vẫn chưa kết thúc. Một năm sau, vị hôn phu của bà, Wojciech Grabowski, cũng qua đời. Trong nỗi tuyệt vọng sâu sắc, Bilińska đã đến Normandy vào các năm 1885 và 1886, tại đó bà vẽ phác và sáng tác nhiều bức tranh phong cảnh.",
+      "id": "image-1761114556553"
+    },
+    {
+      "src": "/images/1.jpg",
+      "alt": "Anna Bilińska",
+      "title": "Bên Bờ Biển",
+      "description": "Khi Anna Bilińska — sinh ra trên lãnh thổ nay thuộc Ukraina, khi đó là một phần của Đế quốc Nga — cùng mẹ và các anh chị em chuyển đến Warsaw, bà bắt đầu theo học các lớp vẽ tư nhân. Tài năng của bà giúp gia đình có thêm thu nhập nhờ việc bán những bức vẽ và chân dung nhỏ. Ở tuổi 28, bà cùng một người bạn thực hiện chuyến du ngoạn vòng quanh châu Âu — có thể xem như “Grand Tour” của bà — ghé thăm Vienna, Salzburg, Berlin, Rome và Paris. Khi đến Paris, Bilińska nhận ra rằng điều bà khao khát nhất là theo đuổi hội họa. Bà chuyển đến sống tại nhà một người bạn ở đó. Vào cuối thế kỷ 19, phụ nữ vẫn chưa được phép theo học tại các học viện mỹ thuật công lập, nên Bilińska đã ghi danh vào Académie Julian — một học viện tư nhân nhưng vô cùng danh giá — vào năm 1882. Do phụ nữ không được học chung với nam giới trong các xưởng vẽ vì có người mẫu khỏa thân, nên Bilińska chỉ có thể thực hành cùng các nữ đồng nghiệp của mình.",
+      "id": "image-1761114556554"
+    },
+    {
+      "src": "/images/2.jpg",
+      "alt": "Anna Bilińska",
+      "title": "Chân dung tự họa của Anna Bilińska-Bohdanowiczowa",
+      "description": "Bilińska trưng bày bức Chân dung tự họa của mình tại Paris Salon và đã giành giải thưởng. Đây là một thành công lớn, bởi vào thời điểm đó, phụ nữ hiếm khi nhận được sự công nhận tại các triển lãm nghệ thuật quan trọng. Ban giám khảo bị ấn tượng bởi kỹ năng và chiều sâu cảm xúc mà bà thể hiện trong tác phẩm. Chiếc váy đen trong bức tranh gợi ý rằng Bilińska vẫn đang để tang cho những người thân yêu đã mất. Chiến thắng tại cuộc thi danh giá này đã mở ra cho bà cánh cửa sự nghiệp quốc tế, và các tác phẩm của Bilińska bắt đầu được triển lãm khắp châu Âu, thậm chí đến cả Hoa Kỳ. Thành công ấy cũng thu hút sự chú ý của giới thượng lưu Paris và mang đến cho bà nhiều khách hàng mới. Trong giai đoạn sau đó, Anna Bilińska nhận được nhiều đơn đặt hàng vẽ chân dung từ những người thuộc tầng lớp xã hội cao. Đồng thời, bà còn vẽ các bức tranh phấn nhỏ về trẻ em vùng Lyon, cũng như chân dung của những người nhập cư Ba Lan tại Paris — những bức này sau đó bà thường tặng lại cho người được vẽ hoặc gia đình họ. Ngoài ra, Bilińska còn làm công việc giám hộ tại Académie Julian, phụ trách việc vận hành xưởng mỹ thuật nữ và chăm sóc, hướng dẫn các sinh viên trẻ.",
+      "id": "image-1761114556555"
+    },
+    {
+      "src": "/images/3.jpg",
+      "alt": "Anna Bilińska",
+      "title": "Chân dung tự họa của Anna Bilińska-Bohdanowicz",
+      "description": "Năm 1892, Anna Bilińska kết hôn với bác sĩ người Ba Lan Antoni Bohdanowicz và cùng ông trở về Ba Lan. Bà ấp ủ kế hoạch đầy tham vọng là thành lập một trường mỹ thuật dành cho phụ nữ tại Warsaw, nhằm giúp những nữ họa sĩ trẻ có cơ hội được đào tạo bài bản như bà từng mong muốn. Tuy nhiên, bi kịch lại đến bất ngờ: chỉ vài tháng sau lễ cưới, Anna Bilińska qua đời vì bệnh tim, để lại bức Chân dung tự họa này còn dang dở. Đến năm 1928, chồng bà — Antoni Bohdanowicz — đã tự bỏ tiền xuất bản một cuốn hồi ký về vợ, trong đó ông sưu tầm các bài báo, thư từ của nữ họa sĩ và những bức ảnh tư liệu quý giá, nhằm tưởng nhớ tài năng và cuộc đời ngắn ngủi nhưng rực rỡ của Anna Bilińska.",
+      "id": "image-1761114556556"
+    },
+    {
+      "src": "/images/4.jpg",
+      "alt": "Anna Bilińska",
+      "title": "A Negress",
+      "description": "Ngay cả sau khi Anna Bilińska qua đời, các tác phẩm của bà vẫn không được yên ổn. Trong Chiến tranh Thế giới thứ hai, hai bức tranh của bà đã bị thất lạc, trong đó có bức chân dung nổi tiếng phía trên (Self-Portrait). Kể từ năm 1945, Bộ Văn hóa và Di sản Ba Lan đã không ngừng tìm kiếm tung tích của cả hai tác phẩm này. Mãi đến năm 2012, bức Self-Portrait mới xuất hiện trở lại trong một cuộc đấu giá tại Villa Grisebach ở Berlin, và được chính phủ Ba Lan mua lại, đưa về quê hương của họa sĩ. Bức còn lại — Portrait of an Italian Woman (Chân dung một phụ nữ Ý) — vẫn đang mất tích cho đến nay. Vì vậy, nếu bạn tình cờ thấy một bức chân dung mang phong cách của Bilińska đâu đó — hãy để mắt thật kỹ nhé!",
+      "id": "image-1761114556557"
+    }
+  ],
+  "imageFrameList": [
+    {
+      "id": "imageFrame-1"
+    },
+    {
+      "id": "imageFrame-2"
+    },
+    {
+      "id": "imageFrame-3"
+    },
+    {
+      "id": "imageFrame-4"
+    }
+  ],
+  "tourMarkers": [
+    {
+      "id": "tourmarker-image-1759285429392",
+      "imageId": "image-1759285429392",
+      "type": "image",
+      "index": 0
+    },
+    {
+      "id": "tourmarker-camera-marker-1761551618848",
+      "itemId": "camera-marker-1761551618848",
+      "type": "camera",
+      "index": 1,
+      "position": [
+        -7.204372501521123,
+        2.6,
+        20.28293484295893
+      ],
+      "rotation": [
+        -180,
+        77.5103706610074,
+        -180
+      ],
+      "duration": 5000
+    },
+    {
+      "id": "tourmarker-image-1759286867749",
+      "imageId": "image-1759286867749",
+      "type": "image",
+      "audio": "/audio/2.mp3",
+      "index": 2
+    }
+  ],
+  "audio": [
+    {
+      "id": "audio-1761638836403",
+      "src": "/audio/0.mp3",
+      "title": "0.mp3",
+      "type": "audio/mpeg",
+      "size": 1082141
+    },
+    {
+      "id": "audio-1761638836404",
+      "src": "/audio/1.mp3",
+      "title": "1.mp3",
+      "type": "audio/mpeg",
+      "size": 1082141
+    },
+    {
+      "id": "audio-1761638836405",
+      "src": "/audio/2.mp3",
+      "title": "2.mp3",
+      "type": "audio/mpeg",
+      "size": 1082141
+    },
+    {
+      "id": "audio-1761638836406",
+      "src": "/audio/3.mp3",
+      "title": "3.mp3",
+      "type": "audio/mpeg",
+      "size": 1082141
+    },
+    {
+      "id": "audio-1761638836407",
+      "src": "/audio/4.mp3",
+      "title": "4.mp3",
+      "type": "audio/mpeg",
+      "size": 1082141
+    }
+  ]
+}

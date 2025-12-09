@@ -1,0 +1,68 @@
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: transparent;
+}
+
+.object-popup {
+  position: fixed;
+  z-index: 9999;
+  transform: translate(-50%, -100%);
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.object-popup.hide {
+  opacity: 0;
+  transform: translate(-50%, -120%);
+  pointer-events: none;
+}
+
+.object-popup.show {
+  opacity: 1;
+  transform: translate(-50%, -100%);
+}
+
+.popup-circle-menu {
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+@keyframes popup-button-in {
+  0% {
+    opacity: 0;
+    transform: scale(0) translate(0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(var(--x), var(--y));
+  }
+}
+
+.circle-button {
+  position: absolute;
+  background-color: white;
+  color: #2b2b2b;
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+
+  opacity: 0;
+  transform: scale(0) translate(0, 0);
+  animation: popup-button-in 0.3s ease forwards;
+}
+
+.circle-button:hover {
+  background-color: #2b2b2b;
+  color: white;
+}

@@ -1,0 +1,197 @@
+$Color-title: #2E2E2E;
+$Color-text: #515151;
+
+.AboutUs{
+    width: 100%;
+    display: flex;
+    border-top: 1px solid #969696;
+    padding-top: 56px;
+    flex-direction: column;
+
+    &__inner{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        &__section1{
+            margin-bottom: 56px;
+
+            .r2{
+                display: none;
+            }
+            &__left{
+                display: flex;
+                flex-direction: column;
+
+                &__title{
+                    margin: 24px 0px;
+                    font-size: 32px;
+                    color: $Color-title;
+                    font-weight: 500;
+                }
+                &__button{
+                    display: flex;
+                    width: 100%;
+                    align-items: center;
+                    justify-content: start;
+                    margin-top: 12px;
+
+                    a{
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 100px;
+                        padding: 4px 16px;
+                        border: $Color-title 1px solid;
+                        text-decoration: none;
+                        font-weight: 600;
+                        transition: all 0.1s ease-in;
+                        background-color: $Color-title;
+                        color: white;
+
+                        &:hover{
+                            background-color: white;
+                            color: $Color-title;
+                            transition: all 0.1s ease-in;
+                        }
+                    }
+
+                    &__icon{
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-left: 4px;
+                    }
+                }
+
+                &__image{
+                    display: flex;
+                    flex-wrap: wrap;
+                    height: 30vh;
+                    width: 100%;
+                    justify-content: space-between;
+
+                    &__image1{
+                        height: 70%;
+                        width: 30%;
+                        background-image: url("./Object/Chair\ 1_2.png");
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-radius: 24px;
+                    }
+                    &__image2{
+                        height: 100%;
+                        width: 65%;
+                        background-image: url("./Object/Statue\ 1_1.png");
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-radius: 24px;
+                    }
+                }
+            }
+            &__right{
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+
+                &__image{
+                    display: flex;
+                    flex-wrap: wrap;
+                    height: 100%;
+                    width: 100%;
+
+                    &__image1{
+                        height: 29%;
+                        width: 47.5%;
+                        background-image: url("./Object/Statue\ 2_2.png");
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-radius: 24px;
+                        margin-right: 5%;
+                    }
+                    &__image2{
+                        height: 29%;
+                        width: 47.5%;
+                        background-image: url("./Object/Chair\ 2_1.png");
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-radius: 24px;
+                    }
+                    &__image3{
+                        height: 29%;
+                        width: 20%;
+                        background-image: url("./Object/Statue\ 1_2.png");
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-radius: 24px;
+                        margin-top: 6%;
+                        margin-bottom: 6%;
+                        margin-right: 5%;
+                    }
+                    &__image4{
+                        height: 29%;
+                        width: 47.5%;
+                        background-image: url("./Object/Chair\ 2_2.png");
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-radius: 24px;
+                        margin-top: 6%;
+                        margin-bottom: 6%;
+                    }
+                    &__image5{
+                        height: 29%;
+                        width: 65%;
+                        background-image: url("./Object/Statue\ 3_2.png");
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-radius: 24px;
+                        margin-right: 5%;
+                    }
+                    &__image6{
+                        height: 15%;
+                        width: 30%;
+                        background-image: url("./Object/Statue\ 3_1.png");
+                        background-position: center;
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        border-radius: 24px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media(max-width: 768px){
+    .AboutUs__inner__section1{
+        .r1{
+            display: none;
+        }
+        .r2{
+            display: flex;
+        }
+    }
+
+    .Contact__inner__left__title{
+        font-size: 32px !important;
+        margin-bottom: 12px !important;
+    }
+    .Contact__inner__left__disc{
+        margin-top: 12px !important;
+    }
+    .Contact__inner__right{
+        label{
+            font-size: 17px !important;
+        }
+    }
+    .AboutUs__inner__section1__right{
+        height: 60vh;
+    }
+}

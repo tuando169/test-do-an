@@ -1,0 +1,1058 @@
+{
+  "isPreset": true,
+  "name": "Custom Scene",
+  "objects": [
+    {
+      "id": "spawn-1",
+      "type": "spawn",
+      "position": [
+        -18.25,
+        0.2,
+        6
+      ],
+      "rotation": [
+        -90.00000000000003,
+        0,
+        -89.99999999999997
+      ],
+      "scale": [
+        1.5,
+        1.5,
+        1.5
+      ]
+    },
+    {
+      "id": "wall-1757902588957",
+      "type": "wall",
+      "position": [
+        -8,
+        -0.01,
+        18
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "color": "#b6b898",
+      "albedo": "/textures/default/tex_default_alb.jpg",
+      "normal": "/textures/default/tex_default_nor.jpg",
+      "orm": "/textures/default/tex_default_orm.jpg",
+      "children": [],
+      "src": "/models/room2.glb"
+    },
+    {
+      "id": "image-1761116355729",
+      "type": "image",
+      "src": "/images/imageFrame.png",
+      "alt": "Drag and drop photos into the frame",
+      "title": "Image Frame",
+      "position": [
+        13.75000299705627,
+        3.0773734856761026,
+        -12.351868885035769
+      ],
+      "rotation": [
+        0,
+        -89.99999743867906,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116362090",
+      "type": "image",
+      "src": "/images/imageFrame.png",
+      "alt": "Drag and drop photos into the frame",
+      "title": "Image Frame",
+      "position": [
+        6.311500248660467,
+        3.215206853530325,
+        -15.750002991879718
+      ],
+      "rotation": [
+        0,
+        0.000007698194382476691,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116371469",
+      "type": "image",
+      "src": "/images/imageFrame.png",
+      "alt": "Drag and drop photos into the frame",
+      "title": "Image Frame",
+      "position": [
+        -2.1066454692401724,
+        3.1423644022747284,
+        -15.750001860827437
+      ],
+      "rotation": [
+        0,
+        0.000007698194382476691,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116389103",
+      "type": "image",
+      "src": "/images/imageFrame.png",
+      "alt": "Drag and drop photos into the frame",
+      "title": "Image Frame",
+      "position": [
+        -13.75000447221802,
+        3.245484395875021,
+        -11.539492276323555
+      ],
+      "rotation": [
+        0,
+        89.99999236361636,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116393897",
+      "type": "image",
+      "src": "/images/imageFrame.png",
+      "alt": "Drag and drop photos into the frame",
+      "title": "Image Frame",
+      "position": [
+        -5.182329030585288,
+        3.2198420353626407,
+        -8.250001239776612
+      ],
+      "rotation": [
+        -180,
+        0,
+        -180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116397653",
+      "type": "image",
+      "src": "/images/imageFrame.png",
+      "alt": "Drag and drop photos into the frame",
+      "title": "Image Frame",
+      "position": [
+        3.7551524225147705,
+        3.1056906387164576,
+        -8.250001239776612
+      ],
+      "rotation": [
+        -180,
+        0,
+        -180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116400568",
+      "type": "image",
+      "src": "/images/imageFrame.png",
+      "alt": "Drag and drop photos into the frame",
+      "title": "Image Frame",
+      "position": [
+        11.811447164164875,
+        3.1624561399868205,
+        -8.250001239776612
+      ],
+      "rotation": [
+        -180,
+        0,
+        -180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116411361",
+      "type": "image",
+      "src": "https://upload.wikimedia.org/wikipedia/en/9/98/Choi_o_an_quan-Nguyen_Phan_Chanh.jpg?20181123060613",
+      "alt": "Nguyễn Phan Chánh",
+      "title": "Chơi ô ăn quan",
+      "position": [
+        13.75000354892579,
+        3.3342552875867275,
+        -0.0722915913369313
+      ],
+      "rotation": [
+        0,
+        -89.99999743867906,
+        0
+      ],
+      "scale": [
+        2.75,
+        2.75,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-4",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116414644",
+      "type": "image",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/X%C3%A3-X%E1%BB%87_et_L%C3%BD-To%C3%A9t.jpg/1200px-X%C3%A3-X%E1%BB%87_et_L%C3%BD-To%C3%A9t.jpg",
+      "alt": "Lý Toét",
+      "title": "Xã Xệ",
+      "position": [
+        11.88407874642189,
+        2.8443716545858595,
+        -7.749999713897704
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.875,
+        1.875,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116418505",
+      "type": "image",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Hai_thieu_nu_va_em_be.JPG/960px-Hai_thieu_nu_va_em_be.JPG",
+      "alt": "Tô Ngọc Vân",
+      "title": "Deux Jeunes filles et un enfants",
+      "position": [
+        4.012651202205478,
+        2.8522769626251443,
+        -7.749999713897704
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.875,
+        2.875,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116423379",
+      "type": "image",
+      "src": "https://upload.wikimedia.org/wikipedia/en/8/88/Female_Militia_in_the_Sea_Tran_Van_Can.jpg?20181123060332",
+      "alt": "Trần Văn Cẩn",
+      "title": "Female Militia in the Sea",
+      "position": [
+        -5.778009377981396,
+        2.8197410601261947,
+        -7.749999713897704
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.5,
+        2.5,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116429234",
+      "type": "image",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f7/T%E1%BB%83_T%C6%B0%E1%BB%9Bng_Nguy%E1%BB%85n_Qu%C3%A1n_Nho2.jpg",
+      "alt": "",
+      "title": "Tể Tướng Nguyễn Quán Nho",
+      "position": [
+        -13.712211982163137,
+        2.996597902447511,
+        4.596972796480944
+      ],
+      "rotation": [
+        0,
+        89.99999231603718,
+        0
+      ],
+      "scale": [
+        2.5,
+        2.5,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116440298",
+      "type": "image",
+      "src": "/images/imageFrame.png",
+      "alt": "Drag and drop photos into the frame",
+      "title": "Image Frame",
+      "position": [
+        -13.750003304904066,
+        3.0569971331211288,
+        -2.851459776501793
+      ],
+      "rotation": [
+        0,
+        89.99999236361636,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116448344",
+      "type": "image",
+      "src": "/images/wm.jpg",
+      "alt": "Ảnh Chụp",
+      "title": "Kháng Chiến",
+      "position": [
+        -13.750001323270979,
+        2.918970312726296,
+        11.897351020552954
+      ],
+      "rotation": [
+        0,
+        89.99999231603718,
+        0
+      ],
+      "scale": [
+        2.5,
+        2.5,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116451712",
+      "type": "image",
+      "src": "/images/pn.webp",
+      "alt": "Phụ Nữ Việt Nam",
+      "title": "Phụ Nữ",
+      "position": [
+        -3.8723824978760018,
+        3.1183142584043173,
+        8.249999809265137
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.5,
+        2.5,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116454745",
+      "type": "image",
+      "src": "https://upload.wikimedia.org/wikipedia/en/e/ec/Gap_Nhau_by_Mai_Van_Hien.jpg?20181123060423",
+      "alt": "Mai Văn Hiến",
+      "title": "Gặp Nhau",
+      "position": [
+        9.560550132104591,
+        3.053626197592254,
+        8.249999809265137
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.375,
+        2.375,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116457706",
+      "type": "image",
+      "src": "/images/dh1.jfif",
+      "alt": "Tranh Dân Gian",
+      "title": "Đông Hồ 1",
+      "position": [
+        13.750004082116451,
+        2.9700098030662256,
+        11.785485170111652
+      ],
+      "rotation": [
+        0,
+        -89.99999758516347,
+        0
+      ],
+      "scale": [
+        1.875,
+        1.875,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-3",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116464896",
+      "type": "image",
+      "src": "/images/dh3.jpg",
+      "alt": "Tranh Dân Gian",
+      "title": "Đông Hồ 3",
+      "position": [
+        -3.010538754099384,
+        3.178534947065816,
+        15.750001535952421
+      ],
+      "rotation": [
+        -180,
+        -0.0000031447349358015197,
+        -180
+      ],
+      "scale": [
+        2.75,
+        2.75,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    },
+    {
+      "id": "image-1761116517466",
+      "type": "image",
+      "src": "/images/dh2.jpg",
+      "alt": "Tranh Dân Gian",
+      "title": "Đông Hồ 2",
+      "position": [
+        6.731886870323178,
+        2.9098047499732522,
+        15.750001001229855
+      ],
+      "rotation": [
+        -180,
+        -0.000003144734935801521,
+        -180
+      ],
+      "scale": [
+        2.625,
+        2.625,
+        1
+      ],
+      "parent": "wall-1757902588957",
+      "imageFrameId": "imageFrame-1",
+      "frameColor": "white"
+    }
+  ],
+  "images": [
+    {
+      "id": "spider",
+      "src": "/images/spider.jpg",
+      "alt": "Spiders",
+      "title": "Spider Picture"
+    },
+    {
+      "id": "cell",
+      "src": "/images/cell.jpg",
+      "alt": "Cell",
+      "title": "Cell"
+    },
+    {
+      "id": "image-1748225092658",
+      "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKi6hUPkerFKU0z3ngLkYSMTq249AgdYawyg&s",
+      "alt": "jackson",
+      "title": "jackson"
+    },
+    {
+      "id": "image-1748396402469",
+      "src": "https://collectionapi.metmuseum.org/api/collection/v1/iiif/488978/preview",
+      "alt": "Jackson Pollock",
+      "title": "Painting"
+    },
+    {
+      "id": "image-1748404577442",
+      "src": "/images/knave.webp",
+      "alt": "Knave",
+      "title": "OSR"
+    },
+    {
+      "id": "image-1748406325983",
+      "src": "/images/forest.jpg",
+      "alt": "Random Pic",
+      "title": "Forest"
+    },
+    {
+      "id": "image-1748406325984",
+      "src": "/images/calvacade.jfif",
+      "alt": "Joni Mabe",
+      "title": "Calvacade"
+    },
+    {
+      "id": "image-1748406325985",
+      "src": "/images/starry.jpg",
+      "alt": "Van Gogh",
+      "title": "Starry Night"
+    },
+    {
+      "id": "image-1748406325986",
+      "src": "/images/nature.jpg",
+      "alt": "Random Guy",
+      "title": "Nature"
+    },
+    {
+      "id": "image-1748406325987",
+      "src": "/images/pond.jpg",
+      "alt": "A big pond",
+      "title": "Pond"
+    },
+    {
+      "id": "image-1748406325988",
+      "src": "/images/rochester.jfif",
+      "alt": "1800s Rochester Map",
+      "title": "Rochester"
+    },
+    {
+      "id": "image-1748406325989",
+      "src": "/images/egg.webp",
+      "alt": "A lot of eggs",
+      "title": "Eggs"
+    },
+    {
+      "id": "image-1748406325990",
+      "src": "/images/dh1.jfif",
+      "alt": "Tranh Dân Gian",
+      "title": "Đông Hồ 1"
+    },
+    {
+      "id": "image-1748406325991",
+      "src": "/images/dh2.jpg",
+      "alt": "Tranh Dân Gian",
+      "title": "Đông Hồ 2"
+    },
+    {
+      "id": "image-1748406325992",
+      "src": "/images/dh3.jpg",
+      "alt": "Tranh Dân Gian",
+      "title": "Đông Hồ 3"
+    },
+    {
+      "id": "image-1748406325993",
+      "src": "/images/wm.jpg",
+      "alt": "Ảnh Chụp",
+      "title": "Kháng Chiến"
+    },
+    {
+      "id": "image-1748406325994",
+      "src": "/images/pn.webp",
+      "alt": "Phụ Nữ Việt Nam",
+      "title": "Phụ Nữ"
+    },
+    {
+      "id": "image-1750041796674",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Untitled_%28point_de_vue%29%2C_Ni%C3%A9pce_1827_%E2%80%94_HRC_2020_%28cropped%29.jpg/1070px-Untitled_%28point_de_vue%29%2C_Ni%C3%A9pce_1827_%E2%80%94_HRC_2020_%28cropped%29.jpg",
+      "alt": "Oldest camera picture",
+      "title": "Point de vue du Gras"
+    },
+    {
+      "id": "image-1750041913093",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Gustave_Le_Gray_-_Brig_upon_the_Water_-_Google_Art_Project.jpg/500px-Gustave_Le_Gray_-_Brig_upon_the_Water_-_Google_Art_Project.jpg",
+      "alt": "Gustave Le Gray",
+      "title": "The Brig"
+    },
+    {
+      "id": "image-1750042012535",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Oscar-gustave-rejlander_two_ways_of_life.jpg/500px-Oscar-gustave-rejlander_two_ways_of_life.jpg",
+      "alt": "Oscar Gustave Rejlander",
+      "title": "Two Ways of Life"
+    },
+    {
+      "id": "image-1750042524402",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Nadar_2.jpg/960px-Nadar_2.jpg",
+      "alt": "Nadar",
+      "title": "Sarah Bernhardt"
+    },
+    {
+      "id": "image-1750042611797",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Call%2C_I_Follow%2C_I_Follow%2C_Let_Me_Die%2C_by_Julia_Margaret_Cameron.jpg/960px-Call%2C_I_Follow%2C_I_Follow%2C_Let_Me_Die%2C_by_Julia_Margaret_Cameron.jpg",
+      "alt": "Julia Margaret Cameron",
+      "title": "Call, I Follow, I Follow, Let Me Die"
+    },
+    {
+      "id": "image-1750044010900",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Steichen_flatiron.jpg/960px-Steichen_flatiron.jpg",
+      "alt": "Edward Steichen",
+      "title": "Steichen Flatiron"
+    },
+    {
+      "id": "image-1750044083129",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/ThePondMoonlight.jpg/1095px-ThePondMoonlight.jpg",
+      "alt": "The Pond—Moonlight",
+      "title": "Edward Steichen"
+    },
+    {
+      "id": "image-1750044111709",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/An_Oasis_in_the_Badlands%2C_South_Dakota_%285711515700%29.jpg/1170px-An_Oasis_in_the_Badlands%2C_South_Dakota_%285711515700%29.jpg",
+      "alt": "Edward S. Curtis",
+      "title": "An Oasis in the Badlands"
+    },
+    {
+      "id": "image-1750044233286",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/BML_Le_Lointain_partie_1_31_128037_Le_Triomphe.jpg/584px-BML_Le_Lointain_partie_1_31_128037_Le_Triomphe.jpg",
+      "alt": "Robert E. Perry",
+      "title": "The North Pole"
+    },
+    {
+      "id": "image-1750046426989",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Pencil_hst_big.jpg/1212px-Pencil_hst_big.jpg",
+      "alt": "Hubble Space Telescope / NASA",
+      "title": "The Pencil Nebula"
+    },
+    {
+      "id": "image-1750046501924",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Challenger_explosion.jpg/1110px-Challenger_explosion.jpg",
+      "alt": "Michele McDonald",
+      "title": "Challenger Disaster"
+    },
+    {
+      "id": "image-1750047703876",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/3/36/PIA00563-Viking1-FirstColorImage-19760721.jpg",
+      "alt": "Viking 1",
+      "title": "The Red Planet"
+    },
+    {
+      "id": "image-1750048694502",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Eagle_nebula_pillars.jpg/1216px-Eagle_nebula_pillars.jpg",
+      "alt": "Hubble Space Telescope / NASA",
+      "title": "Pillars of Creation"
+    },
+    {
+      "id": "image-1750049027682",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Beauty_Out_of_Damage%2C_1993.jpg/500px-Beauty_Out_of_Damage%2C_1993.jpg",
+      "alt": "Matuschka",
+      "title": "Beauty Out of Damage"
+    },
+    {
+      "id": "image-1750049383440",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/USAF_F-16A_F-15C_F-15E_Desert_Storm_edit2.jpg/1280px-USAF_F-16A_F-15C_F-15E_Desert_Storm_edit2.jpg",
+      "alt": "David Turnley",
+      "title": "Operation Desert Storm"
+    },
+    {
+      "id": "image-1750049551717",
+      "src": "https://api.time.com/wp-content/uploads/2023/11/time-top-100-photos-2023-023.jpg?quality=75&w=828",
+      "alt": "",
+      "title": "Wyra'whaw"
+    },
+    {
+      "id": "image-1750057596083",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/La_Promenade%2C_by_Pierre-Auguste_Renoir.jpg/960px-La_Promenade%2C_by_Pierre-Auguste_Renoir.jpg",
+      "alt": "Pierre-Auguste Renoir",
+      "title": "La Promenade"
+    },
+    {
+      "id": "image-1750057983028",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1164px-Vincent_van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+      "alt": "Vincent van Gogh",
+      "title": "Starry Night"
+    },
+    {
+      "id": "image-1750058201685",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Pierre-Auguste_Renoir%2C_French_-_The_Grands_Boulevards_-_Google_Art_Project.jpg/1104px-Pierre-Auguste_Renoir%2C_French_-_The_Grands_Boulevards_-_Google_Art_Project.jpg",
+      "alt": "Pierre-Auguste Renoir",
+      "title": "The Grands Boulevards"
+    },
+    {
+      "id": "image-1750058692948",
+      "src": "https://upload.wikimedia.org/wikipedia/en/b/bc/Le_Pho_Maternity.jpg?20181123060207",
+      "alt": "Lê Phổ",
+      "title": "Maternité"
+    },
+    {
+      "id": "image-1750059003755",
+      "src": "https://upload.wikimedia.org/wikipedia/en/e/ec/Gap_Nhau_by_Mai_Van_Hien.jpg?20181123060423",
+      "alt": "Mai Văn Hiến",
+      "title": "Gặp Nhau"
+    },
+    {
+      "id": "image-1750059474774",
+      "src": "https://upload.wikimedia.org/wikipedia/en/9/98/Choi_o_an_quan-Nguyen_Phan_Chanh.jpg?20181123060613",
+      "alt": "Nguyễn Phan Chánh",
+      "title": "Chơi ô ăn quan"
+    },
+    {
+      "id": "image-1750060071121",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/X%C3%A3-X%E1%BB%87_et_L%C3%BD-To%C3%A9t.jpg/1200px-X%C3%A3-X%E1%BB%87_et_L%C3%BD-To%C3%A9t.jpg",
+      "alt": "Lý Toét",
+      "title": "Xã Xệ"
+    },
+    {
+      "id": "image-1750060183013",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Hai_thieu_nu_va_em_be.JPG/960px-Hai_thieu_nu_va_em_be.JPG",
+      "alt": "Tô Ngọc Vân",
+      "title": "Deux Jeunes filles et un enfants"
+    },
+    {
+      "id": "image-1750060316532",
+      "src": "https://upload.wikimedia.org/wikipedia/en/8/88/Female_Militia_in_the_Sea_Tran_Van_Can.jpg?20181123060332",
+      "alt": "Trần Văn Cẩn",
+      "title": "Female Militia in the Sea"
+    },
+    {
+      "id": "image-1750060577799",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f7/T%E1%BB%83_T%C6%B0%E1%BB%9Bng_Nguy%E1%BB%85n_Qu%C3%A1n_Nho2.jpg",
+      "alt": "",
+      "title": "Tể Tướng Nguyễn Quán Nho"
+    },
+    {
+      "id": "image-1750060699048",
+      "src": "https://upload.wikimedia.org/wikipedia/en/3/3f/Nguyen_Gia_Tri_Women_in_the_Garden.jpg?20181123060319",
+      "alt": "Nguyễn Gia Trí",
+      "title": "Thiếu nữ trong vườn"
+    },
+    {
+      "id": "image-1750060748463",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/G%C3%A1nh_h%C3%A1t_Nam_%C4%90%E1%BB%8Bnh_trong_l%E1%BB%85_T%E1%BB%A9_tu%E1%BA%A7n_%C4%90%E1%BA%A1i_kh%C3%A1nh_c%E1%BB%A7a_Ho%C3%A0ng_%C4%91%E1%BA%BF_Kh%E1%BA%A3i_%C4%90%E1%BB%8Bnh_%281924%29.jpg/500px-G%C3%A1nh_h%C3%A1t_Nam_%C4%90%E1%BB%8Bnh_trong_l%E1%BB%85_T%E1%BB%A9_tu%E1%BA%A7n_%C4%90%E1%BA%A1i_kh%C3%A1nh_c%E1%BB%A7a_Ho%C3%A0ng_%C4%91%E1%BA%BF_Kh%E1%BA%A3i_%C4%90%E1%BB%8Bnh_%281924%29.jpg",
+      "alt": "",
+      "title": "Tuồng"
+    },
+    {
+      "id": "image-1750060904413",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/9/97/Dong_Ho_painting_-_Ly_Ngu_vong_nguyet.jpg",
+      "alt": "Tranh Đông Hồ",
+      "title": "Cá Chép"
+    },
+    {
+      "id": "image-1750061115078",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/2/22/La_Tonkinoise_Et_La_Vieille_Sage.jpg",
+      "alt": "Nhất Linh",
+      "title": "La Tonkinoise Et La Vieille Sage"
+    },
+    {
+      "id": "image-1750061166668",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/03/Thapdiemdiemvoua.jpg",
+      "alt": "",
+      "title": "Diêm Vương"
+    },
+    {
+      "id": "image-1750061179290",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/a/af/Thapdiemdiemvoug.jpg",
+      "alt": "",
+      "title": "Diêm Vương"
+    },
+    {
+      "id": "image-1750061188242",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Thapdiemdiemvouc.jpg",
+      "alt": "",
+      "title": "Diêm Vương"
+    },
+    {
+      "id": "image-1750061199413",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/4/48/Thapdiemdiemvup.jpg",
+      "alt": "",
+      "title": "Diêm Vương"
+    },
+    {
+      "id": "image-1750061306384",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Portrait_of_Mr._Trinh_Dinh_Kien%2C_18th_century%2C_Vietnam_National_Museum_of_Fine_Arts_-_Hanoi%2C_Vietnam.jpg",
+      "alt": "",
+      "title": "Trịnh Đình Kiên"
+    },
+    {
+      "id": "image-1750061355329",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Nguyen_Trai.jpg/800px-Nguyen_Trai.jpg",
+      "alt": "",
+      "title": "Nguyễn Trãi"
+    },
+    {
+      "id": "image-1750063351957",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Raco-Boutang.jpg/500px-Raco-Boutang.jpg",
+      "alt": "Louis Boutan",
+      "title": "Portrait of Emil Racoviță"
+    },
+    {
+      "id": "image-17500633519587",
+      "src": "/images/bird.mp4",
+      "alt": "Bird",
+      "title": "Bird"
+    }
+  ],
+  "imageFrameList": [
+    {
+      "id": "imageFrame-1"
+    },
+    {
+      "id": "imageFrame-2"
+    },
+    {
+      "id": "imageFrame-3"
+    },
+    {
+      "id": "imageFrame-4"
+    }
+  ],
+  "tourMarkers": [
+    {
+      "id": "tourmarker-image-1759285429392",
+      "imageId": "image-1759285429392",
+      "tourIndex": 0,
+      "position": [
+        -18.179734414418537,
+        3.254564428210641,
+        27.194953894957376
+      ],
+      "imagePosition": [
+        -9.517490832010905,
+        1.9203320165944948,
+        7.4676199382102215
+      ],
+      "imageRotation": [
+        0,
+        90,
+        0
+      ],
+      "wallPosition": [
+        0,
+        -0.010000000000000083,
+        14.5
+      ],
+      "wallRotation": [
+        0,
+        0,
+        0
+      ],
+      "wallScale": [
+        1.7,
+        1.7,
+        1.7
+      ],
+      "duration": 77322
+    },
+    {
+      "id": "tourmarker-image-1759285764318",
+      "imageId": "image-1759285764318",
+      "tourIndex": 1,
+      "position": [
+        -18.179734414418537,
+        3.381752232770051,
+        18.71173773687709
+      ],
+      "imagePosition": [
+        -9.517490832010905,
+        1.995148372217677,
+        2.4774927863982885
+      ],
+      "imageRotation": [
+        0,
+        90,
+        0
+      ],
+      "wallPosition": [
+        0,
+        -0.010000000000000083,
+        14.5
+      ],
+      "wallRotation": [
+        0,
+        0,
+        0
+      ],
+      "wallScale": [
+        1.7,
+        1.7,
+        1.7
+      ],
+      "duration": 67631
+    },
+    {
+      "id": "tourmarker-image-1759286867749",
+      "imageId": "image-1759286867749",
+      "tourIndex": 4,
+      "position": [
+        -18.179734414418537,
+        3.5049444743366243,
+        10.261912199145318
+      ],
+      "imagePosition": [
+        -9.517490832010905,
+        2.0676143966686027,
+        -2.492992824032166
+      ],
+      "imageRotation": [
+        0,
+        90,
+        0
+      ],
+      "wallPosition": [
+        0,
+        -0.010000000000000083,
+        14.5
+      ],
+      "wallRotation": [
+        0,
+        0,
+        0
+      ],
+      "wallScale": [
+        1.7,
+        1.7,
+        1.7
+      ],
+      "duration": 86674
+    },
+    {
+      "id": "tourmarker-image-1761114407653",
+      "imageId": "image-1761114407653",
+      "tourIndex": 3,
+      "position": [
+        -7.731905388464262,
+        3.300660187140657,
+        3.903487990385437
+      ],
+      "imagePosition": [
+        -4.548179881328658,
+        1.947447168906269,
+        -5.056771770361532
+      ],
+      "imageRotation": [
+        0,
+        -0.000011739746433277,
+        0
+      ],
+      "wallPosition": [
+        0,
+        -0.010000000000000083,
+        14.5
+      ],
+      "wallRotation": [
+        0,
+        0,
+        0
+      ],
+      "wallScale": [
+        1.7,
+        1.7,
+        1.7
+      ],
+      "duration": 28029
+    },
+    {
+      "id": "tourmarker-image-1761114433565",
+      "imageId": "image-1761114433565",
+      "tourIndex": 2,
+      "position": [
+        -4.916503388076839,
+        3.3030385478218935,
+        18.73733640195194
+      ],
+      "imagePosition": [
+        -1.7155902282804931,
+        1.948846204601114,
+        2.492550824677611
+      ],
+      "imageRotation": [
+        0,
+        90,
+        0
+      ],
+      "wallPosition": [
+        0,
+        -0.010000000000000083,
+        14.5
+      ],
+      "wallRotation": [
+        0,
+        0,
+        0
+      ],
+      "wallScale": [
+        1.7,
+        1.7,
+        1.7
+      ],
+      "duration": 65724
+    }
+  ],
+  "metadata": {
+    "exportedAt": "2025-10-22T07:04:39.296Z",
+    "originalFile": "room1.json",
+    "version": "1.0"
+  }
+}

@@ -1,0 +1,88 @@
+$Color-title: #2e2e2e;
+$Color-text: #515151;
+
+.User {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-top: 1px solid #969696;
+  width: 100%;
+  padding-top: 56px;
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    &__header {
+      display: flex;
+      width: 100%;
+      align-items: start;
+      justify-content: space-between;
+
+      &__left {
+        display: flex;
+        flex-direction: column;
+
+        &__title {
+          font-size: 40px;
+          margin-bottom: 12px;
+          color: $Color-title;
+          font-weight: 600;
+        }
+
+        &__dissc {
+          font-size: 19px;
+        }
+      }
+      &__right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &__image {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 72px;
+          height: 72px;
+          border-radius: 100px;
+          background-position: center;
+          background-size: cover;
+        }
+        &__user {
+          margin-left: 24px;
+
+          &__name {
+            text-transform: uppercase;
+            font-size: 24px;
+            color: $Color-title;
+            font-weight: 500;
+          }
+          &__button {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+
+            &__item {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 4px 16px;
+              color: $Color-title;
+              border: $Color-title solid 2px;
+              margin-right: 12px;
+
+              &__icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: 8px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

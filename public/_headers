@@ -1,0 +1,20 @@
+/*.js
+  Content-Type: application/javascript; charset=utf-8
+
+/*.mjs
+  Content-Type: application/javascript; charset=utf-8
+
+/*.wasm
+  Content-Type: application/wasm
+
+/*.glb
+  Content-Type: model/gltf-binary
+
+/*.gltf
+  Content-Type: model/gltf+json
+
+/*.hdr
+  Content-Type: application/octet-stream
+
+/*.exr
+  Content-Type: application/octet-stream
