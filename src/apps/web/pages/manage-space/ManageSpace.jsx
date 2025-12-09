@@ -11,7 +11,7 @@ import {
   MdVisibility,
   MdSearch,
 } from 'react-icons/md';
-import Modal from '../../components/Modal';
+import Modal from '../../components/modal/index';
 
 export default function ManageSpace() {
   const [api, contextHolder] = notification.useNotification();
