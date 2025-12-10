@@ -1,8 +1,7 @@
 import { MdClose } from 'react-icons/md';
 import { useEffect, useState } from 'react';
-import { RoomApi } from '@/api/roomApi';
 import { ImageApi } from '@/api/imageApi';
-import { notification } from 'antd';
+import { notification, Select } from 'antd';
 import { Object3dApi } from '@/api/object3dApi';
 import { AudioApi } from '@/api/audioApi';
 
@@ -16,34 +15,16 @@ export default function ModalCreateResource({
   const [api, contextHolder] = notification.useNotification();
   const [form, setForm] = useState({
     title: '',
-    room_id: [],
     file: null,
   });
 
   const [preview, setPreview] = useState('');
-  const [rooms, setRooms] = useState([]);
-
-  useEffect(() => {
-    fetchRooms();
-  }, []);
 
   useEffect(() => {
     if (formData) setForm(formData);
   }, [isOpen]);
 
   if (!isOpen) return null;
-
-  async function fetchRooms() {
-    const data = await RoomApi.getAll();
-    setRooms(data);
-  }
-
-  function handleRoomSelect(e) {
-    const selected = Array.from(e.target.selectedOptions).map(
-      (opt) => opt.value
-    );
-    setForm({ ...form, room_id: selected });
-  }
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -68,7 +49,6 @@ export default function ModalCreateResource({
   function handleClose() {
     setForm({
       title: '',
-      room_id: [],
       file: null,
     });
     setPreview('');
@@ -80,7 +60,6 @@ export default function ModalCreateResource({
       const res = await ImageApi.create({
         title: form.title,
         file: form.file,
-        room_id: form.room_id,
       });
       console.log(res);
       if (res.status == 422)
@@ -98,7 +77,6 @@ export default function ModalCreateResource({
         title: form.title,
         file: form.file,
         description: form.description,
-        room_id: form.room_id,
       });
       api.success({
         title: 'Thành công',
@@ -111,7 +89,6 @@ export default function ModalCreateResource({
         title: form.title,
         file: form.file,
         description: form.description,
-        room_id: form.room_id,
       });
       api.success({
         title: 'Thành công',
@@ -126,7 +103,6 @@ export default function ModalCreateResource({
         title: form.title,
         file: form.file,
         description: form.description,
-        room_id: form.room_id,
       });
       api.success({
         title: 'Thành công',
@@ -196,7 +172,7 @@ export default function ModalCreateResource({
 
             {form.file_url && (
               <div>
-                <label className='font-medium'>Đường dẫn hiện tại</label>
+                <label className='font-medium'>Đường dẫn cũ</label>
                 <a
                   href={form.file_url}
                   target='_blank'
@@ -252,24 +228,7 @@ export default function ModalCreateResource({
                 </p>
               )}
             </div>
-            <div className='flex flex-col gap-2'>
-              <label className='font-medium'>Không gian</label>
-              <select
-                multiple // ⭐ Cho chọn nhiều
-                name='room_id'
-                id='room_id'
-                required={form.room_id.length === 0}
-                className='w-full border px-3 py-2 mt-1 h-32'
-                value={form.room_id} // ⭐ select nhiều phải truyền array
-                onChange={handleRoomSelect}
-              >
-                {rooms.map((room) => (
-                  <option key={room.id} value={room.id}>
-                    {room.title}
-                  </option>
-                ))}
-              </select>
-            </div>
+
             <button className='primary-button w-full' type='submit'>
               {form.id ? 'Cập nhật' : 'Tạo mới'}
             </button>
