@@ -1,7 +1,7 @@
 import { initCurrentUser } from "@/apiEditor/authApi";
 import axiosClient from "../common/axiosClient";
+import { apiEndpoints } from "../common/constants";
 import { setCookie, getCookie, deleteAllCookies } from "../common/cookies";
-import { apiEndpoints } from "@/common/constants";
 
 export interface SignupResponse {
   success: boolean;
@@ -25,11 +25,8 @@ export interface LoginResponse {
 }
 
 export interface RefreshResponse {
-  success: boolean;
-  data: {
-    session: {
-      access_token: string;
-    };
+  session: {
+    access_token: string;
   };
 }
 
@@ -123,14 +120,14 @@ export const AuthApi = {
     isRefreshing = true;
     refreshPromise = (async () => {
       try {
+        console.log(apiEndpoints.auth.refreshToken);
+
         const res = await axiosClient.post(apiEndpoints.auth.refreshToken, {
           refresh_token: refreshToken,
         });
         const data: RefreshResponse = res.data;
 
-        if (!data.success) throw new Error("Làm mới token thất bại");
-
-        const newToken = data?.data?.session?.access_token;
+        const newToken = data?.session?.access_token;
         setCookie("access_token", newToken, 1);
 
         return newToken;
