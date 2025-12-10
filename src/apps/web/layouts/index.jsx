@@ -223,13 +223,8 @@ function LayoutDefault() {
                   {currentUser ? (
                     <div className='relative group'>
                       {/* Trigger */}
-                      <div className='font-semibold py-1 cursor-pointer flex items-center gap-2'>
-                        <img
-                          src='/avatar.png'
-                          alt=''
-                          className='rounded-full h-9 w-9 object-cover'
-                        />
-                        <span className='text-xl'>{currentUser.name}</span>
+                      <div className='font-semibold py-1 cursor-pointer'>
+                        {currentUser.name}
                       </div>
 
                       {/* Dropdown */}
@@ -240,14 +235,12 @@ function LayoutDefault() {
                         >
                           Hồ sơ
                         </div>
-                        {currentUser.role !== RoleEnum.Admin && (
-                          <div
-                            className='px-4 py-2 hover:font-semibold cursor-pointer'
-                            onClick={() => navigate('/pricing')}
-                          >
-                            Nâng cấp tài khoản
-                          </div>
-                        )}
+                        <div
+                          className='px-4 py-2 hover:font-semibold cursor-pointer'
+                          onClick={() => navigate('/pricing')}
+                        >
+                          Nâng cấp tài khoản
+                        </div>
 
                         <div
                           className='px-4 py-2   hover:font-semibold cursor-pointer'
@@ -344,14 +337,12 @@ function LayoutDefault() {
                               >
                                 Hồ sơ
                               </div>
-                              {currentUser.role !== RoleEnum.Admin && (
-                                <div
-                                  className='px-4 py-2 hover:font-semibold cursor-pointer'
-                                  onClick={() => navigate('/pricing')}
-                                >
-                                  Nâng cấp tài khoản
-                                </div>
-                              )}
+                              <div
+                                className='px-4 py-2 hover:font-semibold cursor-pointer'
+                                onClick={() => navigate('/pricing')}
+                              >
+                                Nâng cấp tài khoản
+                              </div>
 
                               <div
                                 className='px-4 py-2   hover:font-semibold cursor-pointer'

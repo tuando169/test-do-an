@@ -36,22 +36,16 @@ export default function ManageResource() {
 
   const loadImages = async () => {
     const data = await ImageApi.getList();
-    setImages(
-      data.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''))
-    );
+    setImages(data.sort((a, b) => a.title.localeCompare(b.title)));
   };
   const loadTextures = async () => {
     const data = await TextureApi.getAll();
-    setTextures(
-      data.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''))
-    );
+    setTextures(data.sort((a, b) => a.title.localeCompare(b.title)));
   };
 
   const loadObjects = async () => {
     const data = await Object3dApi.getList();
-    setObjects(
-      data.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''))
-    );
+    setObjects(data.sort((a, b) => a.title.localeCompare(b.title)));
   };
 
   const loadAudio = async () => {

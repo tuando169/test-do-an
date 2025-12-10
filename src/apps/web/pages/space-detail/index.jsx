@@ -88,7 +88,7 @@ function Space() {
                     </div>
                   </div>
                 </div>
-                <div className='flex gap-3 mt-4 justify-end'>
+                <div className='flex gap-3 mt-4'>
                   {(khongGian?.owner_id == localStorage.getItem('user') ||
                     userRole == RoleEnum.Admin) && (
                     <Link
@@ -103,7 +103,10 @@ function Space() {
                       </div>
                     </Link>
                   )}
-                  <Link to={`/exhibition/${khongGian?.slug}`}>
+                  <Link
+                    to={`/exhibition/${khongGian?.slug}`}
+                    className='ml-auto'
+                  >
                     <div className='flex gap-1 primary-button items-center'>
                       <p className=' uppercase  '>KHÁM PHÁ KHÔNG GIAN</p>
                       <div className=' '>

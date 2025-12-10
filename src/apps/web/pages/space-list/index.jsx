@@ -69,14 +69,21 @@ function ListSpace() {
                 <div className='primary-button'>TẠO KHÔNG GIAN</div>
               </div>
             </div>
+            <input
+              type='radio'
+              name='khonggian'
+              id='khonggiantrungbay'
+              defaultChecked
+            />
+            <input type='radio' name='khonggian' id='khonggiansangtao' />
 
             {filteredSpaces.length ? (
               <div className='ListSpace__inner__content'>
-                <div className='grid grid-cols-2 gap-10'>
+                <div className='row'>
                   {filteredSpaces.map((khongGian) => (
                     <Link
                       to={`/space/${khongGian.slug}`}
-                      className=''
+                      className='col-md-6'
                       key={khongGian.id}
                     >
                       <div className='ListSpace__inner__content__box'>
@@ -101,10 +108,12 @@ function ListSpace() {
                             </div>
                           </div>
                         </div>
-                        <img
-                          className='h-60 w-full object-cover bg-center bg-no-repeat'
-                          src={khongGian.thumbnail}
-                        ></img>
+                        <div
+                          className='ListSpace__inner__content__box__image'
+                          style={{
+                            background: `url(${khongGian.thumbnail})`,
+                          }}
+                        ></div>
                         <div className='ListSpace__inner__content__box__button'>
                           <Link to={`/space/${khongGian.slug}`}>
                             <div className='ListSpace__inner__content__box__button__text'>
