@@ -1,3 +1,4 @@
+import { initCurrentUser } from "@/apiEditor/authApi";
 import axiosClient from "../common/axiosClient";
 import { setCookie, getCookie, deleteAllCookies } from "../common/cookies";
 import { apiEndpoints } from "@/common/constants";
@@ -53,6 +54,17 @@ export const AuthApi = {
     }
   },
 
+  async fetchUserInfoAfterLogin(userId: string) {
+    try {
+      const res = await axiosClient.get(apiEndpoints.user.getById(userId));
+      currentUser = res.data;
+      return currentUser;
+    } catch (err) {
+      console.error("Không lấy được thông tin user:", err);
+      return null;
+    }
+  },
+
   async login(email: string, password: string): Promise<any> {
     const res = await axiosClient.post(apiEndpoints.auth.login, {
       email,
@@ -60,14 +72,25 @@ export const AuthApi = {
     });
     const data: LoginResponse = res.data;
 
+    const userId = data?.session?.user?.id;
     const accessToken = data?.session?.access_token;
     const refreshToken = data?.session?.refresh_token;
 
+    // Lưu userId để initCurrentUser biết phải fetch ai
+    localStorage.setItem("userId", userId);
+
+    // Lưu token
     setCookie("access_token", accessToken, 1);
     setCookie("refresh_token", refreshToken, 7);
 
     hasLoggedOut = false;
-    return data.user;
+
+    //GỌI API LẤY THÔNG TIN ROLE
+    const user = await AuthApi.fetchUserInfoAfterLogin(userId);
+
+    setCookie("role", user.role, 1);
+
+    return user; // Trả về luôn role, name,...
   },
 
   /** ------------------ GET TOKEN ----------------------- */
@@ -77,6 +100,10 @@ export const AuthApi = {
 
   getRefreshToken(): string | null {
     return getCookie("refresh_token");
+  },
+
+  getUserRole(): any {
+    return getCookie("role");
   },
 
   getUserInfo(): any {

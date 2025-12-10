@@ -1,7 +1,7 @@
 import { fetchWithAuth, initCurrentUser, getUserInfo } from "./authApi";
 import { getAllRoomTemplates } from "./roomTemplateApi";
 
-const BASE_URL = "https://nsumwobjesbawigigfwy.functions.supabase.co";
+const BASE_URL = "https://3d-gallery-be.vercel.app";
 const PUBLIC_API_KEY = "3D_GALLERY_PUBLIC_API_2025_VS";
 
 /**
@@ -157,7 +157,7 @@ export async function createExhibition({
         }
 
         // SEND
-        const res = await fetchWithAuth("/exhibitions", {
+        const res = await fetchWithAuth("/room", {
         method: "POST",
         body: formData,
         });
@@ -176,7 +176,7 @@ export async function createExhibition({
 /** Lấy danh sách exhibitions (của user) */
 export async function getExhibitionByUserId(params = {}) {
     const query = new URLSearchParams(params).toString();
-    const url = `/exhibitions${query ? `?${query}` : ""}`;
+    const url = `/room${query ? `?${query}` : ""}`;
     const res = await fetchWithAuth(url, { method: "GET" });
     const data = await res.json();
     if (!res.ok || !data.success)
@@ -186,7 +186,7 @@ export async function getExhibitionByUserId(params = {}) {
 
 /** Lấy chi tiết exhibition theo ID */
 export async function getExhibitionDetail(id) {
-    const res = await fetchWithAuth(`/exhibition-detail?exhibition_id=${encodeURIComponent(id)}`, {
+    const res = await fetchWithAuth(`/room/${encodeURIComponent(id)}`, {
         method: "GET",
     });
     const data = await res.json();
@@ -245,7 +245,7 @@ export async function updateExhibition(id, updateData = {}) {
         }
 
         // Gửi request
-        const res = await fetchWithAuth(`/exhibitions?exhibition_id=${encodeURIComponent(id)}`, {
+        const res = await fetchWithAuth(`/room/${encodeURIComponent(id)}`, {
         method: "PUT",
         body: formData,
         });
@@ -264,9 +264,7 @@ export async function updateExhibition(id, updateData = {}) {
 
 /** Xóa exhibition */
 export async function deleteExhibition(ids) {
-    const idList = Array.isArray(ids) ? ids : [ids];
-    const query = idList.map((id) => `exhibition_id=${encodeURIComponent(id)}`).join("&");
-    const res = await fetchWithAuth(`/exhibitions?${query}`, { method: "DELETE" });
+    const res = await fetchWithAuth(`/room/${encodeURIComponent(ids)}`, { method: "DELETE" });
     const data = await res.json();
     if (!res.ok || !data.success)
         throw new Error(data.message || "Xóa exhibition thất bại");
@@ -274,16 +272,15 @@ export async function deleteExhibition(ids) {
 }
 
 /** Lấy danh sách public exhibition (nếu có endpoint public) */
-export async function getAllExhibitions(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${BASE_URL}/public-exhibitions${query ? `?${query}` : ""}`, {
-        method: "GET",
-        headers: {
-        "x-api-key": PUBLIC_API_KEY,
-        },
-    });
-    const data = await res.json();
-    if (!res.ok)
-        throw new Error(data.message || "Không lấy được danh sách public exhibitions");
-    return data.data.results;
+export async function getAllExhibitions() {
+  const res = await fetch(`${BASE_URL}/room/public`, {
+    method: "GET",
+  });
+
+  const data = await res.json();
+
+  if (!res.ok)
+    throw new Error(data.message || "Không lấy được danh sách public exhibitions");
+
+  return data.data; // tùy backend: results hoặc data
 }

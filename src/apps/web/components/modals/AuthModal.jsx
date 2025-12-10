@@ -43,7 +43,6 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
     setLoading(true);
     AuthApi.login(form.email, form.password)
       .then((data) => {
-        localStorage.setItem("user", data.id);
         if (onSuccess) onSuccess(data.id);
 
         api.success({
