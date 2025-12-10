@@ -1,12 +1,10 @@
-import "./WebLine.scss";
+import './WebLine.scss';
 
-function  WebLine(){
-    return(
-        <>
-            <div className="Web__webLine">
-                
-            </div>
-        </>
-    )
+function WebLine(props) {
+  return (
+    <>
+      <div className='Web__webLine' {...props}></div>
+    </>
+  );
 }
 export default WebLine;

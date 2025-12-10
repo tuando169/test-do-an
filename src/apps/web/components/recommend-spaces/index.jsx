@@ -5,7 +5,7 @@ import { MdArrowOutward } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { RoomApi } from '@/api/roomApi';
 
-function Home_Section2() {
+function RecommendSpaces() {
   const [spaces, setSpaces] = useState([]);
   useEffect(() => {
     const fetchSpaces = async () => {
@@ -44,11 +44,11 @@ function Home_Section2() {
             <WebLine />
             {spaces.length ? (
               <div className='Web__home__section2__inner__content'>
-                <div className='row'>
+                <div className='grid grid-cols-4 gap-6'>
                   {spaces.slice(0, 4).map((khongGian) => (
                     <Link
                       to={`/space/${khongGian.slug}`}
-                      className='col-3'
+                      className=''
                       key={khongGian.id}
                     >
                       <div className='Web__home__section2__inner__content__box'>
@@ -102,4 +102,4 @@ function Home_Section2() {
   );
 }
 
-export default Home_Section2;
+export default RecommendSpaces;

@@ -1,0 +1,162 @@
+import { FaSearch } from 'react-icons/fa';
+import { MdArrowOutward } from 'react-icons/md';
+import { useEffect, useState } from 'react';
+import { RoomApi } from '@/api/roomApi';
+import { notification } from 'antd';
+import Modal from '@/apps/web/components/modal';
+import CreateSpaceInfoModal from './CreateSpaceInfoModal';
+
+export default function CreateSpace3DModal({ isVisible, onClose, onSuccess }) {
+  const [api, contextHolder] = notification.useNotification();
+
+  const [templateRooms, setTemplateRooms] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  const [showCreatePopup, setShowCreatePopup] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    type: '3d',
+    visibility: 'public',
+    thumbnail: '',
+    room_json: {},
+  });
+
+  function onCreateSuccess() {
+    api.success({ title: 'Thành công', description: 'Đã tạo không gian.' });
+    if (onSuccess) onSuccess();
+    handleClose();
+  }
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    RoomApi.getPublicTemplateList()
+      .then((data) => setTemplateRooms(data))
+      .catch((e) => console.error(e));
+  }, [isVisible]);
+
+  const filteredSpaces = templateRooms.filter((item) =>
+    item.title.toLowerCase().includes(searchKeyword.toLowerCase())
+  );
+
+  function handleClose() {
+    setShowCreatePopup(false);
+    setFormData({
+      title: '',
+      type: '3d',
+      visibility: 'public',
+      thumbnail: '',
+      room_json: {},
+    });
+    onClose();
+  }
+
+  return (
+    <>
+      {contextHolder}
+
+      <Modal isVisible={isVisible} onClose={handleClose}>
+        <div className='w-[1000px] max-w-full'>
+          <div className='flex items-center w-full my-6'>
+            <div className='text-4xl font-bold text-[#2e2e2e]'>
+              TẠO KHÔNG GIAN
+            </div>
+
+            <div className='flex items-center ml-auto relative'>
+              <input
+                type='text'
+                placeholder='Tìm kiếm không gian'
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                className='h-12 w-72 px-6 border border-gray-500 text-gray-700'
+              />
+              <div className='absolute right-4 text-gray-600'>
+                <FaSearch />
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setFormData({
+                  title: '',
+                  type: 'gallery',
+                  visibility: 'public',
+                  thumbnail: '',
+                  room_json: {},
+                });
+                setShowCreatePopup(true);
+              }}
+              className='primary-button ml-4'
+            >
+              TẠO PHÒNG TRỐNG
+            </button>
+          </div>
+
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            {filteredSpaces.map((room) => (
+              <div key={room.id} className='cursor-pointer'>
+                <div className='shadow-lg p-6 border-[20px] border-transparent hover:border-[#2e2e2e] transition'>
+                  <div className='text-lg font-bold uppercase text-[#2e2e2e] truncate'>
+                    {room.title}
+                  </div>
+
+                  <div className='flex mt-2 text-gray-700'>
+                    <div>
+                      <div>Nghệ sĩ</div>
+                      <div>Thể loại</div>
+                    </div>
+
+                    <div className='ml-6 font-semibold'>
+                      <div>{room.author}</div>
+                      <div>{room.type}</div>
+                    </div>
+                  </div>
+
+                  <div
+                    className='w-full h-40 bg-cover bg-center mt-4'
+                    style={{ backgroundImage: `url(${room.thumbnail})` }}
+                  />
+
+                  <div className='grid grid-cols-2 gap-3 w-full mt-4'>
+                    <div
+                      className='secondary-button flex items-center justify-center'
+                      onClick={() =>
+                        window.open(`/space/${room.slug}`, '_blank')
+                      }
+                    >
+                      XEM TRƯỚC
+                      <MdArrowOutward className='ml-1' />
+                    </div>
+                    <div
+                      className='primary-button flex items-center justify-center'
+                      onClick={() => {
+                        setFormData({
+                          title: room.title,
+                          type: room.type,
+                          visibility: 'private',
+                          thumbnail: room.thumbnail,
+                          room_json: room.room_json,
+                        });
+                        setShowCreatePopup(true);
+                      }}
+                    >
+                      TẠO TỪ MẪU
+                      <MdArrowOutward className='ml-1' />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Modal>
+
+      <CreateSpaceInfoModal
+        isVisible={showCreatePopup}
+        onClose={() => setShowCreatePopup(false)}
+        onSuccess={onCreateSuccess}
+        template={formData}
+      />
+    </>
+  );
+}

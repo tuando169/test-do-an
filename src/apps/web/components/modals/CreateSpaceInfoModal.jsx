@@ -5,7 +5,7 @@ import Modal from "../modal";
 import { AiOutlineLoading3Quarters } from "react-icons/ai"; // Import icon loading (nếu bạn có react-icons)
 // Hoặc nếu không muốn import icon, mình dùng CSS thuần bên dưới
 
-export default function CreateSpaceModal({
+export default function CreateSpaceInfoModal({
   isVisible,
   onClose,
   template,
