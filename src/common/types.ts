@@ -1,4 +1,4 @@
-import { NewsItemTypeEnum } from "./constants";
+import { NewsItemTypeEnum } from './constants';
 
 export interface UserData {
   id: string;
@@ -68,18 +68,27 @@ export interface NewsData {
   title: string;
   slug: string;
   description?: string;
-
-  layout_json: {
-    blocks: Array<{
-      type: NewsItemTypeEnum;
-      content: string;
-    }>;
-  };
+  thumbnail: string;
+  layout_json: Array<{
+    type: NewsItemTypeEnum;
+    content: string;
+  }>;
 
   visibility: string;
 
   created_at: string;
   updated_at: string;
+}
+export interface NewsUploadData {
+  title: string;
+  slug: string;
+  description?: string;
+  thumbnail: File;
+
+  layout_json: Array<{
+    type: NewsItemTypeEnum;
+    content: File | string;
+  }>;
 }
 
 export interface ImageData {

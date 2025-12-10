@@ -1,5 +1,5 @@
-import axios from "axios";
-import { AuthApi } from "@/api/authApi";
+import axios from 'axios';
+import { AuthApi } from '@/api/authApi';
 
 const axiosClient = axios.create({});
 
@@ -24,7 +24,10 @@ axiosClient.interceptors.request.use(
     const token = AuthApi.getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    } else AuthApi.forceLogout();
+    } else {
+      const refreshToken = AuthApi.getRefreshToken();
+      if (!refreshToken) AuthApi.forceLogout();
+    }
     return config;
   },
   (err) => Promise.reject(err)

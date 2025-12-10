@@ -6,7 +6,7 @@ import { notification } from 'antd';
 import Modal from '@/apps/web/components/modal';
 import CreateSpaceInfoModal from './CreateSpaceInfoModal';
 
-export default function CreateSpace3DModal({ isVisible, onClose, onSuccess }) {
+export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
   const [api, contextHolder] = notification.useNotification();
 
   const [templateRooms, setTemplateRooms] = useState([]);

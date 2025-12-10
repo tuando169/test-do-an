@@ -60,7 +60,7 @@ function Space() {
               style={{ boxShadow: '0 0 28px black' }}
             >
               <div className='absolute top-0 left-0 w-full h-full bg-white opacity-80'></div>
-              <div className='relative w-[540px]'>
+              <div className='relative min-w-[540px]'>
                 <div className='font-bold text-[80px]'>{khongGian?.title}</div>
                 <div className='Space__inner__info text-xl gap-5'>
                   <div className='flex flex-col gap-2 font-semibold'>
@@ -89,20 +89,20 @@ function Space() {
                   </div>
                 </div>
                 <div className='flex gap-3 mt-4'>
-                  {userRole == RoleEnum.Admin ||
-                    (khongGian?.owner_id == localStorage.getItem('user') && (
-                      <Link
-                        to={`/exhibition-edit/${khongGian?.slug}`}
-                        className=''
-                      >
-                        <div className='flex gap-1 secondary-button items-center'>
-                          <div className=' uppercase'>Chỉnh sửa KHÔNG GIAN</div>
-                          <div className='Space__inner__button__inner__icon'>
-                            <MdArrowOutward />
-                          </div>
+                  {(khongGian?.owner_id == localStorage.getItem('user') ||
+                    userRole == RoleEnum.Admin) && (
+                    <Link
+                      to={`/exhibition-edit/${khongGian?.slug}`}
+                      className=''
+                    >
+                      <div className='flex gap-1 secondary-button items-center'>
+                        <div className=' uppercase'>Chỉnh sửa KHÔNG GIAN</div>
+                        <div className='Space__inner__button__inner__icon'>
+                          <MdArrowOutward />
                         </div>
-                      </Link>
-                    ))}
+                      </div>
+                    </Link>
+                  )}
                   <Link
                     to={`/exhibition/${khongGian?.slug}`}
                     className='ml-auto'

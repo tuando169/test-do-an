@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { RoomApi } from '@/api/roomApi';
 import AuthModal from '../../components/modals/AuthModal';
-import CreateSpace3DModal from '../../components/modals/CreateSpace3DModal';
+import CreateSpaceModal from '../../components/modals/CreateSpaceModal';
 
 function ListSpace() {
   const [publicRooms, setPublicRooms] = useState([]);
@@ -33,15 +33,15 @@ function ListSpace() {
     setShowCreatePopup(true);
   }
 
+  const fetchData = async () => {
+    try {
+      const data = await RoomApi.getPublicRoomList();
+      setPublicRooms(data);
+    } catch (err) {
+      console.error('Lỗi khi tải danh sách exhibition:', err);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await RoomApi.getPublicRoomList();
-        setPublicRooms(data);
-      } catch (err) {
-        console.error('Lỗi khi tải danh sách exhibition:', err);
-      }
-    };
     fetchData();
   }, []);
 
@@ -144,9 +144,10 @@ function ListSpace() {
           setShowCreatePopup(true);
         }}
       />
-      <CreateSpace3DModal
+      <CreateSpaceModal
         isVisible={showCreatePopup}
         onClose={() => setShowCreatePopup(false)}
+        onSuccess={fetchData}
       />
     </>
   );

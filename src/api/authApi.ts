@@ -195,6 +195,7 @@ export const AuthApi = {
     hasLoggedOut = true;
     localStorage.removeItem("user");
     currentUser = null;
+    deleteAllCookies();
     console.warn("Token không hợp lệ — đã xóa toàn bộ cookie");
   },
 };
