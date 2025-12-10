@@ -24,6 +24,7 @@ export const Object3D = ({
     gizmoActive,
     hoveredId,
     gizmoMode,
+    snapEnabled,
     hdri, // Add hdri parameter
 }) => {
     const ref = useRef();
@@ -151,6 +152,7 @@ export const Object3D = ({
                     objectRef={ref}
                     mode={gizmoMode}
                     gizmoActive={gizmoActive}
+                    snapEnabled={snapEnabled}
                     onTransformChange={(transform) => onTransformChange(id, transform)}
                 />
             )}

@@ -21,6 +21,7 @@ export const SpotLightWithHelper = ({
   gizmoMode,
   selectedId,
   gizmoActive,
+  snapEnabled,
   onTransformChange,
   setSelectedId,
   setPopupVisible,
@@ -158,6 +159,7 @@ export const SpotLightWithHelper = ({
           objectRef={pivotRef}
           mode={gizmoMode} // luôn hợp lệ do shouldShowGizmo
           gizmoActive={gizmoActive}
+          snapEnabled={snapEnabled}
           onTransformChange={handleTransform}
         />
       )}

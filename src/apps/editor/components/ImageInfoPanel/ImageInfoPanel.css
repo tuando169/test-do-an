@@ -39,6 +39,13 @@
     align-items: center;
 }
 
+/* Buttons row container */
+.buttons-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
 /* Nút info - Modern gradient design */
 .info-btn {
     width: 64px; 
@@ -55,6 +62,70 @@
     z-index: 22;
     position: relative;
     overflow: hidden;
+}
+
+/* External audio button - similar style to info button */
+.audio-btn-external {
+    width: 64px; 
+    height: 64px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 22;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.audio-btn-external::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.audio-btn-external:hover {
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 15px 35px rgba(255, 107, 107, 0.6);
+}
+
+.audio-btn-external:hover::before {
+    opacity: 1;
+}
+
+.audio-btn-external.playing {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    animation: pulseGlowAudio 2s infinite;
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
+}
+
+@keyframes pulseGlowAudio {
+    0% { 
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 12px 35px rgba(76, 175, 80, 0.8);
+        transform: scale(1.05);
+    }
+    100% { 
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
+        transform: scale(1);
+    }
 }
 
 .info-btn::before {
@@ -103,7 +174,7 @@
 /* Panel - Modern glass morphism design */
 .image-info-panel {
   width: min(85vw, 1200px);
-  height: min(80vh, 700px);
+  height: min(85vh, 800px);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -133,8 +204,64 @@
   }
 }
 
+/* Image-only mode adjustments */
+.image-info-panel.image-only {
+  width: min(60vw, 600px);
+  height: auto;
+  max-height: min(90vh, 700px);
+  flex-direction: column;
+}
+
+.image-info-panel.image-only .image-preview {
+  width: 100%;
+  height: auto;
+  min-height: 300px;
+  max-height: 600px;
+}
+
+.image-info-panel.image-only .image-preview img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Panel close button */
+.panel-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #64748b;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.panel-close-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #ef4444;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.panel-close-btn:active {
+  transform: scale(0.95);
+}
+
 .image-preview {
-  width: 50%;
+  width: 40%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -157,22 +284,26 @@
 }
 
 .image-preview img {
-  width: 90%;
-  height: 90%;
+  max-width: 90%;
+  max-height: 90%;
+  width: auto;
+  height: auto;
   object-fit: contain;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
   z-index: 1;
   position: relative;
+  cursor: pointer;
 }
 
 .image-preview img:hover {
-  transform: scale(1.02);
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
 
 .image-details {
-  width: 50%;
+  width: 60%;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -234,7 +365,7 @@
 }
 
 .image-details h4 {
-  margin: 0 0 20px 0;
+  margin: 0 0 16px 0;
   font-size: 1.1rem;
   font-weight: 500;
   color: #64748b;
@@ -243,7 +374,7 @@
 }
 
 .image-details p {
-  margin: 0 0 24px 0;
+  margin: 0;
   font-size: 1rem;
   line-height: 1.6;
   color: #374151;
@@ -386,7 +517,7 @@
 @media (max-width: 768px) {
   .image-info-panel {
     width: 95vw;
-    height: 85vh;
+    height: 90vh;
     flex-direction: column;
   }
   
@@ -396,19 +527,21 @@
   }
   
   .image-preview {
-    height: 40%;
+    height: 50%;
+    min-height: 300px;
   }
   
   .image-details {
-    height: 60%;
+    height: 50%;
+    min-height: 300px;
   }
   
   .image-details-content {
-    padding: 24px 20px;
+    padding: 20px;
   }
   
   .image-details h2 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
   
   .audio-timeline {
@@ -419,5 +552,210 @@
   .audio-btn {
     width: 38px;
     height: 38px;
+  }
+
+  /* Responsive styles for external buttons */
+  .buttons-row {
+    gap: 12px;
+  }
+  
+  .info-btn,
+  .audio-btn-external {
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+  }
+  
+  .audio-btn-external {
+    font-size: 16px;
+  }
+}
+
+/* Modern Audio Player Styles */
+.audio-player-container {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.audio-play-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  position: relative;
+}
+
+.audio-play-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+}
+
+.audio-play-btn:active {
+  transform: translateY(0);
+}
+
+.audio-play-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.audio-play-btn.playing {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.audio-play-btn.playing:hover {
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.4);
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.audio-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.audio-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.audio-progress-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.audio-progress-bar.dragging {
+  cursor: grabbing;
+}
+
+.audio-progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 2px;
+  transition: width 0.05s ease;
+}
+
+.audio-progress-bar.dragging .audio-progress-fill {
+  transition: none;
+}
+
+.audio-progress-handle {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: grab;
+  will-change: transform;
+}
+
+.audio-progress-bar.dragging .audio-progress-handle {
+  transition: none;
+}
+
+.audio-progress-handle:active {
+  cursor: grabbing;
+}
+
+.audio-progress-bar:hover .audio-progress-handle,
+.audio-progress-bar.dragging .audio-progress-handle {
+  opacity: 1;
+}
+
+.audio-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  min-width: 60px;
+  white-space: nowrap;
+}
+
+.audio-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 2px;
+}
+
+/* Mobile Responsiveness for Audio Player */
+@media (max-width: 768px) {
+  .audio-player-container {
+    margin-top: 12px;
+    padding: 12px;
+  }
+  
+  .audio-play-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .audio-play-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .loading-spinner {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .audio-time {
+    font-size: 11px;
+    min-width: 50px;
+  }
+  
+  .audio-title {
+    font-size: 12px;
   }
 }

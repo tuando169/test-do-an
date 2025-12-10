@@ -266,7 +266,6 @@ class SoundController {
   this.masterGainNode.gain.value = this.config.masterVolume;
 
   this.isInitialized = true;
-  console.log("✅ AudioContext initialized");
 }
 
   /**
@@ -296,6 +295,52 @@ class SoundController {
   }
 
   /**
+   * Prepare background audio for later playback (singleton approach)
+   * @param {string} url - Audio file URL
+   */
+  async prepareBackgroundAudio(url) {
+    await this.ensureInitialized();
+    
+    const preparedId = 'background_audio_prepared';
+    
+    // Check if already prepared
+    if (this.audioElements.has(preparedId)) {
+      const existing = this.audioElements.get(preparedId);
+      if (existing.url === url) {
+        console.log('Background audio already prepared for this URL');
+        return;
+      } else {
+        // Different URL, clean up old preparation
+        this.removeAudio(preparedId);
+      }
+    }
+    
+    // Create singleton audio element
+    const audio = new Audio();
+    audio.src = url;
+    audio.preload = 'metadata';
+    audio.crossOrigin = 'anonymous';
+    audio.playsInline = true;
+    audio.muted = true;
+    audio.volume = 0;
+    audio.loop = true;
+    
+    // Store prepared audio for later use
+    this.audioElements.set(preparedId, {
+      audio,
+      source: null,
+      gainNode: null,
+      volume: this.config.backgroundVolume,
+      isBackground: true,
+      url,
+      loop: true,
+      prepared: true
+    });
+    
+    console.log('Background audio prepared (singleton)');
+  }
+
+  /**
    * Play background audio that loops continuously
    * @param {string} url - Audio file URL
    * @param {number} volume - Volume level (0-1), optional
@@ -316,13 +361,35 @@ class SoundController {
       await this.resumeAudioContext();
     }
 
-    const audio = new Audio(url);
-    audio.crossOrigin = 'anonymous';
-    audio.loop = true;
-    audio.playsInline = true;
-    audio.preload = 'auto';
-    audio.muted = false;
-    audio.defaultMuted = false;
+    // Check for existing audio element with this URL (singleton approach)
+    const existingAudio = Array.from(this.audioElements.entries())
+      .find(([id, data]) => data.url === url && data.audio);
+    
+    let audio;
+    
+    if (existingAudio) {
+      // Reuse existing audio element (prepared or active)
+      const [existingId, existingData] = existingAudio;
+      audio = existingData.audio;
+      audio.muted = false;
+      audio.volume = 1.0;
+      console.log('Reusing existing audio element (singleton)');
+      
+      // Clean up the existing entry if it was prepared
+      if (existingData.prepared) {
+        this.audioElements.delete(existingId);
+      }
+    } else {
+      // Only create new Audio if none exists for this URL
+      audio = new Audio(url);
+      audio.crossOrigin = 'anonymous';
+      audio.loop = true;
+      audio.playsInline = true;
+      audio.preload = 'auto';
+      audio.muted = false;
+      audio.defaultMuted = false;
+      console.log('Created new audio element (no existing found)');
+    }
 
     const track = this.audioContext.createMediaElementSource(audio);
     const gain = this.audioContext.createGain();
@@ -349,15 +416,39 @@ class SoundController {
 
     try {
       await audio.play();
-      console.log(" Background audio started:", url);
+      
+      // Add error handlers to restart on unexpected stops
+      audio.addEventListener('ended', () => {
+        if (audio.loop) {
+          console.log("Background audio ended unexpectedly, restarting...");
+          audio.currentTime = 0;
+          audio.play().catch(err => console.warn("Failed to restart background audio:", err));
+        }
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.warn("Background audio error:", e);
+      });
+      
+      audio.addEventListener('pause', () => {
+        if (audio.loop && !audio.ended) {
+          console.log("Background audio paused unexpectedly, resuming...");
+          setTimeout(() => {
+            if (!audio.ended && audio.paused) {
+              audio.play().catch(err => console.warn("Failed to resume background audio:", err));
+            }
+          }, 100);
+        }
+      });
+      
     } catch (err) {
-      console.warn(" Background audio play failed:", err);
+      console.warn("✗ Background audio play failed:", err);
+      throw err; // Re-throw to let the caller handle fallback
     }
 
     // Safari tends to zero out gain on init — force restore
     setTimeout(() => {
       gain.gain.setValueAtTime(volume, this.audioContext.currentTime + 0.1);
-      console.log(" Enforced background gain:", volume);
     }, 800);
 
     return audioId;
@@ -369,61 +460,80 @@ class SoundController {
    * @param {Object} options - Audio options
    */
   async playAudio(url, options = {}) {
-  await this.ensureInitialized();
-  await this.ensureResumed();
+    await this.ensureInitialized();
+    await this.ensureResumed();
 
-  const id = options.id || "tour_audio";
+    const id = options.id || "tour_audio";
+    const volume = options.volume ?? 1.0;
+    const loop = options.loop ?? false;
 
-  // 🔹 Nếu audio đã tồn tại — reuse nó
-  let audioData = this.audioElements.get(id);
-  let audio;
-  if (audioData?.audio) {
-    audio = audioData.audio;
-    if (audio.src !== url) {
-      try {
-        audio.pause();
-        audio.src = url;
-        audio.load();
-      } catch (err) {
-        console.warn("Reuse audio failed, fallback to recreate", err);
-        audio = new Audio(url);
+    // Check if we need to clean up existing audio with different URL
+    let audioData = this.audioElements.get(id);
+    if (audioData?.url && audioData.url !== url) {
+      this.stopAudio(id);
+      audioData = null;
+    }
+
+    let audio, source, gainNode;
+
+    if (audioData?.audio && audioData.url === url) {
+      // Reuse existing audio with same URL
+      audio = audioData.audio;
+      source = audioData.source;
+      gainNode = audioData.gainNode;
+      
+      // Update properties
+      audio.loop = loop;
+      gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
+    } else {
+      // Create new audio
+      audio = new Audio(url);
+      audio.crossOrigin = "anonymous";
+      audio.playsInline = true;
+      audio.setAttribute("playsinline", "true");
+      audio.setAttribute("webkit-playsinline", "true");
+      audio.loop = loop;
+      audio.volume = 1.0; // Let Web Audio API handle volume
+
+      // Create audio graph
+      source = this.audioContext.createMediaElementSource(audio);
+      gainNode = this.audioContext.createGain();
+      gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
+      
+      source.connect(gainNode);
+      gainNode.connect(this.masterGainNode);
+
+      // Store complete audio data
+      this.audioElements.set(id, { 
+        audio, 
+        source,
+        gainNode, 
+        url,
+        volume,
+        loop,
+        isBackground: options.isBackground || false
+      });
+    }
+
+    // Handle event callbacks
+    if (options.onEnded) {
+      audio.onended = options.onEnded;
+    }
+
+    // Play audio with proper error handling
+    try {
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        await playPromise;
       }
+      console.log(`Audio playing: ${id} (${url})`);
+    } catch (err) {
+      console.warn("🔇 Play failed:", err);
+      throw err;
     }
-  } else {
-    audio = new Audio(url);
+
+    return audio;
   }
-
-  audio.crossOrigin = "anonymous";
-  audio.playsInline = true;
-  audio.setAttribute("playsinline", "true");
-  audio.setAttribute("webkit-playsinline", "true");
-  audio.loop = options.loop ?? false;
-  audio.volume = options.volume ?? 1.0;
-
-  // 🔹 Nếu chưa có gain node thì tạo mới
-  let gainNode = audioData?.gainNode;
-  if (!gainNode) {
-    const track = this.audioContext.createMediaElementSource(audio);
-    gainNode = this.audioContext.createGain();
-    gainNode.gain.setValueAtTime(audio.volume, this.audioContext.currentTime);
-    track.connect(gainNode);
-    gainNode.connect(this.masterGainNode);
-
-    this.audioElements.set(id, { audio, gainNode, url });
-  }
-
-  // 🔹 Gọi play() non-await để không block gesture
-  try {
-    const playPromise = audio.play();
-    if (playPromise) {
-      playPromise.catch(err => console.warn("🔇 Safari blocked play:", err));
-    }
-  } catch (err) {
-    console.warn("🔇 Play failed:", err);
-  }
-
-  return audio;
-}
 
 
   /**

@@ -17,6 +17,7 @@ export const SpawnMarker = ({
     gizmoMode,
     gizmoActive,
     hoveredId,
+    snapEnabled,
     onTransformChange,
 }) => {
     const ref = useRef();
@@ -43,6 +44,7 @@ export const SpawnMarker = ({
                     objectRef={ref}
                     mode={gizmoMode}
                     gizmoActive={gizmoActive}
+                    snapEnabled={snapEnabled}
                     onTransformChange={(transform) => {
                         transform.position[1] = 0.2; 
                         onTransformChange(id, transform);

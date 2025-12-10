@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './MobileControls.css';
 
-const MobileControls = ({ onMove, onJoystickStateChange }) => {
+const MobileControls = ({ onMove, onJoystickStateChange, onHidePanels }) => {
   const [isMobile, setIsMobile] = useState(false);
   const joystickRef = useRef(null);
   const knobRef = useRef(null);
@@ -23,6 +23,7 @@ const MobileControls = ({ onMove, onJoystickStateChange }) => {
       joystickTouchId.current = touch.identifier;
       active.current = true;
       requestAnimationFrame(() => onJoystickStateChange?.(true));
+      onHidePanels?.(); // Hide any open panels when joystick becomes active
       updateJoystick(touch.clientX, touch.clientY);
       break;
     }

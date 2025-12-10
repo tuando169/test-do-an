@@ -1,17 +1,17 @@
-import { useEffect, useState, forwardRef, useImperativeHandle, useRef, createRef, Fragment, useMemo, useCallback } from 'react';
+import { useEffect, useState, forwardRef, useImperativeHandle, useRef, createRef, Fragment, useMemo, useCallback, use } from 'react';
 import { useThree, useLoader, useFrame } from '@react-three/fiber';
-import { MeshReflectorMaterial, Sky, useTexture, SoftShadows, Environment } from '@react-three/drei';
-import { EffectComposer, Bloom, SSAO, Noise } from '@react-three/postprocessing';
+import { MeshReflectorMaterial, Sky, useTexture, Environment } from '@react-three/drei';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { CameraMovement } from './Camera';
 import { Wall } from './Wall';
 import { Image } from './Image';
+import { PhysicPlane } from "./PhysicPlane";
 import { SpawnMarker } from './SpawnMarker';
 import { Object3D } from './Object';
 import meshRefs from './meshRefs';
 import * as THREE from 'three';
 import {SpotLightWithHelper} from "./SpotLightWithHelper";
 import TourMarker from './TourMarker';
-import SoundController from './SoundController';
 
 const eventToNDC = (e, gl) => {
   const rect = gl.domElement.getBoundingClientRect();
@@ -21,12 +21,6 @@ const eventToNDC = (e, gl) => {
   const y = -((cy - rect.top) / rect.height) * 2 + 1;
   return { x, y };
 };
-
-const soundController = new SoundController({
-  masterVolume: 1.0,
-  backgroundVolume: 0.4,
-  autoPlayBackground: false,
-});
 
 // Custom skybox component that renders infinite cubemap
 const SkyboxRenderer = ({ preset, filePath }) => {
@@ -128,7 +122,7 @@ const SkyboxRenderer = ({ preset, filePath }) => {
   return null; // No geometry rendered
 };
 
-const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData, images, imageFrameList, tempTourIndices, markersVisible, tourMode, tourPlaying, currentTourIndex, setCurrentTourIndex, setTourProgress, onTourComplete, onTourInterrupted, tourInfoButtonVisible, tourInfoPanelOpen, onShowTourInfo, onHideTourInfo, draggedImage, setDraggedImage, isImageEditModalOpen, onObjectsChange, onObjectAdded, skySettings, groundSettings, bloomSettings, imageFrame, hdri, skySettingMode, groundSettingMode, groundTexture, setPopupData, setPopupPosition, setPopupVisible, popupVisible, gizmoMode, setGizmoMode, onImageClick, setTooltip, mobileInput, isJoystickActive, tourMarkers, isEditRoom, showTransparentWalls, soundController, isMuted, uploadedAudioFiles }, ref) => {
+const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData, images, imageFrameList, tempTourIndices, markersVisible, tourMode, tourPlaying, currentTourIndex, setCurrentTourIndex, setTourProgress, onTourComplete, onTourInterrupted, tourInfoButtonVisible, tourInfoPanelOpen, onShowTourInfo, onHideTourInfo, onHideAnyInfoPanel, draggedImage, setDraggedImage, isImageEditModalOpen, onObjectsChange, onObjectAdded, skySettings, groundSettings, bloomSettings, imageFrame, physicPlane, hdri, skySettingMode, groundSettingMode, groundTexture, setPopupData, setPopupPosition, setPopupVisible, popupVisible, gizmoMode, setGizmoMode, snapEnabled, onImageClick, setTooltip, mobileInput, isJoystickActive, tourMarkers, onUpdateTourMarkers, isEditRoom, showTransparentWalls, soundController, isMuted, uploadedAudioFiles, typeRoom, objectRole, userRole }, ref) => {
   const [objs, setObjs] = useState(objects || []); // Initialize with walls from JSON
   const gizmoActive = useRef(false); // Ref to track gizmo interaction
   const [hoveredId, setHoveredId] = useState(null); // Track hovered object ID
@@ -137,6 +131,7 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
   const [tempSpotLightPosition, setTempSpotLightPosition] = useState([0, 3, 0]);
   const [placingSpotLight, setPlacingSpotLight] = useState(false); 
   const [placingImageFrame, setPlacingImageFrame] = useState(false);
+  const [placingPhysicPlane, setPlacingPhysicPlane] = useState(false);
   const [tempImageFramePosition, setTempImageFramePosition] = useState([0, 0, 0]);
   const [tempImageFrameRotation, setTempImageFrameRotation] = useState([0, 0, 0]);
   const [objectTree, setObjectTree] = useState(buildObjectTree(objects)); // Build the object tree from the initial objects
@@ -148,7 +143,7 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
   const mouse = useRef(new THREE.Vector2()); // Mouse position in normalized device coordinates
   const pausedElapsedMsRef = useRef(0);
   const { gl, camera } = useThree(); // Access camera and renderer
-  const GROUND_LEVEL = 2.6;
+  const GROUND_LEVEL = 1.7;
   const cameraTarget = useRef(null);
   const cameraLookAtTarget = useRef(null);
   const isReflective = true;
@@ -175,10 +170,12 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
   
   // Ground click validation tracking
   const pointerDownPoint = useRef(null);
-  
+  const pointerDownObjectId = useRef(null);
+
+  // Image teleportation tracking
+  const isTeleportingToImage = useRef(false);
 
   useEffect(() => {
-    console.log("hdri changed:", hdri);
     if (hdri) {
       if(hdri === "sunset" || hdri === "dawn")
       {
@@ -193,52 +190,133 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
     }
   }, [hdri]);
 
-  const collectRaycastableMeshes = (excludeIds = new Set()) => {
+  const collectRaycastableMeshes = useCallback((excludeIds = new Set()) => {
     const meshes = [];
+    // Use cached meshes if available and no exclusions
+    if (excludeIds.size === 0 && collectRaycastableMeshes.cachedMeshes) {
+      return collectRaycastableMeshes.cachedMeshes;
+    }
+    
     Array.from(meshRefs.values()).forEach((obj) => {
       if (!obj) return;
       if (Array.isArray(obj)) {
         obj.forEach((m) => {
-          if (m && m.isMesh) {
+          if (m && m.isMesh && m.visible) {
             const id = m.userData?.id;
             if (!id || !excludeIds.has(id)) meshes.push(m);
           }
         });
       } else {
-        // group / mesh
-        obj.traverse((child) => {
-          if (child.isMesh && child.material && child.visible && child.geometry) {
-            const id = child.userData?.id;
-            if (!id || !excludeIds.has(id)) {
-              if (!child.geometry.boundingSphere) child.geometry.computeBoundingSphere();
-              meshes.push(child);
+        // group / mesh - optimize traversal
+        if (obj.visible) {
+          obj.traverse((child) => {
+            if (child.isMesh && child.material && child.visible && child.geometry) {
+              const id = child.userData?.id;
+              if (!id || !excludeIds.has(id)) {
+                // Lazy compute bounding sphere only when needed
+                if (!child.geometry.boundingSphere) child.geometry.computeBoundingSphere();
+                meshes.push(child);
+              }
             }
-          }
-        });
+          });
+        }
       }
     });
+    
+    // Cache meshes when no exclusions
+    if (excludeIds.size === 0) {
+      collectRaycastableMeshes.cachedMeshes = meshes;
+    }
+    
     return meshes;
-  };
+  }, []);
 
   useFrame(() => {
     if (!sunLightRef.current) return
-    const sunPos = new THREE.Vector3(...skySettings.sunPosition)
-    const distance = sunPos.length()
+    
+    // Only update sun light intensity every 10th frame to reduce CPU load
+    if (useFrame.frameCount % 10 === 0) {
+      const sunPos = new THREE.Vector3(...skySettings.sunPosition)
+      const distance = sunPos.length()
 
-    const k = 0.0005 
-    const falloff = 1 / (1 + k * distance * distance)
+      const k = 0.0005 
+      const falloff = 1 / (1 + k * distance * distance)
 
-    sunLightRef.current.intensity = 20 * falloff 
+      sunLightRef.current.intensity = 20 * falloff 
+    }
   })
 
   useEffect(() => {
     setObjs(objects);
     setWallBoxes(new Map());
+    // Invalidate raycast cache when objects change
+    if (collectRaycastableMeshes.cachedMeshes) {
+      collectRaycastableMeshes.cachedMeshes = null;
+    }
   }, [objects]);  //update objects after edit
 
   useEffect(() => {
     camera.layers.enable(1); // Enable layer 1 for the camera
   }, [camera]);
+
+  // Clear audio durations cache when tour markers change
+  useEffect(() => {
+    audioDurationsRef.current.clear();
+  }, [tourMarkers]);
+
+  // Preload and measure audio durations when tour markers are updated
+  useEffect(() => {
+    if (!soundController || !tourMarkers || tourMarkers.length === 0) return;
+
+    // Create a function to measure audio duration for a given URL
+    const measureAudioDuration = async (audioUrl, markerId) => {
+      if (!audioUrl) return;
+      
+      try {
+        // Create a temporary audio element to measure duration
+        const tempAudio = new Audio(audioUrl);
+        tempAudio.preload = 'metadata';
+        
+        return new Promise((resolve) => {
+          const timeoutId = setTimeout(() => {
+            tempAudio.remove();
+            resolve(); // Resolve without setting duration if timeout
+          }, 10000); // 10 second timeout
+          
+          tempAudio.onloadedmetadata = () => {
+            clearTimeout(timeoutId);
+            if (tempAudio.duration && isFinite(tempAudio.duration)) {
+              const durMs = Math.max(5000, Math.round(tempAudio.duration * 1000));
+              audioDurationsRef.current.set(markerId, durMs);
+            }
+            tempAudio.remove();
+            resolve();
+          };
+          
+          tempAudio.onerror = () => {
+            clearTimeout(timeoutId);
+            tempAudio.remove();
+            resolve(); // Resolve without setting duration if error
+          };
+        });
+      } catch (error) {
+        console.warn('Error measuring audio duration:', error);
+      }
+    };
+
+    // Measure duration for all tour markers with audio
+    const measureAllAudio = async () => {
+      const promises = tourMarkers.map(async (marker) => {
+        if (marker.audio && marker.id) {
+          await measureAudioDuration(marker.audio, marker.id);
+        }
+      });
+      
+      await Promise.all(promises);
+    };
+
+    measureAllAudio();
+  }, [tourMarkers, soundController]);
 
   const handleBoundingBoxUpdate = (id, box) => {
     setWallBoxes(prev => {
@@ -341,16 +419,27 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
   const getCurrentItemDuration = useCallback((currentItem) => {
     if (!currentItem) return 5000;
     
-    // For camera markers, use their duration directly
+    // For camera markers, check audio duration first, then marker duration
     if (currentItem.itemType === 'camera') {
+      // Check if we have a measured audio duration for this camera marker
+      const measured = audioDurationsRef.current.get(currentItem.id);
+      if (measured && measured >= 5000) return measured;
+      
+      // Fall back to camera marker's duration property
       return currentItem.duration || 5000;
     }
     
-    // For image markers, check audio duration first, then marker duration
-    const measured = audioDurationsRef.current.get(currentItem.id);
-    if (measured && measured >= 5000) return measured;
+    // For image markers, find the tour marker and check audio duration first, then marker duration
     const marker = tourMarkers?.find(m => m.imageId === currentItem.id);
-    if (marker?.duration) return Math.max(5000, marker.duration);
+    if (marker) {
+      // Check if we have a measured audio duration for this tour marker
+      const measured = audioDurationsRef.current.get(marker.id);
+      if (measured && measured >= 5000) return measured;
+      
+      // Fall back to marker's duration property
+      if (marker.duration) return Math.max(5000, marker.duration);
+    }
+    
     return 5000;
   }, [tourMarkers]);
 
@@ -497,6 +586,7 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
     // Show info button for current tour image
     if (onShowTourInfo && currentItem.src && currentItem.title) {
       onShowTourInfo({
+        id: currentItem.id, // Include the image ID for tour marker matching
         src: currentItem.src,
         alt: currentItem.alt || '',
         title: currentItem.title || '',
@@ -642,113 +732,124 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
 
   // --- TỰ PHÁT ÂM THANH TRONG TOUR MODE ---
 
-// --- EFFECT PHÁT AUDIO KHI CHUYỂN ẢNH ---
-useEffect(() => {
-  if (!tourMode || !tourPlaying || mode !== "view") return;
+  // --- EFFECT PHÁT AUDIO KHI CHUYỂN ẢNH ---
+  useEffect(() => {
+    if (!tourMode || !tourPlaying || mode !== "view") return;
 
-  // Use the same tour sequence as the main tour logic
-  const currentItem = memoizedTourImages[currentTourIndex];
-  if (!currentItem) return;
+    // Use the same tour sequence as the main tour logic
+    const currentItem = memoizedTourImages[currentTourIndex];
+    if (!currentItem) return;
 
-  // Find the audio for the current item based on its type
-  let audioToPlay = null;
-  
-  if (currentItem.itemType === 'image') {
-    // For image markers, find the tour marker for this image to get the audio
-    const currentMarker = tourMarkers?.find(m => m.imageId === currentItem.id);
-    audioToPlay = currentMarker?.audio;
-  } else if (currentItem.itemType === 'camera') {
-    // For camera markers, get audio directly from the marker
-    audioToPlay = currentItem.audio;
-  }
-
-  // token để hủy nếu effect bị cleanup
-  let cancelled = false;
-
-  (async () => {
-    try {
-      // Always stop any currently playing tour audio when moving to a new marker
-      const currentAudioData = soundController.audioElements?.get?.("tour_audio");
-      if (currentAudioData) {
-        soundController.stopAudio?.("tour_audio");
-        narrationAudioRef.current = null;
-        await new Promise(r => setTimeout(r, 50)); // Small delay to ensure cleanup
-      }
-
-      // If current marker has no audio, just stop here
-      if (!audioToPlay || cancelled) return;
-
-      await soundController.ensureInitialized?.();
-      await soundController.ensureResumed?.();
-      soundController.nudgeOutput?.();
-
-      // Play the new audio
-      const inst = await soundController.playAudio(audioToPlay, {
-        id: "tour_audio",
-        volume: 1.0,
-        fadeIn: false,
-        loop: false,
-      });
-      if (cancelled) {
-        soundController.stopAudio?.("tour_audio");
-        return;
-      }
-      narrationAudioRef.current = inst;
-
-      // Ensure mute state is applied after audio is fully connected and playing
-      if (isMuted) {
-        // Use a small delay to ensure audio is fully connected to the audio graph
-        setTimeout(() => {
-          if (soundController && !cancelled) {
-            soundController.setMasterVolume?.(0, 0);
-          }
-        }, 50);
-      }
-
-      const audioData = soundController.audioElements.get("tour_audio");
-      const audioEl = audioData?.audio;
-      if (audioEl) {
-        audioEl.onloadedmetadata = () => {
-          if (cancelled) return;
-          const durMs = Math.max(5000, Math.round(audioEl.duration * 1000));
-          audioDurationsRef.current.set(currentItem.id, durMs);
-        };
-        audioEl.onended = () => {
-          if (cancelled) return;
-          narrationAudioRef.current = null;
-        };
-      }
-    } catch (err) {
-      console.warn("Lỗi phát audio tour:", err);
+    // Find the audio for the current item based on its type
+    let audioToPlay = null;
+    
+    if (currentItem.itemType === 'image') {
+      // For image markers, find the tour marker for this image to get the audio
+      const currentMarker = tourMarkers?.find(m => m.imageId === currentItem.id);
+      audioToPlay = currentMarker?.audio;
+    } else if (currentItem.itemType === 'camera') {
+      // For camera markers, get audio directly from the marker
+      audioToPlay = currentItem.audio;
     }
-  })();
 
-  return () => {
-    cancelled = true;
-    // Don't stop audio during tour - let it continue playing
-    // Only stop when tour actually ends or component unmounts
-  };
-}, [tourMode, tourPlaying, currentTourIndex, mode, isMuted, soundController, tourMarkers, memoizedTourImages]);
+    // token để hủy nếu effect bị cleanup
+    let cancelled = false;
 
-// --- RESET khi bắt đầu hoặc kết thúc tour ---
-useEffect(() => {
-  if (!tourMode || !tourPlaying) {
-    playedImageRef.current.clear();
-  }
-}, [tourMode, tourPlaying]);
+    (async () => {
+      try {
+        // Always stop any currently playing tour audio when moving to a new marker
+        const currentAudioData = soundController.audioElements?.get?.("tour_audio");
+        if (currentAudioData) {
+          soundController.stopAudio?.("tour_audio");
+          narrationAudioRef.current = null;
+          await new Promise(r => setTimeout(r, 50)); // Small delay to ensure cleanup
+        }
 
-// --- HANDLE MUTE STATE CHANGES DURING TOUR ---
-useEffect(() => {
-  if (!soundController || !tourMode) return;
-  
-  // Just ensure master volume reflects current mute state
-  // Don't pause/stop individual audio tracks - let them play silently when muted
-  if (isMuted) {
-    soundController.setMasterVolume?.(0, 0);
-  }
-  // When unmuted, the App.jsx toggleMute function will restore the master volume
-  // so we don't need to handle unmuting here
-}, [isMuted, soundController, tourMode]);
+        // If current marker has no audio, just stop here
+        if (!audioToPlay || cancelled) return;
+
+        await soundController.ensureInitialized?.();
+        await soundController.ensureResumed?.();
+
+        // Play the new audio
+        const inst = await soundController.playAudio(audioToPlay, {
+          id: "tour_audio",
+          volume: 1.0,
+          fadeIn: false,
+          loop: false,
+        });
+        if (cancelled) {
+          soundController.stopAudio?.("tour_audio");
+          return;
+        }
+        narrationAudioRef.current = inst;
+
+        // Ensure mute state is applied after audio is fully connected and playing
+        if (isMuted) {
+          // Use a small delay to ensure audio is fully connected to the audio graph
+          setTimeout(() => {
+            if (soundController && !cancelled) {
+              soundController.setMasterVolume?.(0, 0);
+            }
+          }, 50);
+        }
+
+        const audioData = soundController.audioElements.get("tour_audio");
+        const audioEl = audioData?.audio;
+        if (audioEl) {
+          audioEl.onloadedmetadata = () => {
+            if (cancelled) return;
+            const durMs = Math.max(5000, Math.round(audioEl.duration * 1000));
+            
+            // Store duration using the appropriate marker ID
+            let storageKey = null;
+            if (currentItem.itemType === 'image') {
+              const currentMarker = tourMarkers?.find(m => m.imageId === currentItem.id);
+              storageKey = currentMarker?.id;
+            } else if (currentItem.itemType === 'camera') {
+              storageKey = currentItem.id;
+            }
+            
+            if (storageKey) {
+              audioDurationsRef.current.set(storageKey, durMs);
+            }
+          };
+          audioEl.onended = () => {
+            if (cancelled) return;
+            narrationAudioRef.current = null;
+          };
+        }
+      } catch (err) {
+        console.warn("Lỗi phát audio tour:", err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      // Don't stop audio during tour - let it continue playing
+      // Only stop when tour actually ends or component unmounts
+    };
+  }, [tourMode, tourPlaying, currentTourIndex, mode, isMuted, soundController, tourMarkers, memoizedTourImages]);
+
+  // --- RESET khi bắt đầu hoặc kết thúc tour ---
+  useEffect(() => {
+    if (!tourMode || !tourPlaying) {
+      playedImageRef.current.clear();
+    }
+  }, [tourMode, tourPlaying]);
+
+  // --- HANDLE MUTE STATE CHANGES DURING TOUR ---
+  useEffect(() => {
+    if (!soundController || !tourMode) return;
+    
+    // Just ensure master volume reflects current mute state
+    // Don't pause/stop individual audio tracks - let them play silently when muted
+    if (isMuted) {
+      soundController.setMasterVolume?.(0, 0);
+    }
+    // When unmuted, the App.jsx toggleMute function will restore the master volume
+    // so we don't need to handle unmuting here
+  }, [isMuted, soundController, tourMode]);
 
   // Handle keyboard shortcuts for gizmo mode
   useEffect(() => {
@@ -761,13 +862,28 @@ useEffect(() => {
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown); 
   }, [mode]);
 
   // Handle keyboard shortcut for deleting objects
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Delete" && selectedId && mode === "edit") {
+        
+        // Check if this is a tour marker deletion
+        if (selectedId.startsWith('tourmarker-')) {
+          // Delete tour marker
+          if (onUpdateTourMarkers) {
+            const updatedTourMarkers = tourMarkers.filter(marker => marker.id !== selectedId);
+            onUpdateTourMarkers(updatedTourMarkers);
+          }
+          
+          // Clean up mesh refs
+          meshRefs.delete(selectedId);
+          setSelectedId(null);
+          setGizmoMode('');
+          return;
+        }
 
         const obj = objs.find(o => o.id === selectedId);
         if(obj.src !== imageFrame.src && obj.type === "image"){
@@ -1030,102 +1146,123 @@ useEffect(() => {
     };
   };
 
+  // Debounced mouse move handler to reduce CPU load
+  const mouseMoveTimeout = useRef(null);
+  
   const handleMouseMove = (e) => {
     e.stopPropagation();
 
+    // Skip debounce when placing objects for immediate feedback
+    if (placingWall || placingImageFrame || placingSpotLight || placingPhysicPlane) {
+      processMouseMove(e);
+    } else {
+      // Debounce mouse move events to reduce CPU load for normal hover detection
+      if (mouseMoveTimeout.current) {
+        clearTimeout(mouseMoveTimeout.current);
+      }
+      
+      mouseMoveTimeout.current = setTimeout(() => {
+        processMouseMove(e);
+      }, 16); // Debounce to ~60fps
+    }
+  };
+
+  const processMouseMove = (e) => {
     // Convert mouse position to normalized device coordinates (-1 to +1)
     const rect = gl.domElement.getBoundingClientRect();
     mouse.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
-    if (placingWall) {
-      // Use raycaster to find the intersection point with the ground
-      const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0); // Horizontal plane at y = 0
-      raycaster.current.setFromCamera(mouse.current, camera);
-      const intersectionPoint = new THREE.Vector3();
-  
-      // Check if the ray intersects the ground plane
-      if (raycaster.current.ray.intersectPlane(groundPlane, intersectionPoint)) {
-        const gridSize = 0.125; // Define the grid size (e.g., 1 unit)
-        
-        // Snap the intersection point to the nearest grid unit
-        const snappedX = Math.round(intersectionPoint.x / gridSize) * gridSize;
-        const snappedZ = Math.round(intersectionPoint.z / gridSize) * gridSize;
-  
-        setTempWallPosition([snappedX, 1.5, snappedZ]); // Update temporary wall position
+      if (placingWall) {
+        // Use raycaster to find the intersection point with the ground
+        const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0); // Horizontal plane at y = 0
+        raycaster.current.setFromCamera(mouse.current, camera);
+        const intersectionPoint = new THREE.Vector3();
+    
+        // Check if the ray intersects the ground plane
+        if (raycaster.current.ray.intersectPlane(groundPlane, intersectionPoint)) {
+          const gridSize = 0.125; // Define the grid size (e.g., 1 unit)
+          
+          // Snap the intersection point to the nearest grid unit
+          const snappedX = Math.round(intersectionPoint.x / gridSize) * gridSize;
+          const snappedZ = Math.round(intersectionPoint.z / gridSize) * gridSize;
+    
+          setTempWallPosition([snappedX, 1.5, snappedZ]); // Update temporary wall position
+        }
+      } else if (placingSpotLight) {
+        // Convert mouse to world space
+        const vector = new THREE.Vector3(mouse.current.x, mouse.current.y, 0.5); 
+        vector.unproject(camera);
+
+        const dir = vector.sub(camera.position).normalize();
+        const distance = 5; // distance from camera to bulb
+
+        const newPos = camera.position.clone().add(dir.multiplyScalar(distance));
+        setTempSpotLightPosition([newPos.x, newPos.y, newPos.z]);
+      } else if (placingImageFrame || placingPhysicPlane) {
+        raycaster.current.setFromCamera(mouse.current, camera);
+
+        const exclude = new Set(['preview-image-frame']);
+        const allMeshes = collectRaycastableMeshes(exclude);
+
+        const intersects = raycaster.current.intersectObjects(allMeshes, true);
+        if (intersects.length === 0) return;
+
+        const intersection = intersects[0];
+        const targetId = intersection.object.userData?.id;
+        const targetObj = objs.find((o) => o.id === targetId);
+
+        // Chỉ bám vào tường
+        if (!targetObj || targetObj.type !== 'wall') return;
+
+        // Dùng chung logic với click
+        const { worldPosition, worldEuler } = calculateFrameTransform(intersection, camera, meshRefs);
+
+        setTempImageFramePosition([worldPosition.x, worldPosition.y, worldPosition.z]);
+        setTempImageFrameRotation([worldEuler.x, worldEuler.y, worldEuler.z]);
       }
-    } else if (placingSpotLight) {
-      // Convert mouse to world space
-      const vector = new THREE.Vector3(mouse.current.x, mouse.current.y, 0.5); 
-      vector.unproject(camera);
+      else
+      {
+        // Use raycaster to detect hovered objects
+        raycaster.current.setFromCamera(mouse.current, camera);
 
-      const dir = vector.sub(camera.position).normalize();
-      const distance = 5; // distance from camera to bulb
-
-      const newPos = camera.position.clone().add(dir.multiplyScalar(distance));
-      setTempSpotLightPosition([newPos.x, newPos.y, newPos.z]);
-    } else if (placingImageFrame) {
-      raycaster.current.setFromCamera(mouse.current, camera);
-
-      const exclude = new Set(['preview-image-frame']);
-      const allMeshes = collectRaycastableMeshes(exclude);
-
-      const intersects = raycaster.current.intersectObjects(allMeshes, true);
-      if (intersects.length === 0) return;
-
-      const intersection = intersects[0];
-      const targetId = intersection.object.userData?.id;
-      const targetObj = objs.find((o) => o.id === targetId);
-
-      // Chỉ bám vào tường
-      if (!targetObj || targetObj.type !== 'wall') return;
-
-      // Dùng chung logic với click
-      const { worldPosition, worldEuler } = calculateFrameTransform(intersection, camera, meshRefs);
-
-      setTempImageFramePosition([worldPosition.x, worldPosition.y, worldPosition.z]);
-      setTempImageFrameRotation([worldEuler.x, worldEuler.y, worldEuler.z]);
-    }
-    else
-    {
-      // Use raycaster to detect hovered objects
-      raycaster.current.setFromCamera(mouse.current, camera);
-
-      // Get all intersected objects - safely handle meshRefs values
-      const allMeshes = [];
-      Array.from(meshRefs.values()).forEach(obj => {
-        if (obj) {
-          if (Array.isArray(obj)) {
-            allMeshes.push(...obj.filter(item => item && item.isMesh));
-          } else if (obj.isMesh) {
-            allMeshes.push(obj);
-          } else if (obj.children) {
-            obj.traverse((child) => {
-              if (child.isMesh) {
-                allMeshes.push(child);
-              }
-            });
+        // Get all intersected objects - safely handle meshRefs values
+        const allMeshes = [];
+        Array.from(meshRefs.values()).forEach(obj => {
+          if (obj) {
+            if (Array.isArray(obj)) {
+              allMeshes.push(...obj.filter(item => item && item.isMesh));
+            } else if (obj.isMesh) {
+              allMeshes.push(obj);
+            } else if (obj.children) {
+              obj.traverse((child) => {
+                if (child.isMesh) {
+                  allMeshes.push(child);
+                }
+              });
+            }
           }
-        }
-      });
-      
-      const intersects = raycaster.current.intersectObjects(allMeshes, true);
+        });
+        
+        const intersects = raycaster.current.intersectObjects(allMeshes, true);
 
-      if (intersects.length > 0) {
-        const hoveredObject = intersects[0].object; // Get the first intersected object
-        const hoveredId = hoveredObject.userData.id; // Retrieve the ID from userData
-        const hoveredData = objects.find(o => o.id === hoveredId);
+        if (intersects.length > 0) {
+          const hoveredObject = intersects[0].object; // Get the first intersected object
+          const hoveredId = hoveredObject.userData.id; // Retrieve the ID from userData
+          const hoveredData = objects.find(o => o.id === hoveredId);
 
-        if (hoveredId) {
-          setHoveredId(hoveredId); // Update the hovered ID
+          if (hoveredId) {
+            setHoveredId(hoveredId); // Update the hovered ID.
+          }
+        } else {
+          setHoveredId(null); // Clear the hovered ID if no object is hovered
         }
-      } else {
-        setHoveredId(null); // Clear the hovered ID if no object is hovered
       }
-    }
   };
 
   const handleMouseClick = (e) => {
+    // Don't handle clicks during tour mode
+    if (tourMode) return;
     
     e.stopPropagation();
 
@@ -1165,49 +1302,8 @@ useEffect(() => {
         return;
       }
 
-      // ====== TÍNH POSITION & ROTATION ======
-      const normalMatrix = new THREE.Matrix3().getNormalMatrix(clickedObject.matrixWorld);
-      let worldNormal = intersection.face.normal.clone().applyMatrix3(normalMatrix).normalize();
-
-      // Đảm bảo normal hướng ra ngoài, không bị lộn vào trong
-      const reference = camera.position;
-      if (worldNormal.dot(reference.clone().sub(intersection.point)) < 0) {
-        worldNormal.negate();
-      }
-
-      // Đặt frame cách tường một khoảng
-      const offset = 0.05;
-      const worldPosition = intersection.point.clone().add(worldNormal.clone().multiplyScalar(offset));
-
-      // Build rotation với hướng chuẩn
-      const worldUp = new THREE.Vector3(0, 1, 0);
-      let tangent = new THREE.Vector3().crossVectors(worldUp, worldNormal);
-      if (tangent.lengthSq() < 1e-6) {
-        tangent = new THREE.Vector3(1, 0, 0).cross(worldNormal);
-      }
-      tangent.normalize();
-
-      const bitangent = new THREE.Vector3().crossVectors(worldNormal, tangent).normalize();
-
-      const rotMatrix = new THREE.Matrix4().makeBasis(tangent, bitangent, worldNormal);
-      const quat = new THREE.Quaternion().setFromRotationMatrix(rotMatrix);
-      const euler = new THREE.Euler().setFromQuaternion(quat, 'XYZ');
-
-      // ====== TÍNH LOCAL POSITION SO VỚI TƯỜNG ======
-      const wallContainer = meshRefs.get(clickedId);
-      let localPosition = worldPosition.clone();
-      let localEuler = euler.clone();
-
-      if (wallContainer && !Array.isArray(wallContainer)) {
-        // Position
-        localPosition = wallContainer.worldToLocal(worldPosition.clone());
-
-        // Rotation
-        wallContainer.updateMatrixWorld();
-        const wallQuat = new THREE.Quaternion().setFromRotationMatrix(wallContainer.matrixWorld);
-        const localQuat = quat.clone().premultiply(wallQuat.invert());
-        localEuler = new THREE.Euler().setFromQuaternion(localQuat, 'XYZ');
-      }
+      // ====== SỬ DỤNG CALCULATEFRAMETRANSFORM ======
+      const { localPosition, worldEuler } = calculateFrameTransform(intersection, camera, meshRefs);
 
       // ====== TẠO OBJECT MỚI ======
       const newImageFrameId = `image-${Date.now()}`;
@@ -1219,14 +1315,16 @@ useEffect(() => {
         title: imageFrame.title,
         position: [localPosition.x, localPosition.y, localPosition.z],
         rotation: [
-          THREE.MathUtils.radToDeg(localEuler.x),
-          THREE.MathUtils.radToDeg(localEuler.y),
-          THREE.MathUtils.radToDeg(localEuler.z),
+          THREE.MathUtils.radToDeg(worldEuler.x),
+          THREE.MathUtils.radToDeg(worldEuler.y),
+          THREE.MathUtils.radToDeg(worldEuler.z),
         ],
         scale: [1, 1, 1],
         parent: clickedId, 
         imageFrameId: "imageFrame-1",
-        frameColor: "white"
+        frameColor: "white",
+        aspectRatio: [1, 1], // Default square aspect ratio for placeholder
+        showImageDescription: true // Default to showing description
       };
 
       // ====== CẬP NHẬT OBJECT LIST ======
@@ -1243,6 +1341,86 @@ useEffect(() => {
       }
 
       setPlacingImageFrame(false); // Tắt chế độ đặt image frame
+      return;
+    }
+
+    if (placingPhysicPlane) {
+
+      console.log("hehe");
+      
+      // Update mouse to current click position
+      const rect = gl.domElement.getBoundingClientRect();
+      mouse.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      // Raycast vào tất cả các wall mesh
+      raycaster.current.setFromCamera(mouse.current, camera);
+
+      const exclude = new Set(['preview-image-frame']);
+      const allMeshes = collectRaycastableMeshes(exclude);
+
+      const intersects = raycaster.current.intersectObjects(allMeshes, true);
+      if (intersects.length === 0) {
+        alert("Click vào tường để đặt Image Frame!");
+        return;
+      }
+
+      // Lấy intersection đầu tiên
+      const intersection = intersects[0];
+      const clickedObject = intersection.object;
+      const clickedId = clickedObject.userData.id;
+      const clickedObjData = objs.find(o => o.id === clickedId);
+
+      // Nếu không phải wall thì không đặt
+      if (!clickedObjData || clickedObjData.type !== "wall") {
+        alert("Chỉ có thể đặt Image Frame lên tường!");
+        return;
+      }
+
+      // ====== SỬ DỤNG CALCULATEFRAMETRANSFORM ======
+      const { localPosition, worldEuler } = calculateFrameTransform(intersection, camera, meshRefs);
+
+      // ====== TẠO OBJECT MỚI ======
+      const newImageFrameId = `image-${Date.now()}`;
+      const newFrame = {
+        id: newImageFrameId,
+        type: "image",
+        src: physicPlane.src,         // placeholder frame
+        alt: physicPlane.alt,
+        title: physicPlane.title,
+        position: [localPosition.x, localPosition.y, localPosition.z],
+        rotation: [
+          THREE.MathUtils.radToDeg(worldEuler.x),
+          THREE.MathUtils.radToDeg(worldEuler.y),
+          THREE.MathUtils.radToDeg(worldEuler.z),
+        ],
+        scale: [1, 1, 1],
+        parent: clickedId, 
+        imageFrameId: "imageFrame-1",
+        frameColor: "white",
+        canvasColor: "white",
+        aspectRatio: [1, 1], // Default square aspect ratio for placeholder
+        showImageDescription: true // Default to showing description
+      };
+
+      console.log(newFrame);
+
+      // ====== CẬP NHẬT OBJECT LIST ======
+      setObjs(prev =>
+        prev.map(obj =>
+          obj.id === clickedId && obj.type === "wall"
+            ? { ...obj, children: [...(obj.children || []), newImageFrameId] }
+            : obj
+        ).concat(newFrame)
+      );
+
+      console.log(objs);
+
+      if (onObjectsChange) {
+        onObjectsChange([...objs, newFrame]);
+      }
+
+      setPlacingPhysicPlane(false); // Tắt chế độ đặt image frame
       return;
     }
 
@@ -1358,7 +1536,8 @@ useEffect(() => {
         scale: [2.5, 3, 0.1],
         color: "#b6b898",
         children: [],
-        transparent: false
+        transparent: false,
+        wallRole: objectRole
       };
 
       setObjs((prevObjects) => [...prevObjects, newWall]);
@@ -1407,15 +1586,76 @@ useEffect(() => {
       const intersects = raycaster.current.intersectObjects(allMeshes, true);
 
       if (intersects.length > 0) {
-        const clickedObject = intersects[0].object; // Get the first intersected object
+        // Find the first intersected object
+        let clickedObject = intersects[0].object;
+        let intersection = intersects[0];
         
-        // Skip ground clicks - they're handled in onPointerUp with validation
-        if (clickedObject === groundRef.current) {
-          return; // Exit early, don't process ground clicks here
+        // Check if this is a potential ground click (ground plane or GLB floor)
+        // For GLB objects, only consider it a ground click if:
+        // 1. The intersection point is very close to ground level (within 0.3 units)
+        // 2. The normal vector points mostly upward (indicating floor, not wall)
+        const isGroundClick = clickedObject === groundRef.current || 
+          (clickedObject.userData?.id && 
+           objs.find(obj => obj.id === clickedObject.userData.id)?.src?.toLowerCase().endsWith('.glb') &&
+           intersection.point.y <= GROUND_LEVEL + 0.3 && // Stricter height check for floor detection
+           intersection.face && intersection.face.normal.y > 0.7); // Normal pointing upward indicates floor
+        
+        // Handle ground/floor clicks - move camera in view mode and deselect
+        if (isGroundClick && mode === 'view') {
+          // Check if mouse movement was minimal (to distinguish clicks from drags)
+          const MOVEMENT_THRESHOLD = 5; // pixels
+          let shouldSlerp = true;
+          
+          if (pointerDownPoint.current) {
+            const deltaX = Math.abs(e.clientX - pointerDownPoint.current.x);
+            const deltaY = Math.abs(e.clientY - pointerDownPoint.current.y);
+            const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            // Only slerp if movement was minimal
+            shouldSlerp = totalMovement <= MOVEMENT_THRESHOLD;
+          }
+          
+          if (mode === 'view' && shouldSlerp) {
+            setImageLerpFlag(false);
+            // Reset image teleportation flag for ground clicks (enable collision)
+            isTeleportingToImage.current = false;
+            cameraTarget.current = { x: intersection.point.x, y: GROUND_LEVEL, z: intersection.point.z };
+            cameraLookAtTarget.current = new THREE.Vector3(intersection.point.x, GROUND_LEVEL, intersection.point.z);
+          }
+          
+          // Deselect any selected object when clicking on ground/floor
+          setGizmoMode('');
+          setSelectedId(null);
+          return; // Exit early after handling ground/floor click
+        }
+        
+        // If not a ground click, find the first non-ground intersected object for regular interaction
+        if (!isGroundClick) {
+          // Look for the first non-ground object to interact with
+          for (let i = 0; i < intersects.length; i++) {
+            if (intersects[i].object !== groundRef.current) {
+              clickedObject = intersects[i].object;
+              intersection = intersects[i];
+              break;
+            }
+          }
+        }
+        
+        // Skip further processing if this was a ground click
+        if (isGroundClick) {
+          return;
         }
         
         const clickedId = clickedObject.userData.id; // Retrieve the ID from userData
-        const clickedObjData = objs.find(o => o.id === clickedId);
+        let clickedObjData = objs.find(o => o.id === clickedId);
+        
+        // If not found in objs, check tourMarkers array
+        if (!clickedObjData && clickedId && clickedId.startsWith('tourmarker-')) {
+          const tourMarker = tourMarkers.find(tm => tm.id === clickedId);
+          if (tourMarker) {
+            clickedObjData = { ...tourMarker, type: 'tourmarker' };
+          }
+        }
 
         if (clickedObjData?.src?.toLowerCase().endsWith(".glb")) {
           if(isEditRoom === false){
@@ -1427,6 +1667,15 @@ useEffect(() => {
         }
 
         if (mode === 'view' && clickedObjData?.type === 'image' && clickedObjData?.src) {
+          // Only teleport to image if pointer down and up are on the same image (no dragging)
+          if (pointerDownObjectId.current !== clickedId) {
+            return; // Don't teleport if user dragged from different object or started drag outside
+          }
+          
+          // Cancel any existing camera movement before starting new one
+          cameraTarget.current = null;
+          cameraLookAtTarget.current = null;
+          
           // Get image world position and normal
           const imageMesh = clickedObject;
           const imageWorldPos = new THREE.Vector3();
@@ -1440,15 +1689,19 @@ useEffect(() => {
           const camTarget = imageWorldPos.clone().add(imageNormal.clone().multiplyScalar(5));
           camTarget.y = GROUND_LEVEL;
 
+          // Set flag to indicate we're teleporting to an image (disable collision)
+          isTeleportingToImage.current = true;
           cameraTarget.current = { x: camTarget.x, y: camTarget.y, z: camTarget.z };
           cameraLookAtTarget.current = imageWorldPos.clone();
 
           onImageClick?.({
+            id: clickedObjData.id, // Include the image ID for tour marker matching
             src: clickedObjData.src,
             title: clickedObjData.title,
             alt: clickedObjData.alt,
             description: clickedObjData.description,
-            audio: clickedObjData.audio
+            audio: clickedObjData.audio,
+            showImageDescription: clickedObjData.showImageDescription
           })
           setImageLerpFlag(true);
 
@@ -1461,15 +1714,31 @@ useEffect(() => {
             return; // Don't allow selection of hidden transparent walls
           }
 
+          if (mode === 'edit' && clickedObjData.type === 'wall' && clickedObjData.objectRole === "template" && typeRoom === "exhibition" && userRole !== "admin") {
+            return alert("Objects from templates cannot be edited");
+          }
+
           const canvasRect = gl.domElement.getBoundingClientRect();
 
-          setPopupPosition({
-            x: e.clientX,  
-            y: e.clientY,
-          });
-
-          setPopupData(clickedObjData);
-          setPopupVisible(true);
+          // If clicking on a different object, close popup first then reopen
+          if (selectedId && selectedId !== clickedId) {
+            setPopupVisible(false);
+            setTimeout(() => {
+              setPopupPosition({
+                x: e.clientX,  
+                y: e.clientY,
+              });
+              setPopupData(clickedObjData);
+              setPopupVisible(true);
+            }, 50);
+          } else {
+            setPopupPosition({
+              x: e.clientX,  
+              y: e.clientY,
+            });
+            setPopupData(clickedObjData);
+            setPopupVisible(true);
+          }
         }
 
         if (clickedId) {
@@ -1478,7 +1747,9 @@ useEffect(() => {
             return; // Don't allow selection of hidden transparent walls
           }
 
-          setGizmoMode('')
+          // Reset gizmo mode when selecting objects
+          setGizmoMode('');
+          
           setSelectedId(clickedId); // Toggle selection
           setHoveredId(null); // Clear the hovered object ID
         }
@@ -1593,6 +1864,29 @@ useEffect(() => {
 
   // Handle object transformation
   const handleTransformChange = (id, transform) => {
+    // Check if this is a tour marker transformation
+    if (id && id.startsWith('tourmarker-')) {
+      // Handle tour marker transformation
+      const updatedTourMarkers = tourMarkers.map((marker) =>
+        marker.id === id
+          ? {
+              ...marker,
+              position: transform.position ?? marker.position,
+              rotation: transform.rotation ?? marker.rotation,
+              scale: transform.scale ?? marker.scale,
+            }
+          : marker
+      );
+      
+      // Call the parent's tour marker update function if available
+      if (typeof onUpdateTourMarkers === 'function') {
+        onUpdateTourMarkers(updatedTourMarkers);
+      }
+      
+      return; // Exit early for tour markers
+    }
+
+    // Handle regular object transformation
     setObjs((prevObjects) => {
       const updated = prevObjects.map((obj) =>
         obj.id === id
@@ -1607,10 +1901,13 @@ useEffect(() => {
               penumbra: transform.penumbra ?? obj.penumbra,
               imageFrameId: transform.imageFrameId ?? obj.imageFrameId,
               frameColor: transform.frameColor ?? obj.frameColor,
+              canvasColor: transform.canvasColor ?? obj.canvasColor,
               albedo: transform.albedo ?? obj.albedo,
               normal: transform.normal ?? obj.normal,
               orm: transform.orm ?? obj.orm,
-              transparent: transform.transparent ?? obj.transparent
+              transparent: transform.transparent ?? obj.transparent,
+              aspectRatio: transform.aspectRatio ?? obj.aspectRatio,
+              showImageDescription: transform.showImageDescription ?? obj.showImageDescription
             }
           : obj
       );
@@ -1623,152 +1920,6 @@ useEffect(() => {
 
       return updated;
     });
-  };
-
-  // Save updated objects to the existing JSON file via the backend
-  const saveToFile = async () => {
-    try {
-      const placedObjects = objs.filter((obj) => obj.id !== -1); // Filter out temporary walls
-
-      // Update existing tourMarkers with tempTourIndices
-      const updatedTourMarkers = [...(tourMarkers || [])];
-      
-      // Update existing markers with new indices (for both image and camera markers)
-      if (tempTourIndices) {
-        tempTourIndices.forEach((tourIndex, itemId) => {
-          if (tourIndex !== undefined && tourIndex !== -1) {
-            // Find existing marker for this item (either image or camera)
-            const existingMarkerIndex = updatedTourMarkers.findIndex(m => {
-              // Check for image marker
-              if (m.imageId === itemId) return true;
-              // Check for camera marker
-              if (m.type === 'camera') {
-                // Handle both new itemId format and legacy id format
-                return (m.itemId === itemId) || (m.id === `tourmarker-${itemId}`);
-              }
-              return false;
-            });
-            
-            if (existingMarkerIndex !== -1) {
-              // Update existing marker's index
-              updatedTourMarkers[existingMarkerIndex] = {
-                ...updatedTourMarkers[existingMarkerIndex],
-                index: tourIndex
-              };
-            } else {
-              // Create new marker only for images (camera markers are created when added)
-              const image = placedObjects.find(obj => obj.type === 'image' && obj.id === itemId);
-              if (image) {
-                // Find the parent wall to get its transformation
-                const parentWall = placedObjects.find(obj => obj.id === image.parent);
-                const wallPosition = parentWall ? parentWall.position : [0, 0, 0];
-                const wallRotation = parentWall ? parentWall.rotation : [0, 0, 0];
-                const wallScale = parentWall ? parentWall.scale : [1, 1, 1];
-                
-                // Calculate marker position accounting for wall transformation
-                const wallMatrix = new THREE.Matrix4();
-                wallMatrix.makeRotationFromEuler(new THREE.Euler(
-                  THREE.MathUtils.degToRad(wallRotation[0]),
-                  THREE.MathUtils.degToRad(wallRotation[1]),
-                  THREE.MathUtils.degToRad(wallRotation[2])
-                ));
-                wallMatrix.setPosition(new THREE.Vector3(...wallPosition));
-                wallMatrix.scale(new THREE.Vector3(...wallScale));
-                
-                const imageMatrix = new THREE.Matrix4();
-                imageMatrix.makeRotationFromEuler(new THREE.Euler(
-                  THREE.MathUtils.degToRad(image.rotation[0]),
-                  THREE.MathUtils.degToRad(image.rotation[1]),
-                  THREE.MathUtils.degToRad(image.rotation[2])
-                ));
-                imageMatrix.setPosition(new THREE.Vector3(...image.position));
-                
-                // Combine transformations
-                const worldImageMatrix = new THREE.Matrix4();
-                worldImageMatrix.multiplyMatrices(wallMatrix, imageMatrix);
-                
-                // Calculate the normal vector of the image (pointing away from the wall)
-                const quaternion = new THREE.Quaternion();
-                const scale = new THREE.Vector3();
-                const position = new THREE.Vector3();
-                worldImageMatrix.decompose(position, quaternion, scale);
-                
-                // Image normal vector (pointing outward from the image surface)
-                // Use negative Z as forward direction (standard in Three.js)
-                const imageNormal = new THREE.Vector3(0, 0, -1);
-                imageNormal.applyQuaternion(quaternion);
-                
-                // Position marker 2 units in front of image along its normal
-                const forward = imageNormal.multiplyScalar(2);
-                
-                // Get world position and add forward offset
-                const imageWorldPosition = new THREE.Vector3();
-                imageWorldPosition.setFromMatrixPosition(worldImageMatrix);
-                imageWorldPosition.add(forward);
-                const measured = audioDurationsRef.current.get(itemId);
-                
-                const newTourMarker = {
-                  id: `tourmarker-${itemId}`,
-                  imageId: itemId,
-                  type: 'image',
-                  index: tourIndex,
-                  position: [imageWorldPosition.x, imageWorldPosition.y, imageWorldPosition.z],
-                  imagePosition: image.position,
-                  imageRotation: image.rotation,
-                  wallPosition: wallPosition,
-                  wallRotation: wallRotation,
-                  wallScale: wallScale,
-                  duration: measured ? Math.max(5000, measured) : 5000,
-                };
-                updatedTourMarkers.push(newTourMarker);
-              }
-            }
-          }
-        });
-      }
-
-      const requestBody = { isPreset: objectData.isPreset, name: objectData.name, objects: placedObjects, images: images, imageFrameList: imageFrameList, tourMarkers: updatedTourMarkers, audio: uploadedAudioFiles || [] };
-
-      const responseObject = await fetch('http://localhost:5000/update-object', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!responseObject.ok) {
-        const errorText = await responseObject.text();
-        throw new Error('Failed to save changes to the file.');
-      } else {
-        const successText = await responseObject.text();
-      }
-
-      const responseEnviroment = await fetch('http://localhost:5000/update-enviroment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          skySettingMode: skySettingMode, 
-          groundSettingMode: groundSettingMode,
-          selectedHdri: hdri,
-          selectedGroundTexture: groundTexture,
-          sky: skySettings, 
-          ground: groundSettings,
-          bloom: bloomSettings 
-        }),
-      });
-
-      if (!responseEnviroment.ok) {
-        throw new Error('Failed to save changes to the file.');
-      }
-  
-      alert('Changes saved successfully!');
-    } catch (error) {
-      console.error('Error saving changes:', error);
-      alert('Failed to save changes.');
-    }
   };
 
   // ===== Thêm hoặc thay audio cho ảnh =====
@@ -1793,6 +1944,69 @@ useEffect(() => {
     console.log(` Audio set for ${selectedId}:`, audioUrl);
   };
 
+  // Function to teleport to a specific image
+  const teleportToImage = (imageId) => {
+    const imageObj = objs.find(obj => obj.id === imageId && obj.type === 'image');
+    if (!imageObj) {
+      console.warn('Image not found for teleportation:', imageId);
+      return;
+    }
+
+    const parentWall = imageObj.parent ? objs.find(obj => obj.id === imageObj.parent) : null;
+    if (!parentWall) {
+      console.warn('Parent wall not found for image:', imageId);
+      return;
+    }
+
+    const wallPosition = parentWall.position || [0, 0, 0];
+    const wallRotation = parentWall.rotation || [0, 0, 0];
+    const wallScale = parentWall.scale || [1, 1, 1];
+    const imagePosition = imageObj.position;
+    const imageRotation = imageObj.rotation || [0, 0, 0];
+
+    // Calculate image world position
+    const wallPos = new THREE.Vector3(...wallPosition);
+    const wallRot = new THREE.Euler(
+      THREE.MathUtils.degToRad(wallRotation[0]),
+      THREE.MathUtils.degToRad(wallRotation[1]),
+      THREE.MathUtils.degToRad(wallRotation[2])
+    );
+    const wallQuat = new THREE.Quaternion().setFromEuler(wallRot);
+    
+    // Transform image position from wall-local to world space
+    const imageLocalPos = new THREE.Vector3(...imagePosition);
+    const imageWorldPos = imageLocalPos.clone();
+    imageWorldPos.applyQuaternion(wallQuat);
+    imageWorldPos.multiply(new THREE.Vector3(...wallScale));
+    imageWorldPos.add(wallPos);
+
+    // Calculate the image's forward direction (normal vector pointing away from wall)
+    const imageRot = new THREE.Euler(
+      THREE.MathUtils.degToRad(imageRotation[0]),
+      THREE.MathUtils.degToRad(imageRotation[1]),
+      THREE.MathUtils.degToRad(imageRotation[2])
+    );
+    const imageQuat = new THREE.Quaternion().setFromEuler(imageRot);
+    
+    // Combine wall and image rotations
+    const combinedQuat = wallQuat.clone().multiply(imageQuat);
+    
+    // Forward direction (positive Z to point away from image surface)
+    const forward = new THREE.Vector3(0, 0, 1);
+    forward.applyQuaternion(combinedQuat);
+    
+    // Calculate camera target position (move back from image)
+    const DISTANCE = 2.0; // Distance from image
+    const camTarget = imageWorldPos.clone().add(forward.clone().multiplyScalar(DISTANCE));
+    camTarget.y = GROUND_LEVEL;
+
+    // Set teleportation targets
+    isTeleportingToImage.current = true;
+    cameraTarget.current = { x: camTarget.x, y: camTarget.y, z: camTarget.z };
+    cameraLookAtTarget.current = imageWorldPos.clone();
+    setImageLerpFlag(true);
+  };
+  
   // Get current camera position and rotation
   const getCurrentCameraState = () => {
     if (!camera) {
@@ -1815,7 +2029,6 @@ useEffect(() => {
   
   // Expose the saveToFile and createWall methods to the parent component
   useImperativeHandle(ref, () => ({
-    saveToFile,
     createWall: handleCreateWall,
     createSpotLight: handleCreateSpotLight,
     createSpotLightForImage: handleCreateSpotLightForImage,
@@ -1824,9 +2037,53 @@ useEffect(() => {
     startPlacingImageFrame: () => {
       setPlacingImageFrame(true);
     },
+    startPlacingPhysicPlane: () => {
+      setPlacingPhysicPlane(true);
+    },
     replaceImageOnFrame: replaceImageOnFrame,
     handleAddOrReplaceAudio: handleAddOrReplaceAudio,
-    getCurrentCameraState: getCurrentCameraState
+    getCurrentCameraState: getCurrentCameraState,
+    teleportToImage: teleportToImage,
+    cancelCameraMovement: () => {
+      cameraTarget.current = null;
+      cameraLookAtTarget.current = null;
+    },
+    getRoomPayload(typeRoom) {
+      // build lại chính xác như logic cũ saveToFile nhưng KHÔNG download
+      const objectJson = JSON.stringify({
+        isPreset: objectData?.isPreset ?? false,
+        objects,
+        images,
+        imageFrameList,
+        tourMarkers
+      });
+
+      const environmentJson = JSON.stringify({
+        sky: skySettings,
+        ground: groundSettings,
+        bloom: bloomSettings,
+        selectedHdri: hdri,
+        selectedGroundTexture: groundTexture,
+        skySettingMode,
+        groundSettingMode
+      });
+
+      if (typeRoom === "exhibition") {
+        return {
+          environment_config: {
+            room: objectJson,
+            environment: environmentJson
+          }
+        };
+      } else {
+        return {
+          wall_config: {
+            room: objectJson,
+            environment: environmentJson
+          }
+        };
+      }
+    }
   }));
 
   // Recursive function to render objects
@@ -1843,55 +2100,90 @@ useEffect(() => {
       const wallRef = wallRefs.current[object.id];
 
       return (
-        <Fragment key={object.id}>
-          <Wall
-            key={object.id}
+        <>
+          <Fragment key={object.id}>
+            <Wall
+              key={object.id}
+              id={object.id}
+              albedo={object.albedo}
+              normal={object.normal}
+              orm={object.orm}
+              scale={object.scale}
+              position={object.position}
+              rotation={object.rotation}
+              color={object.color}
+              mode={mode}
+              selectedId={selectedId}
+              gizmoActive={gizmoActive}
+              hoveredId={hoveredId}
+              gizmoMode={gizmoMode}
+              snapEnabled={snapEnabled}
+              onTransformChange={handleTransformChange}
+              meshRef={wallRef}
+              modelSrc={object.src}
+              transparent={object.transparent}
+              onBoundingBoxUpdate={handleBoundingBoxUpdate}
+            />
+            {object.children.map((child) => renderObject(child, wallRef))}
+          </Fragment>
+        </>
+      );
+    } else if (object.type === 'image') {
+      if(object.src === physicPlane.src){
+        return (
+          <PhysicPlane
+            key={`${object.id}-${object.imageFrameId}-${object.src}`}
             id={object.id}
-            albedo={object.albedo}
-            normal={object.normal}
-            orm={object.orm}
+            src={object}
             scale={object.scale}
             position={object.position}
             rotation={object.rotation}
-            color={object.color}
             mode={mode}
             selectedId={selectedId}
             gizmoActive={gizmoActive}
             hoveredId={hoveredId}
             gizmoMode={gizmoMode}
             onTransformChange={handleTransformChange}
-            meshRef={wallRef}
-            modelSrc={object.src}
-            transparent={object.transparent}
-            onBoundingBoxUpdate={handleBoundingBoxUpdate}
+            parentRef={parentRef}
+            title={object.title}
+            alt={object.alt}
+            imageFrameId={object.imageFrameId}
+            imageFrameSrc = {physicPlane.src}
+            frameColor = {object.frameColor}
+            onHover={setTooltip}
+            wallBoxes={wallBoxes}
+            showTransparentWalls={showTransparentWalls}
           />
-          {object.children.map((child) => renderObject(child, wallRef))}
-        </Fragment>
-      );
-    } else if (object.type === 'image') {
-      return (
-        <Image
-          key={`${object.id}-${object.imageFrameId}-${object.src}`}
-          id={object.id}
-          src={object}
-          scale={object.scale}
-          position={object.position}
-          rotation={object.rotation}
-          mode={mode}
-          selectedId={selectedId}
-          gizmoActive={gizmoActive}
-          hoveredId={hoveredId}
-          gizmoMode={gizmoMode}
-          onTransformChange={handleTransformChange}
-          parentRef={parentRef}
-          title={object.title}
-          alt={object.alt}
-          imageFrameId={object.imageFrameId}
-          imageFrameSrc = {imageFrame.src}
-          frameColor = {object.frameColor}
-          onHover={setTooltip}
-        />
-      );
+        );
+      } else{
+        return (
+          <Image
+            key={`${object.id}-${object.imageFrameId}-${object.src}`}
+            id={object.id}
+            src={object}
+            scale={object.scale}
+            data={object.description}
+            position={object.position}
+            rotation={object.rotation}
+            mode={mode}
+            selectedId={selectedId}
+            gizmoActive={gizmoActive}
+            hoveredId={hoveredId}
+            gizmoMode={gizmoMode}
+            snapEnabled={snapEnabled}
+            onTransformChange={handleTransformChange}
+            parentRef={parentRef}
+            title={object.title}
+            alt={object.alt}
+            imageFrameId={object.imageFrameId}
+            imageFrameSrc = {imageFrame.src}
+            frameColor = {object.frameColor}
+            canvasColor = {object.canvasColor || 'white'}
+            showImageDescription={object.showImageDescription}
+            onHover={setTooltip}
+          />
+        );
+      }
     } else if (object.type === 'object') {
       return (
         <Object3D
@@ -1909,6 +2201,7 @@ useEffect(() => {
           gizmoActive={gizmoActive}
           hoveredId={hoveredId}
           gizmoMode={gizmoMode}
+          snapEnabled={snapEnabled}
           hdri={hdri}
           onTransformChange={handleTransformChange}
         />
@@ -1925,6 +2218,7 @@ useEffect(() => {
                 hoveredId={hoveredId}
                 gizmoMode={gizmoMode}
                 gizmoActive={gizmoActive}
+                snapEnabled={snapEnabled}
                 onTransformChange={handleTransformChange}
             />
         );
@@ -1944,6 +2238,7 @@ useEffect(() => {
               gizmoMode={gizmoMode}
               selectedId={selectedId}
               gizmoActive={gizmoActive}
+              snapEnabled={snapEnabled}
               onTransformChange={handleTransformChange}
               setSelectedId = {setSelectedId}
             />
@@ -1964,6 +2259,7 @@ useEffect(() => {
               gizmoMode={gizmoMode}
               selectedId={selectedId}
               gizmoActive={gizmoActive}
+              snapEnabled={snapEnabled}
               onTransformChange={handleTransformChange}
               setSelectedId = {setSelectedId}
               setPopupVisible={setPopupVisible}
@@ -1976,261 +2272,48 @@ useEffect(() => {
     return null;
   };
 
-  useEffect(() => {
-    const handleDrop = (e) => {
-      setSelectedId(null);
-      e.preventDefault();
-      if (!draggedImage) return;
 
-      const imageSrc = draggedImage.src;
-      const img = new window.Image();
-
-      img.crossOrigin = "anonymous";
-
-      img.onload = () => {
-        const aspect = img.naturalWidth / img.naturalHeight;
-
-        // Get mouse position relative to canvas
-        const rect = gl.domElement.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-        mouse.current.x = x;
-        mouse.current.y = y;
-
-        raycaster.current.setFromCamera(mouse.current, camera);
-        
-        // Get all intersected objects - safely handle meshRefs values
-        const allMeshes = [];
-        Array.from(meshRefs.values()).forEach(obj => {
-          if (obj) {
-            if (Array.isArray(obj)) {
-              // Legacy: array of meshes
-              allMeshes.push(...obj.filter(item => item && item.isMesh));
-            } else if (obj.isMesh) {
-              // Single mesh
-              allMeshes.push(obj);
-            } else if (obj.children) {
-              // Group or container - traverse to find meshes
-              obj.traverse((child) => {
-                if (child.isMesh && child.material && child.visible && child.geometry) {
-                  // Ensure mesh is properly set up for raycasting
-                  if (!child.geometry.boundingSphere) {
-                    child.geometry.computeBoundingSphere();
-                  }
-                  allMeshes.push(child);
-                }
-              });
-            }
-          }
-        });
-        
-        const intersects = raycaster.current.intersectObjects(allMeshes, false);
-
-        if (intersects.length > 0) {
-          const intersection = intersects[0];
-          const clickedObject = intersection.object;
-          const clickedId = clickedObject.userData.id;
-          const clickedObjData = objs.find(o => o.id === clickedId);
-          const clickedObjectSrc = clickedObjData.src;
-          if(clickedObjectSrc === imageFrame.src){
-            const updatedObjs = objs.map(o => {
-              if (o.id === clickedId) {
-                return { ...o, src: draggedImage.src,
-                  alt: draggedImage.alt,
-                  title: draggedImage.title,
-                  scale: [aspect, 1, 1] 
-                };
-              }
-              return o;
-            });
-
-            setObjs(updatedObjs); 
-            onObjectsChange(updatedObjs);
-            return
-          }
-
-          if (draggedImage.src === imageFrame.src) {
-            // Get the wall object to determine if it's using a GLB model
-            const wallObj = objs.find(o => o.id === clickedId);
-            
-            let worldNormal, worldPosition, localPosition, euler;
-
-            if (wallObj?.src) {
-              // Compute the wall normal in world space
-              const normalMatrix = new THREE.Matrix3().getNormalMatrix(clickedObject.matrixWorld);
-              let worldNormal = intersection.face.normal.clone().applyMatrix3(normalMatrix).normalize();
-              
-              // Decide reference point (camera or room center)
-              const reference = camera.position; 
-              // Or: const reference = new THREE.Vector3(0, 1.5, 0); // room center
-              
-              // If the normal is pointing *away* from reference, flip it
-              if (worldNormal.dot(reference.clone().sub(intersection.point)) < 0) {
-                worldNormal.negate();
-              }
-              
-              // Apply the cleaner approach for GLB models
-              // 1. World normal is already computed above
-              // 2. Flip inward-pointing normals (for interior walls) - already done above
-              
-              // 3. Place the image slightly off the wall
-              const offset = 0.05;
-              worldPosition = intersection.point.clone().add(worldNormal.clone().multiplyScalar(offset));
-              
-              // 4. Build rotation with stable up direction
-              const worldUp = new THREE.Vector3(0, 1, 0);
-              
-              // If wall normal is nearly parallel to up, pick a fallback
-              let tangent = new THREE.Vector3().crossVectors(worldUp, worldNormal);
-              if (tangent.lengthSq() < 1e-6) {
-                tangent = new THREE.Vector3(1, 0, 0).cross(worldNormal);
-              }
-              tangent.normalize();
-              
-              const bitangent = new THREE.Vector3().crossVectors(worldNormal, tangent).normalize();
-              
-              // Make basis: X = tangent, Y = bitangent (up), Z = forward (normal)
-              const rotMatrix = new THREE.Matrix4().makeBasis(tangent, bitangent, worldNormal);
-              
-              // Convert to quaternion/Euler
-              const quat = new THREE.Quaternion().setFromRotationMatrix(rotMatrix);
-              const worldEuler = new THREE.Euler().setFromQuaternion(quat, 'XYZ');
-              
-              // Get the wall's container for coordinate transformation
-              const wallContainer = meshRefs.get(clickedId);
-              if (wallContainer && !Array.isArray(wallContainer)) {
-                // Convert world position and rotation to local space
-                localPosition = wallContainer.worldToLocal(worldPosition.clone());
-                
-                // Convert world rotation to local space
-                wallContainer.updateMatrixWorld();
-                const wallQuat = new THREE.Quaternion().setFromRotationMatrix(wallContainer.matrixWorld);
-                const localQuat = quat.clone().premultiply(wallQuat.invert());
-                euler = new THREE.Euler().setFromQuaternion(localQuat, 'XYZ');
-              } else {
-                // Fallback to world space
-                const offset = 0.01;
-                worldPosition = intersection.point.clone().add(worldNormal.clone().multiplyScalar(offset));
-                localPosition = worldPosition.clone();
-                
-                // Create proper rotation in world space
-                const imageForward = worldNormal.clone().negate(); // Face away from wall
-                const worldUp = new THREE.Vector3(0, 1, 0);
-                const right = new THREE.Vector3().crossVectors(worldUp, imageForward).normalize();
-                const up = new THREE.Vector3().crossVectors(imageForward, right).normalize();
-                
-                const rotationMatrix = new THREE.Matrix4().makeBasis(right, up, imageForward);
-                euler = new THREE.Euler().setFromRotationMatrix(rotationMatrix);
-              }
-            } else {
-              // For regular box geometry walls (legacy code)
-              const normalMatrix = new THREE.Matrix3().getNormalMatrix(clickedObject.matrixWorld);
-              worldNormal = intersection.face.normal.clone().applyMatrix3(normalMatrix).normalize();
-              const localNormal = worldNormal.clone().applyMatrix3(new THREE.Matrix3().getNormalMatrix(clickedObject.matrixWorld.clone().invert())).normalize();
-              
-              const offset = 0.06;
-              const worldOffset = worldNormal.clone().multiplyScalar(offset);
-              worldPosition = intersection.point.clone().add(worldOffset);
-              
-              // Convert this world position to the wall's local space for storing in the image object
-              localPosition = clickedObject.worldToLocal(worldPosition.clone());
-
-              // Calculate local rotation so image faces away from the wall
-              const quaternion = new THREE.Quaternion().setFromUnitVectors(
-                new THREE.Vector3(0, 0, 1),
-                localNormal
-              );
-              euler = new THREE.Euler().setFromQuaternion(quaternion);
-            }
-
-            // 5. Create the new image object
-            const newImageId = `image-${Date.now()}`;
-            const newImage = {
-              id: newImageId,
-              type: "image",
-              src: imageSrc,
-              alt: draggedImage.alt,
-              title: draggedImage.title,
-              position: [localPosition.x, localPosition.y, localPosition.z],
-              rotation: [
-                THREE.MathUtils.radToDeg(euler.x),
-                THREE.MathUtils.radToDeg(euler.y),
-                THREE.MathUtils.radToDeg(euler.z)
-              ],
-              scale: [aspect, 1, 1],
-              parent: clickedId,
-              imageFrameId: "imageFrame-1",
-              frameColor: "white"
-            };
-
-            if (onObjectAdded) {
-                onObjectAdded(
-                    newImage.id,
-                    newImage.position,
-                    newImage.rotation,
-                    {
-                        scale: newImage.scale,
-                        src: newImage.src,
-                        alt: newImage.alt,
-                        title: newImage.title,
-                        parent: newImage.parent,
-                        imageFrameId: newImage.imageFrameId,
-                        frameColor: newImage.frameColor
-                    },
-                    'image'
-                );
-            }
-            // 6. Update objects: add image, and add image as child to wall
-            setObjs(prev => prev.map(obj =>
-              obj.id === clickedId && obj.type === "wall"
-                ? { ...obj, children: [...(obj.children || []), newImageId] }
-                : obj
-            ).concat(newImage));
-          } else{
-            alert("You can only drop images on Image Frame!");
-          }
-        }
-      }
-
-      img.onerror = (err) => {
-        console.error("Failed to load image during drag and drop:", {
-          imageSrc,
-          draggedImage,
-          error: err,
-          errorType: err.type,
-          timestamp: new Date().toISOString()
-        });
-        
-        // Show user-friendly error message
-        alert(`Failed to load image: ${imageSrc}\nPlease check if the image URL is valid and accessible.`);
-        
-        setDraggedImage(null);
-      };
-
-      img.src = imageSrc;
-      
-      setDraggedImage(null);
-    };
-
-    const handleDragOver = (e) => {
-      e.preventDefault();
-    };
-
-    gl.domElement.addEventListener('drop', handleDrop);
-    gl.domElement.addEventListener('dragover', handleDragOver);
-
-    return () => {
-      gl.domElement.removeEventListener('drop', handleDrop);
-      gl.domElement.removeEventListener('dragover', handleDragOver);
-    };
-  }, [draggedImage, gl]);
-
-  // Thay ảnh trên frame (dùng chung cho click hoặc drag-drop)
+    // Thay ảnh trên frame (dùng chung cho click hoặc drag-drop)
   const replaceImageOnFrame = (frameId, newImage) => {
+
+    console.log("???", newImage);
     const frameObj = objs.find(o => o.id === frameId && o.type === "image");
     if (!frameObj) return;
 
+    // Kiểm tra loại file (ảnh hoặc video)
+    const isVideo = /\.(mp4|webm|mov|ogg)$/i.test(newImage.file_url);
+
+    if (isVideo) {
+      console.log("Detected video file, skipping Image() load:", newImage.file_url);
+
+      const updatedObjs = objs.map(o => {
+        if (o.id === frameId) {
+
+          return {
+            ...o,
+            src: newImage.file_url,
+            alt: newImage.metadata.tac_gia || "Không tác giả",
+            title: newImage.metadata.tieu_de || "Tranh không có tiêu đề",
+            description: newImage.metadata || "Tranh không có thông tin",
+            type: "image",
+            ...(newImage.index !== undefined && { index: newImage.index }),
+            ...(newImage.audio && { audio: newImage.audio }),
+            scale: [1, 1, 1],         // tạm aspect ratio 16:9
+            aspectRatio: [16/9, 1],   // Default video aspect ratio
+            canvasColor: o.canvasColor || "white",  // preserve existing canvasColor or default
+            frameColor: o.frameColor || "white",     // preserve existing frameColor or default
+            showImageDescription: o.showImageDescription ?? true // preserve existing setting or default
+          };
+        }
+        return o;
+      });
+
+      setObjs(updatedObjs);
+      onObjectsChange?.(updatedObjs);
+      return; //stop tại đây — không tạo new Image()
+    }
+
+    //Ảnh bình thường
     const img = new window.Image();
     img.crossOrigin = "anonymous";
 
@@ -2241,15 +2324,17 @@ useEffect(() => {
         if (o.id === frameId) {
           return {
             ...o,
-            // Copy all metadata from newImage, overwriting old values
-            src: newImage.src,
-            alt: newImage.alt,
-            title: newImage.title,
-            description: newImage.description, // Include description
-            // Copy any other metadata fields that might exist
+            src: newImage.thumbnail || newImage.file_url,
+            alt: newImage.metadata.tac_gia || "Không tác giả",
+            title: newImage.metadata.tieu_de || "Tranh không có tiêu đề",
+            description: newImage.metadata || "Tranh không có thông tin",
             ...(newImage.index !== undefined && { index: newImage.index }),
             ...(newImage.audio && { audio: newImage.audio }),
             scale: [aspect, 1, 1],
+            aspectRatio: [aspect, 1], // Store aspectRatio for toolbox dimension calculations
+            canvasColor: o.canvasColor || "white",  // preserve existing canvasColor or default
+            frameColor: o.frameColor || "white",     // preserve existing frameColor or default
+            showImageDescription: o.showImageDescription ?? true // preserve existing setting or default
           };
         }
         return o;
@@ -2262,18 +2347,157 @@ useEffect(() => {
     img.onerror = (err) => {
       console.error("Failed to load image for frame replacement:", {
         frameId,
-        newImageSrc: newImage.src,
+        newImageSrc: newImage.thumbnail || newImage.file_url,
         newImage,
         error: err,
         errorType: err.type,
         timestamp: new Date().toISOString()
       });
       
-      // Show user-friendly error message
       alert(`Failed to load replacement image: ${newImage.src}\nPlease check if the image URL is valid and accessible.`);
     };
-    img.src = newImage.src;
+
+    img.src = newImage.thumbnail || newImage.file_url;
   };
+
+  useEffect(() => {
+    const handleDrop = (e) => {
+      setSelectedId(null);
+      e.preventDefault();
+      if (!draggedImage) return;
+
+      // Lấy vị trí chuột
+      const rect = gl.domElement.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      mouse.current.set(x, y);
+      raycaster.current.setFromCamera(mouse.current, camera);
+
+      // Thu thập toàn bộ mesh để raycast
+      const allMeshes = [];
+      Array.from(meshRefs.values()).forEach(obj => {
+        if (!obj) return;
+        if (Array.isArray(obj)) allMeshes.push(...obj.filter(m => m && m.isMesh));
+        else if (obj.isMesh) allMeshes.push(obj);
+        else obj.traverse(c => {
+          if (c.isMesh && c.material && c.visible && c.geometry) {
+            if (!c.geometry.boundingSphere) c.geometry.computeBoundingSphere();
+            allMeshes.push(c);
+          }
+        });
+      });
+
+      const intersects = raycaster.current.intersectObjects(allMeshes, false);
+      if (intersects.length === 0) {
+        setDraggedImage(null);
+        return;
+      }
+
+      const intersection = intersects[0];
+      const clickedObject = intersection.object;
+      const clickedId = clickedObject.userData.id;
+      const clickedObjData = objs.find(o => o.id === clickedId);
+      const clickedObjectSrc = clickedObjData?.src;
+      const imageSrc = draggedImage.src;
+      const isVideo = /\.(mp4|webm|mov|ogg)$/i.test(imageSrc);
+
+      // ============ CASE 1: Kéo thả vào khung ảnh (Image Frame) ============
+      if (clickedObjectSrc === imageFrame.src) {
+        console.log("🖼️ Replace content on frame:", clickedId);
+        replaceImageOnFrame(clickedId, draggedImage); // ✅ dùng hàm chung xử lý ảnh/video
+        setDraggedImage(null);
+        return;
+      }
+
+      // ============ CASE 2: Đặt khung mới lên tường ============
+      else if (draggedImage.src === imageFrame.src) {
+        console.log("🧩 Dropping image frame on wall:", clickedId);
+        const wallObj = objs.find(o => o.id === clickedId);
+        if (!wallObj) return;
+
+        // Tính toán hướng tường
+        const normalMatrix = new THREE.Matrix3().getNormalMatrix(clickedObject.matrixWorld);
+        const worldNormal = intersection.face.normal.clone().applyMatrix3(normalMatrix).normalize();
+        const offset = 0.05;
+        const worldPosition = intersection.point.clone().add(worldNormal.clone().multiplyScalar(offset));
+
+        // Định hướng mặt ảnh song song với tường
+        const worldUp = new THREE.Vector3(0, 1, 0);
+        const right = new THREE.Vector3().crossVectors(worldUp, worldNormal).normalize();
+        const up = new THREE.Vector3().crossVectors(worldNormal, right).normalize();
+
+        const rotMatrix = new THREE.Matrix4().makeBasis(right, up, worldNormal);
+        const euler = new THREE.Euler().setFromRotationMatrix(rotMatrix);
+
+        const wallContainer = meshRefs.get(clickedId);
+        const localPosition = wallContainer ? wallContainer.worldToLocal(worldPosition.clone()) : worldPosition.clone();
+
+        const newFrame = {
+          id: `image-${Date.now()}`,
+          type: "image",
+          src: imageFrame.src,
+          alt: "New Frame",
+          title: "Frame",
+          position: [localPosition.x, localPosition.y, localPosition.z],
+          rotation: [
+            THREE.MathUtils.radToDeg(euler.x),
+            THREE.MathUtils.radToDeg(euler.y),
+            THREE.MathUtils.radToDeg(euler.z),
+          ],
+          scale: [1, 1, 1],
+          parent: clickedId,
+          imageFrameId: "imageFrame-1",
+          frameColor: "white",
+          aspectRatio: [1, 1] // Default square aspect ratio for placeholder
+        };
+
+        if (onObjectAdded) {
+          onObjectAdded(
+            newFrame.id,
+            newFrame.position,
+            newFrame.rotation,
+            {
+              scale: newFrame.scale,
+              src: newFrame.src,
+              alt: newFrame.alt,
+              title: newFrame.title,
+              parent: newFrame.parent,
+              imageFrameId: newFrame.imageFrameId,
+              frameColor: newFrame.frameColor,
+            },
+            "image"
+          );
+        }
+
+        setObjs(prev =>
+          prev
+            .map(obj =>
+              obj.id === clickedId && obj.type === "wall"
+                ? { ...obj, children: [...(obj.children || []), newFrame.id] }
+                : obj
+            )
+            .concat(newFrame)
+        );
+
+        setDraggedImage(null);
+        return;
+      } else{
+        alert("Please drop the image onto an image frame to replace its content, or drop the image frame onto a wall to place a new frame.");
+      }
+
+    };
+
+    const handleDragOver = (e) => e.preventDefault();
+
+    gl.domElement.addEventListener("drop", handleDrop);
+    gl.domElement.addEventListener("dragover", handleDragOver);
+
+    return () => {
+      gl.domElement.removeEventListener("drop", handleDrop);
+      gl.domElement.removeEventListener("dragover", handleDragOver);
+    };
+  }, [draggedImage, objs, gl, camera, meshRefs, replaceImageOnFrame, imageFrame, onObjectAdded]);
 
   return (
     <group 
@@ -2288,46 +2512,28 @@ useEffect(() => {
           mouse.current.x = x;
           mouse.current.y = y;
           
-          // Simple tracking for movement validation
+          // Track pointer down position and object
           pointerDownPoint.current = { x: e.clientX, y: e.clientY };
+          
+          // Raycast to find object under pointer on down
+          raycaster.current.setFromCamera(mouse.current, camera);
+          const allMeshes = collectRaycastableMeshes();
+          const intersects = raycaster.current.intersectObjects(allMeshes, true);
+          
+          if (intersects.length > 0) {
+            const clickedObject = intersects[0].object;
+            pointerDownObjectId.current = clickedObject.userData.id;
+          } else {
+            pointerDownObjectId.current = null;
+          }
         }
       }}
       onPointerUp={(e) => {
-        // Simple ground click with movement validation - only for left mouse button
-        const currentPoint = { x: e.clientX, y: e.clientY };
-        
-        if (
-          mode === 'view' &&
-          e.button === 0 && // Only left mouse button
-          pointerDownPoint.current &&
-          Math.abs(currentPoint.x - pointerDownPoint.current.x) < 10 && // Minimal screen movement
-          Math.abs(currentPoint.y - pointerDownPoint.current.y) < 10
-        ) {
-          // Raycast to check what we're clicking on
-          const { x, y } = eventToNDC(e, gl);
-          raycaster.current.setFromCamera({ x, y }, camera);
-          
-          // Raycast against all objects including ground
-          const allMeshes = collectRaycastableMeshes();
-          
-          // Always include ground mesh for reliable ground click detection
-          if (groundRef.current) {
-            allMeshes.push(groundRef.current);
-          }
-          
-          const intersects = raycaster.current.intersectObjects(allMeshes, true);
-          
-          // Only allow ground movement if the first hit object is the ground
-          if (intersects.length > 0 && intersects[0].object === groundRef.current) {
-            const intersection = intersects[0];
-            setImageLerpFlag(false);
-            cameraTarget.current = { x: intersection.point.x, y: GROUND_LEVEL, z: intersection.point.z };
-            cameraLookAtTarget.current = new THREE.Vector3(intersection.point.x, GROUND_LEVEL, intersection.point.z);
-          }
-        }
-        
-        // Reset tracking
-        pointerDownPoint.current = null;
+        // Delay reset to allow onClick handler to use the pointer down point
+        setTimeout(() => {
+          pointerDownPoint.current = null;
+          pointerDownObjectId.current = null;
+        }, 0);
       }}
       onPointerMissed={() => { setSelectedId(null); setGizmoMode(''); }}
     >
@@ -2386,6 +2592,7 @@ useEffect(() => {
       {/* Render tour markers for images with tour indices - EDIT MODE ONLY */}
       {mode === 'edit' && markersVisible && tempTourIndices && objs.filter(obj => obj.type === 'image').map((image) => {
         const tourIndex = tempTourIndices.get(image.id);
+
         if (tourIndex !== undefined && tourIndex !== -1) {
           // Find the parent wall to get its position, rotation and scale
           const parentWall = objs.find(obj => obj.id === image.parent);
@@ -2393,9 +2600,18 @@ useEffect(() => {
           const wallRotation = parentWall ? parentWall.rotation : [0, 0, 0];
           const wallScale = parentWall ? parentWall.scale : [1, 1, 1];
           
+          // Find the linked marker from tourMarkers array to get the actual marker ID and existing position
+          const linkedMarker = tourMarkers.find(marker => 
+            marker.imageId === image.id
+          );
+          
+          // Use the actual marker ID or fallback to legacy format for backward compatibility
+          const tourMarkerId = linkedMarker?.id || `tourmarker-${image.id}`;
+          
           return (
             <TourMarker
               key={`tour-${image.id}`}
+              id={tourMarkerId}
               type="image"
               imageId={image.id}
               imagePosition={image.position}
@@ -2404,9 +2620,14 @@ useEffect(() => {
               wallRotation={wallRotation}
               wallScale={wallScale}
               tourIndex={tourIndex}
-              onClick={() => {
-                console.log(`Tour marker ${tourIndex + 1} clicked for image ${image.id}`);
-              }}
+              mode={mode}
+              selectedId={selectedId}
+              gizmoMode={gizmoMode}
+              gizmoActive={gizmoActive}
+              hoveredId={hoveredId}
+              snapEnabled={snapEnabled}
+              onTransformChange={handleTransformChange}
+              markerPosition={linkedMarker?.position} // Pass existing position if available
             />
           );
         }
@@ -2421,15 +2642,24 @@ useEffect(() => {
           const tourIndex = tempTourIndices.get(itemId);
           
           if (tourIndex !== undefined && tourIndex !== -1) {
+            const tourMarkerId = cameraMarker.id; // Use the existing marker ID directly
+            
             return (
               <TourMarker
                 key={`camera-tour-${cameraMarker.id}`}
+                id={tourMarkerId}
                 type="camera"
                 cameraPosition={cameraMarker.position}
+                cameraRotation={cameraMarker.rotation}
                 tourIndex={tourIndex}
-                onClick={() => {
-                  console.log(`Camera tour marker ${tourIndex + 1} clicked for marker ${cameraMarker.id}`);
-                }}
+                mode={mode}
+                selectedId={selectedId}
+                gizmoMode={gizmoMode}
+                gizmoActive={gizmoActive}
+                hoveredId={hoveredId}
+                snapEnabled={snapEnabled}
+                onTransformChange={handleTransformChange}
+                markerPosition={cameraMarker.position} // For camera markers, use position directly
               />
             );
           }
@@ -2454,6 +2684,7 @@ useEffect(() => {
           hoveredId={hoveredId}
           setHoveredId={setHoveredId}
           gizmoMode={gizmoMode}
+          snapEnabled={snapEnabled}
           modelSrc={null}
         />
       )}
@@ -2484,8 +2715,34 @@ useEffect(() => {
             mode={mode}
             selectedId={null}
             parentRef={null}
+            snapEnabled={snapEnabled}
             imageFrameId="imageFrame-1"
             imageFrameSrc={imageFrame.src}
+            frameColor="white"
+            canvasColor="white"
+          />
+        </group>
+      )}
+
+      {placingPhysicPlane && (
+        <group
+          name="preview-group"
+          position={tempImageFramePosition}
+          rotation={tempImageFrameRotation}
+        >
+          <PhysicPlane
+            id="preview-image-frame"
+            src={physicPlane}
+            isPreview={true} 
+            scale={[1, 1, 1]}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            mode={mode}
+            selectedId={null}
+            parentRef={null}
+            snapEnabled={snapEnabled}
+            imageFrameId="imageFrame-1"
+            imageFrameSrc={physicPlane.src}
           />
         </group>
       )}
@@ -2514,7 +2771,13 @@ useEffect(() => {
         tourMode={tourMode}
         tourPlaying={tourPlaying}
         onTourInterrupted={onTourInterrupted}
+        onHideAnyInfoPanel={onHideAnyInfoPanel}
         wallBoxes={wallBoxes}
+        isTeleportingToImage={isTeleportingToImage}
+        onCancelCameraTarget={() => {
+          cameraTarget.current = null;
+          cameraLookAtTarget.current = null;
+        }}
       />
 
       {bloomSettings?.enabled && (

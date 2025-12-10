@@ -16,6 +16,35 @@ button:focus {
   outline: none;
 }
 
+/* Loading states for lazy-loaded components */
+.loading-toolbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  backdrop-filter: blur(5px);
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.loading-popup {
+  animation: fadeIn 0.2s ease-in;
+}
+
 /* Ensure the Canvas takes up the full screen */
 canvas {
   display: block; /* Remove any inline spacing */
@@ -57,6 +86,15 @@ canvas {
 
 .toolbox-container.edit-mode {
   transform: translateX(0); /* Toolbox in normal position */
+}
+
+/* Button Stack Container */
+.button-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 20px 20px 0;
 }
 
 .toolbox-content {
@@ -147,8 +185,6 @@ canvas {
 /* View/Edit Toggle Button */
 .toggle-button-circle {
   position: relative;
-  top: 20px;
-  right: 20px;
   z-index: 1000;
   width: 40px;
   height: 40px;
@@ -166,19 +202,11 @@ canvas {
   flex-shrink: 0; /* Prevent the button from shrinking */
 }
 
-/* Toggle button positioning in edit mode */
-.toolbox-container.edit-mode .toggle-button-circle {
-  position: relative;
-  margin-right: 10px;
-  transform: scale(1);
-}
-
 /* Toggle button positioning in view mode - move to top right corner */
 .toolbox-container.view-mode .toggle-button-circle {
   position: fixed;
   top: 20px;
   right: 20px;
-  margin-right: 0;
   transform: scale(1.1);
 }
 
@@ -210,6 +238,56 @@ canvas {
 .toggle-button-circle:hover svg {
   transform: scale(1.2);
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+
+/* Snap Toggle Button */
+.snap-toggle-button {
+  position: relative;
+  z-index: 1000;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: rgba(128, 128, 128, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  flex-shrink: 0;
+}
+
+.snap-toggle-button.enabled {
+  background: rgba(33, 150, 243, 0.8);
+  border-color: rgba(33, 150, 243, 0.9);
+}
+
+.snap-toggle-button.disabled {
+  background: rgba(158, 158, 158, 0.6);
+  border-color: rgba(158, 158, 158, 0.7);
+}
+
+.snap-toggle-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+.snap-toggle-button:active {
+  transform: scale(0.9);
+  transition: all 0.1s ease;
+}
+
+.snap-toggle-button svg {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+}
+
+.snap-toggle-button:hover svg {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
 }
 
 /* Audio Mute/Unmute Button */
@@ -541,4 +619,105 @@ canvas {
 
 #look-zone {
   pointer-events: auto;
+}
+
+/* Image List Button */
+.image-list-button {
+  position: absolute;
+  top: 220px; /* Positioned below the tour/markers button */
+  left: 20px;
+  z-index: 1000;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: rgba(128, 128, 128, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+/* Move image list button up on iOS when buttons are repositioned */
+.image-list-button.ios-positioned {
+  top: 170px; /* Take the normal tour button position */
+}
+
+.image-list-button:hover {
+  background: rgba(156, 39, 176, 0.8);
+  border-color: rgba(156, 39, 176, 0.9);
+  transform: scale(1.15) rotateZ(-5deg);
+  box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4), 0 0 20px rgba(156, 39, 176, 0.2);
+}
+
+.image-list-button:active {
+  transform: scale(0.9) rotateZ(2deg);
+  background: rgba(123, 31, 162, 0.9);
+  box-shadow: 0 2px 8px rgba(156, 39, 176, 0.3);
+  transition: all 0.1s ease;
+}
+
+.image-list-button svg {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+}
+
+.image-list-button:hover svg {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+
+/* Exhibition Information Button */
+.exhibition-info-button {
+  position: absolute;
+  top: 270px; /* Positioned below the image list button */
+  left: 20px;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: rgba(128, 128, 128, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+
+/* Move exhibition info button up on iOS when buttons are repositioned */
+.exhibition-info-button.ios-positioned {
+  top: 220px; /* Move up when other buttons are repositioned */
+}
+
+.exhibition-info-button:hover {
+  background: rgba(33, 150, 243, 0.8);
+  border-color: rgba(33, 150, 243, 0.9);
+  transform: scale(1.15) rotateZ(-5deg);
+  box-shadow: 0 8px 20px rgba(33, 150, 243, 0.4), 0 0 20px rgba(33, 150, 243, 0.2);
+}
+
+.exhibition-info-button:active {
+  transform: scale(0.9) rotateZ(2deg);
+  background: rgba(25, 118, 210, 0.9);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  transition: all 0.1s ease;
+}
+
+.exhibition-info-button svg {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+}
+
+.exhibition-info-button:hover svg {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
 }

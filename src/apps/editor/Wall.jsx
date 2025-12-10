@@ -7,6 +7,7 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { TransformWidget } from './TransformWidget';
 import meshRefs from './meshRefs';
+import { OBB } from 'three/examples/jsm/math/OBB.js';
 
 // Gizmo mode hợp lệ
 const isValidGizmoMode = (m) =>
@@ -27,6 +28,7 @@ export const Wall = ({
   gizmoActive,
   hoveredId,
   gizmoMode,
+  snapEnabled,
   meshRef,
   onParentTransformChange,
   color = '#b6b898',
@@ -238,9 +240,32 @@ export const Wall = ({
       onParentTransformChange({ position: p, quaternion: q, scale: s });
     }
     if (ref.current && onBoundingBoxUpdate && !modelSrc) {
-      const box = new THREE.Box3().setFromObject(ref.current);
-      onBoundingBoxUpdate(id, box);
+      ref.current.updateWorldMatrix(true, true);
+
+      // Lấy mesh chính
+      const mesh = ref.current.children.find((c) => c.isMesh);
+      if (!mesh || !mesh.geometry) return;
+
+      // Nếu chưa có boundingBox → tính một lần
+      if (!mesh.geometry.boundingBox) {
+        mesh.geometry.computeBoundingBox();
+      }
+
+      // Tạo OBB LƯU GIÁ TRỊ LOCAL
+      const obb = new OBB();
+      const box3 = mesh.geometry.boundingBox;
+      obb.center.copy(box3.getCenter(new THREE.Vector3()));
+      obb.halfSize.copy(
+        box3.getSize(new THREE.Vector3()).multiplyScalar(0.5)
+      );
+
+      // Apply transform sang world space
+      obb.applyMatrix4(ref.current.matrixWorld);
+
+      // Gửi OBB lên component cha
+      onBoundingBoxUpdate(id, obb);
     }
+
   });
 
   // Recalculate UVs based on scale (only for box geometry, not GLB models)
@@ -347,6 +372,7 @@ export const Wall = ({
           objectRef={ref}
           mode={gizmoMode} // luôn hợp lệ do shouldShowGizmo
           gizmoActive={gizmoActive}
+          snapEnabled={snapEnabled}
           onTransformChange={(tr) => handleWallTransformChange(id, tr)}
         />
       )}

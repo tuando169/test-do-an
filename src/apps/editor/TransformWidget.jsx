@@ -10,13 +10,14 @@ export const TransformWidget = ({
   mode = 'translate',
   gizmoActive,
   onTransformChange,
-  translationSnap = 0.25,
-  rotationSnap = 15,
-  scaleSnap = 0.125,
+  translationSnap = 0.1,
+  rotationSnap = 5,
+  scaleSnap = 0.05,
   space = 'world',
   showX = true,
   showY = true,
   showZ = true,
+  snapEnabled = true,
 }) => {
   const transformRef = useRef();
   const { camera, gl } = useThree();
@@ -27,10 +28,18 @@ export const TransformWidget = ({
       const controls = transformRef.current;
 
       try {
-        // Set snapping values
-        controls.setTranslationSnap(translationSnap);
-        controls.setRotationSnap(THREE.MathUtils.degToRad(rotationSnap));
-        controls.setScaleSnap(scaleSnap);
+        // Set snapping values based on snapEnabled
+        if (snapEnabled) {
+          controls.setTranslationSnap(translationSnap);
+          controls.setRotationSnap(THREE.MathUtils.degToRad(rotationSnap));
+          controls.setScaleSnap(scaleSnap);
+          console.log('Snap enabled with values:', { translationSnap, rotationSnap, scaleSnap });
+        } else {
+          controls.setTranslationSnap(null);
+          controls.setRotationSnap(null);
+          controls.setScaleSnap(null);
+          console.log('Snap disabled');
+        }
       } catch (error) {
         console.warn('Error setting TransformControls snap values:', error);
         return;
@@ -114,7 +123,7 @@ export const TransformWidget = ({
         }
       };
     }
-  }, [gizmoActive, onTransformChange, objectRef, id, gl]);
+  }, [gizmoActive, onTransformChange, objectRef, id, gl, snapEnabled, translationSnap, rotationSnap, scaleSnap]);
 
   // Safety check: only render if objectRef has a valid current object
   if (!objectRef?.current) {

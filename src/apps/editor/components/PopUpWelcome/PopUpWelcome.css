@@ -1,7 +1,3 @@
-body, html, * {
-  font-family: 'Roboto', sans-serif !important;
-}
-
 .popUpMove__content__content__inner{
     display: flex;
     align-items: center;

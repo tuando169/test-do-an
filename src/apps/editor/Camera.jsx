@@ -1,6 +1,7 @@
 import { useThree, useFrame } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { OBB } from 'three/examples/jsm/math/OBB.js';
 
 // Mobile device detection
 const isMobileDevice = () => {
@@ -17,12 +18,12 @@ const SENSITIVITY = {
 
 // Movement and zoom speed constants
 const MOVEMENT_SPEED = {
-    PC: 8,          // Default movement speed for PC
+    PC: 5,          // Default movement speed for PC
     MOBILE: 5       // Slower movement speed for mobile
 };
 
 const ZOOM_SPEED = {
-    PC: 0.6,        // Default zoom speed for PC
+    PC: 0.4,        // Default zoom speed for PC
     MOBILE: 0.4     // Slower zoom speed for mobile
 };
 
@@ -41,8 +42,12 @@ export const CameraMovement = ({
     tourMode = false,
     tourPlaying = false,
     onTourInterrupted,
-    onCameraMovement
+    onCameraMovement,
+    onHideAnyInfoPanel,
+    isTeleportingToImage,
+    onCancelCameraTarget
 }) => {
+    
     const { camera, gl } = useThree();
     useEffect(() => {
         const el = gl.domElement;
@@ -180,7 +185,14 @@ export const CameraMovement = ({
     // Update mobile input values
     useEffect(() => {
         mobileMove.current = mobileInput.move || { x: 0, y: 0 };
-    }, [mobileInput]);
+        
+        // Cancel camera target when joystick movement starts
+        if (mobileInput.move && (mobileInput.move.x !== 0 || mobileInput.move.y !== 0)) {
+            if (cameraTarget.current && !tourMode && onCancelCameraTarget) {
+                onCancelCameraTarget();
+            }
+        }
+    }, [mobileInput, tourMode, onCancelCameraTarget]);
 
     // Track previous tour mode state to detect when tour mode ends
     const prevTourMode = useRef(tourMode);
@@ -199,6 +211,9 @@ export const CameraMovement = ({
     // Mouse drag to rotate camera
     useEffect(() => {
         const handlePointerDown = (e) => {
+            // Don't handle pointer events if user is typing
+            if (isUserTyping()) return;
+            
             // Nếu chạm trong vùng joystick thì bỏ qua (để joystick xử lý)
             const joystickEl = document.querySelector('.mobile-joystick');
             if (joystickEl) {
@@ -227,7 +242,10 @@ export const CameraMovement = ({
         };
         const handlePointerMove = (e) => {
             if (!isPointerDown.current || e.pointerId !== rotationTouchId.current) return;
-            if (gizmoActive.current || disableMovement) return;
+            if (gizmoActive.current) return;
+            
+            // Disable camera rotation during tour mode
+            if (tourMode) return;
 
             const now = performance.now();
             if (handlePointerMove.lastTime && now - handlePointerMove.lastTime < 16) return; // ~60fps
@@ -237,10 +255,32 @@ export const CameraMovement = ({
             const dy = e.clientY - lastPointer.current.y;
             lastPointer.current = { x: e.clientX, y: e.clientY };
 
+            // Horizontal movement for camera rotation
             yaw.current -= dx * cameraSensitivity;
             if (mode === 'edit') {
                 pitch.current -= dy * cameraSensitivity;
                 pitch.current = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, pitch.current));
+            } else {
+                // In view mode, vertical movement moves camera forward/backward
+                const direction = new THREE.Vector3();
+                camera.getWorldDirection(direction);
+                
+                // Use vertical mouse movement (dy) to move forward/backward
+                const forwardSpeed = 0.02; // Adjust sensitivity for forward movement
+                const forwardMovement = -dy * forwardSpeed;
+                
+                // Calculate next position
+                const nextPos = camera.position.clone().addScaledVector(direction, forwardMovement);
+                nextPos.y = GROUND_LEVEL; // Keep camera at ground level in view mode
+                
+                // Apply collision detection for view mode movement
+                if (!tourMode) {
+                    const safePos = moveWithCollisionDetection(camera.position, nextPos, wallBoxes, 0.5);
+                    camera.position.copy(safePos);
+                } else {
+                    // In tour mode, allow free movement
+                    camera.position.copy(nextPos);
+                }
             }
 
             // Cancel target when user starts rotating camera (but not during tour mode)
@@ -257,7 +297,15 @@ export const CameraMovement = ({
                 }
             }
 
-            onCameraMovement?.();
+            // Only call onCameraMovement if movement is not disabled (to allow rotation without hiding buttons)
+            if (!disableMovement) {
+                onCameraMovement?.();
+            }
+
+            // Hide info panels during camera rotation
+            if (!tourMode) {
+                onHideAnyInfoPanel?.();
+            }
         };
         
         gl.domElement.addEventListener("pointerdown", handlePointerDown);
@@ -271,37 +319,102 @@ export const CameraMovement = ({
         };
     }, [gl, mode, tourMode, tourPlaying, onTourInterrupted, onCameraMovement]);
 
+    // Helper function to check if user is typing in an input field
+    const isUserTyping = () => {
+        const activeElement = document.activeElement;
+        if (!activeElement) return false;
+        
+        const tagName = activeElement.tagName.toLowerCase();
+        const inputTypes = ['input', 'textarea', 'select', 'button'];
+        const isContentEditable = activeElement.contentEditable === 'true';
+        const isInputField = inputTypes.includes(tagName);
+        
+        // For input elements, also check if they're the type that accepts text input
+        if (tagName === 'input') {
+            const inputType = activeElement.type?.toLowerCase() || 'text';
+            const textInputTypes = ['text', 'password', 'email', 'search', 'url', 'tel', 'number'];
+            const isTextInput = textInputTypes.includes(inputType);
+            if (!isTextInput) return false; // Skip for buttons, checkboxes, etc.
+        }
+        
+        // Check if the element has a role that indicates text input
+        const inputRoles = ['textbox', 'searchbox', 'combobox'];
+        const hasInputRole = inputRoles.includes(activeElement.getAttribute('role'));
+        
+        // Also check if the element is within a modal, panel, or toolbox
+        const isInUIElement = activeElement.closest('.toolbox') || 
+                             activeElement.closest('.exhibition-info-panel') || 
+                             activeElement.closest('.image-info-panel') || 
+                             activeElement.closest('.modal') ||
+                             activeElement.closest('.modal-overlay') ||
+                             activeElement.closest('.panel') ||
+                             activeElement.closest('[role="dialog"]') ||
+                             activeElement.closest('[contenteditable="true"]');
+        
+        // Special check for DraggableAxisInput editing mode
+        const isEditingAxisInput = activeElement.closest('.axis-input') && 
+                                   (isInputField || isContentEditable);
+        
+        return isInputField || isContentEditable || hasInputRole || isInUIElement || isEditingAxisInput;
+    };
+
     // Camera movement
     useEffect(() => {
         const handleKeyDown = (event) => {
-            pressedKeys.current.add(event.code);
+    if (isUserTyping()) return;
 
-            // Interrupt tour mode if user moves
-            if (tourMode && tourPlaying && onTourInterrupted && 
-                ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'ShiftLeft', 'ShiftRight'].includes(event.code)) {
-                onTourInterrupted();
-            }
-            
-            // Hide info button if not in tour mode and user moves
-            if (!tourMode && onCameraMovement && 
-                ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'ShiftLeft', 'ShiftRight'].includes(event.code)) {
-                onCameraMovement();
-            }
+    // Normalize arrow keys
+    let code = event.code;
+    if (code === "ArrowUp") code = "KeyW";
+    if (code === "ArrowDown") code = "KeyS";
+    if (code === "ArrowLeft") code = "KeyA";
+    if (code === "ArrowRight") code = "KeyD";
 
-            // Cancel target when user starts moving (but not during tour mode)
-            if (cameraTarget.current && !tourMode) {
-                cameraTarget.current = null;
-                cameraLookAtTarget.current = null;
-                setIsAtImageTarget(false);
+    pressedKeys.current.add(code);
 
-                const euler = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
-                yaw.current = euler.y;
-                pitch.current = euler.x; 
-            }
-        };
+    // Interrupt tour
+    if (tourMode && tourPlaying && onTourInterrupted &&
+        ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'ShiftLeft', 'ShiftRight'].includes(code)) {
+        onTourInterrupted();
+    }
+
+    // Hide top-right info button
+    if (!tourMode && onCameraMovement &&
+        ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'ShiftLeft', 'ShiftRight'].includes(code)) {
+        onCameraMovement();
+    }
+
+    // Hide info panel popup (THIS IS THE IMPORTANT PART)
+    if (!tourMode && onHideAnyInfoPanel &&
+        ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'ShiftLeft', 'ShiftRight'].includes(code)) {
+        onHideAnyInfoPanel();
+    }
+
+    // Cancel camera target
+    if (cameraTarget.current && !tourMode) {
+        cameraTarget.current = null;
+        cameraLookAtTarget.current = null;
+        setIsAtImageTarget(false);
+
+        const euler = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
+        yaw.current = euler.y;
+        pitch.current = euler.x;
+    }
+};
 
         const handleKeyUp = (event) => {
-            pressedKeys.current.delete(event.code);
+            // Prevent camera movement if user is typing in an input field
+            if (isUserTyping()) {
+                return;
+            }
+            
+            let code = event.code;
+            if (code === "ArrowUp") code = "KeyW";
+            if (code === "ArrowDown") code = "KeyS";
+            if (code === "ArrowLeft") code = "KeyA";
+            if (code === "ArrowRight") code = "KeyD";
+
+            pressedKeys.current.delete(code);
         };
     
         window.addEventListener('keydown', handleKeyDown);
@@ -311,11 +424,14 @@ export const CameraMovement = ({
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [tourMode, tourPlaying, onTourInterrupted, onCameraMovement]);
+    }, [tourMode, tourPlaying, onTourInterrupted, onCameraMovement, onHideAnyInfoPanel]);
 
     // Scroll wheel to zoom (move camera forward/backward)
     useEffect(() => {
         const handleWheel = (e) => {
+            // Skip zoom when movement is disabled or user is typing
+            if (disableMovement || isUserTyping()) return;
+            
             // Interrupt tour mode if user scrolls
             if (tourMode && tourPlaying && onTourInterrupted) {
                 onTourInterrupted();
@@ -362,49 +478,58 @@ export const CameraMovement = ({
         return () => {
             gl.domElement.removeEventListener('wheel', handleWheel);
         };
-    }, [gl, mode, wallBoxes, tourMode, tourPlaying, onTourInterrupted, onCameraMovement]);
+    }, [gl, mode, wallBoxes, tourMode, tourPlaying, onTourInterrupted, onCameraMovement, disableMovement]);
 
     // When switching from edit to view mode, push camera out of wall if inside (skip during tour mode)
     useEffect(() => {
         if (prevMode.current === 'edit' && mode === 'view' && !tourMode) {
             let iterations = 0;
             const maxIterations = 30;
-            let moved = false;
+
             do {
-                let collidingBox = null;
-                for (let [, box] of wallBoxes) {
-                    if (box.intersectsBox(
-                        new THREE.Box3().setFromCenterAndSize(
-                        camera.position.clone(),
-                        new THREE.Vector3(0.8, 1.7, 0.8) // hitbox nhân vật
-                        )
-                    )) {
-                        collidingBox = box;
+                let collidedObb = null;
+
+                const camOBB = createCameraOBB(
+                    camera.position.clone(),
+                    0.4
+                );
+
+                // Kiểm tra collision OBB <-> OBB
+                for (let [, wallOBB] of wallBoxes) {
+                    if (wallOBB.intersectsOBB(camOBB)) {
+                        collidedObb = wallOBB;
                         break;
                     }
                 }
-                if (collidingBox) {
-                    moved = true;
-                    // Move away from the center of the wall box
-                    const boxCenter = collidingBox.getCenter(new THREE.Vector3());
-                    const direction = camera.position.clone().sub(boxCenter).setY(0).normalize();
-                    if (direction.lengthSq() === 0) {
-                        // If exactly at the center, push along X
-                        direction.set(1, 0, 0);
-                    }
-                    // Move outwards by a step (wall half size + camera radius + margin)
-                    const boxSize = collidingBox.getSize(new THREE.Vector3());
-                    const maxHalf = Math.max(boxSize.x, boxSize.z) / 2;
-                    camera.position.copy(
-                        boxCenter.clone().add(direction.multiplyScalar(maxHalf + CAMERA_RADIUS + 0.05))
-                    );
-                    camera.position.y = GROUND_LEVEL;
-                } else {
-                    moved = false;
+
+                if (!collidedObb) break;
+
+                // Tính hướng đẩy camera ra khỏi tường
+                const pushDir = camera.position
+                    .clone()
+                    .sub(collidedObb.center)
+                    .setY(0)
+                    .normalize();
+
+                if (pushDir.lengthSq() === 0) {
+                    pushDir.set(1, 0, 0); // tránh NaN
                 }
+
+                // Dịch camera ra ngoài
+                const pushDist = collidedObb.halfSize.length() + 0.5;
+
+                camera.position.copy(
+                    collidedObb.center.clone().add(
+                        pushDir.multiplyScalar(pushDist)
+                    )
+                );
+
+                camera.position.y = GROUND_LEVEL;
                 iterations++;
-            } while (moved && iterations < maxIterations);
+
+            } while (iterations < maxIterations);
         }
+
         prevMode.current = mode;
     }, [mode, wallBoxes, camera, GROUND_LEVEL, tourMode]);
 
@@ -424,8 +549,8 @@ export const CameraMovement = ({
                 0.04
             );
 
-            // Skip collision checking during tour mode
-            if (!tourMode) {
+            // Skip collision checking during tour mode or image teleportation
+            if (!tourMode && !isTeleportingToImage?.current) {
                 const safePos = moveWithCollisionDetection(camera.position, nextPos, wallBoxes, 0.5);
                 if (safePos.equals(camera.position)) {
                     // Movement was blocked
@@ -466,6 +591,11 @@ export const CameraMovement = ({
                 cameraTarget.current = null;
                 cameraLookAtTarget.current = null;
 
+                // Reset teleportation flag when movement is complete
+                if (isTeleportingToImage?.current) {
+                    isTeleportingToImage.current = false;
+                }
+
                 setIsAtImageTarget(true);
                 lastTargetPos.current = camera.position.clone();
                 lastTargetQuat.current = camera.quaternion.clone();
@@ -500,7 +630,7 @@ export const CameraMovement = ({
         camera.getWorldDirection(direction);
         right.crossVectors(direction, camera.up).normalize();
 
-        if (mode === 'view' && !isMovingToTarget && !tourMode) {
+        if (mode === 'view' && !isMovingToTarget && !tourMode && !disableMovement && !isUserTyping()) {
             let nextPos = camera.position.clone();
             let moved = false;
 
@@ -512,6 +642,11 @@ export const CameraMovement = ({
 
             // Mobile movement (joystick input) - only when not dragging camera
             if (!isPointerDown.current && (mobileMove.current.x !== 0 || mobileMove.current.y !== 0)) {
+                // Cancel camera target when joystick is used, just like keyboard
+                if (cameraTarget.current) {
+                    cameraTarget.current = null;
+                    cameraLookAtTarget.current = null;
+                }
                 nextPos.addScaledVector(direction, mobileMove.current.y * step); // Forward/backward
                 nextPos.addScaledVector(right, mobileMove.current.x * step); // Left/right
                 moved = true;
@@ -530,7 +665,7 @@ export const CameraMovement = ({
                 const safePos = moveWithCollisionDetection(camera.position, nextPos, wallBoxes, 0.5);
                 camera.position.copy(safePos);
             }
-        } else if (mode !== 'view' && !tourMode) {
+        } else if (mode !== 'view' && !tourMode && !disableMovement && !isUserTyping()) {
             let moved = false;
 
             // Keyboard movement
@@ -545,6 +680,11 @@ export const CameraMovement = ({
 
             // Mobile movement (joystick input) - only when not dragging camera
             if (!isPointerDown.current && (mobileMove.current.x !== 0 || mobileMove.current.y !== 0)) {
+                // Cancel camera target when joystick is used, just like keyboard
+                if (cameraTarget.current) {
+                    cameraTarget.current = null;
+                    cameraLookAtTarget.current = null;
+                }
                 camera.position.addScaledVector(direction, mobileMove.current.y * step); // Forward/backward
                 camera.position.addScaledVector(right, mobileMove.current.x * step); // Left/right
                 moved = true;
@@ -560,14 +700,29 @@ export const CameraMovement = ({
         }
     });
 
-    function collidesWithWalls(pos, wallBoxes, halfSize = 0.4) {
-        const camBox = new THREE.Box3().setFromCenterAndSize(
-            pos.clone(),
-            new THREE.Vector3(halfSize * 2, 1.7, halfSize * 2) // hitbox người
+    function createCameraOBB(pos, halfSize = 0.4) {
+        const camOBB = new OBB();
+
+        camOBB.center.copy(pos);
+        camOBB.halfSize.set(halfSize, 1.7 / 2, halfSize);
+
+        // Camera luôn thẳng đứng → rotation = identity
+        camOBB.rotation.set(
+            1, 0, 0,
+            0, 1, 0,
+            0, 0, 1
         );
 
-        for (let [, wallBox] of wallBoxes) {
-            if (wallBox.intersectsBox(camBox)) return true;
+        return camOBB;
+    }
+
+    function collidesWithWalls(pos, wallBoxes, halfSize = 0.4) {
+        const camOBB = createCameraOBB(pos, halfSize);
+
+        for (let [, wallOBB] of wallBoxes) {
+            if (wallOBB.intersectsOBB(camOBB)) {
+                return true;
+            }
         }
         return false;
     }
