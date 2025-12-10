@@ -134,6 +134,7 @@ export async function initCurrentUser() {
   try {
     const id = getUserInfo()?.id;
     const res = await fetchWithAuth(`/user/${id}`, { method: "GET" });
+    console.log("initCurrentUser response:", res);
     if (!res.ok) return null;
 
     const data = await res.json();

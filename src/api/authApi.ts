@@ -74,7 +74,7 @@ export const AuthApi = {
     const refreshToken = data?.session?.refresh_token;
 
     // Lưu userId để initCurrentUser biết phải fetch ai
-    localStorage.setItem("userId", userId);
+    localStorage.setItem("user", userId);
 
     // Lưu token
     setCookie("access_token", accessToken, 1);

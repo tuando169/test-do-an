@@ -1,5 +1,5 @@
-let BASE_URL = "http://localhost:8000";
-// let BASE_URL = "https://3d-gallery-be.vercel.app";
+// let BASE_URL = "http://localhost:8000";
+let BASE_URL = "https://3d-gallery-be.vercel.app";
 
 if (import.meta.env.MODE === "production")
   BASE_URL = "https://3d-gallery-be.vercel.app";
