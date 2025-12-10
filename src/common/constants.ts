@@ -1,5 +1,8 @@
-// const BASE_URL = 'http://localhost:8000';
-const BASE_URL = "https://3d-gallery-be.vercel.app";
+let BASE_URL = "http://localhost:8000";
+// let BASE_URL = "https://3d-gallery-be.vercel.app";
+
+if (import.meta.env.MODE === "production")
+  BASE_URL = "https://3d-gallery-be.vercel.app";
 
 export enum RoleEnum {
   Admin = "admin",
@@ -21,7 +24,7 @@ export const apiEndpoints = {
     login: `${BASE_URL}/auth/login`,
     signup: `${BASE_URL}/auth/signup`,
     logout: `${BASE_URL}/auth/logout`,
-    refreshToken: `${BASE_URL}}/auth/refresh-token`,
+    refreshToken: `${BASE_URL}/auth/refresh`,
   },
   room: {
     getAll: `${BASE_URL}/room`,
