@@ -3,7 +3,7 @@ import { NewsItemTypeEnum } from './constants';
 export interface UserData {
   id: string;
   email: string;
-  password_hash?: string;
+  avatar: string;
   name?: string;
   phone?: string;
   role: string;
@@ -140,4 +140,20 @@ export interface TextureUploadData {
   nor?: File;
   orm?: File;
   texture_for: string;
+}
+export interface LicenseData {
+  id: string;
+  title: string;
+
+  price: number
+  media_limit: number
+  space_limit: number
+}
+
+export interface LicenseUploadData {
+  title: string;
+
+  price: number
+  media_limit: number
+  space_limit: number
 }
