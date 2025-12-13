@@ -1,7 +1,21 @@
 import axios from 'axios';
 import { AuthApi } from '../api/authApi';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// =================================================================
+// CẤU HÌNH ĐƯỜNG DẪN API (TỰ ĐỘNG CHUYỂN ĐỔI)
+// =================================================================
+
+// Link Backend thật của bạn
+const PROD_URL = 'https://3d-gallery-be.vercel.app'; 
+
+// Logic tự động kiểm tra:
+// Nếu đang chạy ở máy mình (localhost) -> Dùng cổng 8000
+// Nếu đang chạy trên mạng (Vercel, v.v...) -> Dùng PROD_URL
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const baseURL = isLocal ? 'http://localhost:8000' : PROD_URL;
+
+console.log("🌏 App đang chạy ở chế độ:", isLocal ? "Local Dev" : "Production");
+console.log("🔗 API Base URL:", baseURL);
 
 const axiosClient = axios.create({
   baseURL: baseURL, 
@@ -35,7 +49,7 @@ axiosClient.interceptors.request.use(
       // Nếu không có token thì thử lấy refresh token để check đăng nhập
       const refreshToken = AuthApi.getRefreshToken();
       if (!refreshToken) {
-         // Không làm gì hoặc xử lý tùy logic, ở đây giữ nguyên code cũ của bạn
+         // Không làm gì hoặc xử lý tùy logic
          // AuthApi.forceLogout(); 
       }
     }
