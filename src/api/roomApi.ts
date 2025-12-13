@@ -111,14 +111,22 @@ export const RoomApi = {
       formData.append('description', payload.description || '');
       formData.append('visibility', payload.visibility || 'public');
       formData.append('tags', JSON.stringify(payload.tags || []));
-      formData.append('room_json', JSON.stringify(payload.room_json || {}));
 
       if (payload.thumbnail) formData.append('thumbnail', payload.thumbnail);
       if (payload.type) formData.append('type', payload.type);
       console.log(payload, formData);
 
       const res = await axiosClient.post(apiEndpoints.room.create, formData);
-      return res.data;
+      const updateData: RoomData = res.data;
+
+      const res2 = await axiosClient.patch(
+        apiEndpoints.room.updateById(updateData.id),
+        {
+          room_json: payload.room_json,
+        }
+      );
+
+      return Promise.resolve(res2.data);
     } catch (err) {
       console.error('RoomApi.create error:', err);
       throw err;
