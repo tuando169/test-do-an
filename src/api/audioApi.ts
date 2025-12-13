@@ -1,6 +1,6 @@
-import { apiEndpoints } from '@/common/constants';
 import axiosClient from '../common/axiosClient';
-import { MediaUploadData } from '@/common/types';
+import { apiEndpoints } from '../common/constants';
+import { MediaData, MediaUploadData } from '../common/types';
 
 export const AudioApi = {
   async create(data: MediaUploadData): Promise<void> {
@@ -8,7 +8,9 @@ export const AudioApi = {
       const formData = new FormData();
       formData.append('file', data.file);
       formData.append('title', data.title);
-      formData.append('room_id', data.room_id);
+      data.room_id.forEach((id, index) =>
+        formData.append(`room_id${index}`, id)
+      );
 
       const res = await axiosClient.post(apiEndpoints.audio.create, formData);
 
@@ -23,7 +25,9 @@ export const AudioApi = {
       const formData = new FormData();
       formData.append('file', data.file);
       formData.append('title', data.title);
-      formData.append('room_id', data.room_id);
+      data.room_id.forEach((id, index) =>
+        formData.append(`room_id${index}`, id)
+      );
 
       const res = await axiosClient.patch(
         apiEndpoints.audio.updateById(id),
@@ -39,7 +43,13 @@ export const AudioApi = {
   async getList() {
     try {
       const res = await axiosClient.get(apiEndpoints.audio.getAll);
-      return res.data || [];
+      const data: MediaData[] = res.data;
+      return (
+        data.sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        ) || []
+      );
     } catch (err: any) {
       console.error('MediaApi.getList error:', err);
       throw err;

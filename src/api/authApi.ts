@@ -1,4 +1,3 @@
-import { initCurrentUser } from '@/apiEditor/authApi';
 import axiosClient from '../common/axiosClient';
 import { apiEndpoints } from '../common/constants';
 import { setCookie, getCookie, deleteAllCookies } from '../common/cookies';

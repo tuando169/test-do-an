@@ -1,6 +1,6 @@
-import { apiEndpoints } from '@/common/constants.js';
 import axiosClient from '../common/axiosClient.js';
-import { MediaUploadData } from '@/common/types.js';
+import { apiEndpoints } from '../common/constants.js';
+import { MediaData, MediaUploadData } from '../common/types.js';
 
 export const Object3dApi = {
   async create(data: MediaUploadData): Promise<void> {
@@ -8,7 +8,9 @@ export const Object3dApi = {
       const formData = new FormData();
       formData.append('file', data.file);
       formData.append('title', data.title);
-      formData.append('room_id', data.room_id);
+      data.room_id.forEach((id, index) =>
+        formData.append(`room_id${index}`, id)
+      );
 
       const res = await axiosClient.post(
         apiEndpoints.object3d.create,
@@ -27,7 +29,9 @@ export const Object3dApi = {
       const formData = new FormData();
       formData.append('file', data.file);
       formData.append('title', data.title);
-      formData.append('room_id', data.room_id);
+      data.room_id.forEach((id, index) =>
+        formData.append(`room_id${index}`, id)
+      );
 
       const res = await axiosClient.patch(
         apiEndpoints.object3d.updateById(id),
@@ -44,7 +48,13 @@ export const Object3dApi = {
   async getList() {
     try {
       const res = await axiosClient.get(apiEndpoints.object3d.getAll);
-      return res.data || [];
+      const data: MediaData[] = res.data;
+      return (
+        data.sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        ) || []
+      );
     } catch (err) {
       throw err;
     }
