@@ -13,8 +13,8 @@ export const UserApi = {
     return Promise.resolve(res.data);
   },
 
-  async update(payload: UserData): Promise<UserData> {
-    const res = await axiosClient.patch(apiEndpoints.user.update, payload);
+  async update(id: string, payload: UserData): Promise<UserData> {
+    const res = await axiosClient.patch(apiEndpoints.user.updateById(id), payload);
     return Promise.resolve(res.data);
   },
   async delete(id: string): Promise<void> {

@@ -1,19 +1,20 @@
 // let BASE_URL = "http://localhost:8000";
-let BASE_URL = import.meta.env.VITE_API_URL || "https://3d-gallery-be.vercel.app";
+let BASE_URL =
+  import.meta.env.VITE_API_URL || 'https://3d-gallery-be.vercel.app';
 
-if (import.meta.env.MODE === "production")
-  BASE_URL = "https://3d-gallery-be.vercel.app";
+if (import.meta.env.MODE === 'production')
+  BASE_URL = 'https://3d-gallery-be.vercel.app';
 
 export enum RoleEnum {
-  Admin = "admin",
-  Designer = "designer",
-  Client = "client",
-  Guest = "guest",
+  Admin = 'admin',
+  Designer = 'designer',
+  Client = 'client',
+  Guest = 'guest',
 }
 export enum NewsItemTypeEnum {
-  Image = "image",
-  Object3D = "object3d",
-  Text = "text",
+  Image = 'image',
+  Object3D = 'object3d',
+  Text = 'text',
 }
 export const apiEndpoints = {
   template: {
@@ -43,7 +44,7 @@ export const apiEndpoints = {
     getAll: `${BASE_URL}/user`,
     create: `${BASE_URL}/user`,
     getById: (id: string) => `${BASE_URL}/user/${id}`,
-    update: `${BASE_URL}/user`,
+    updateById: (id: string) => `${BASE_URL}/user/${id}`,
     deleteById: (id: string) => `${BASE_URL}/user/${id}`,
   },
   image: {

@@ -1,7 +1,7 @@
-import { initCurrentUser } from "@/apiEditor/authApi";
-import axiosClient from "../common/axiosClient";
-import { apiEndpoints } from "../common/constants";
-import { setCookie, getCookie, deleteAllCookies } from "../common/cookies";
+import { initCurrentUser } from '@/apiEditor/authApi';
+import axiosClient from '../common/axiosClient';
+import { apiEndpoints } from '../common/constants';
+import { setCookie, getCookie, deleteAllCookies } from '../common/cookies';
 
 export interface SignupResponse {
   success: boolean;
@@ -36,14 +36,19 @@ let isRefreshing = false;
 let refreshPromise: Promise<string> | null = null;
 
 export const AuthApi = {
-  async signup(payload: SignupPayload): Promise<void> {
+  async signup(payload: FormData): Promise<void> {
     try {
-      const res = await axiosClient.post(apiEndpoints.auth.signup, payload);
+      console.log(payload);
+
+      await axiosClient.post(apiEndpoints.auth.signup, payload);
 
       return Promise.resolve();
     } catch (err: any) {
-      if (err.status == 422) return Promise.reject("Email đã được sử dụng, vui lòng nhập email khác");
-      return Promise.reject("Đăng ký thất bại, vui lòng thử lại")
+      if (err.status == 422)
+        return Promise.reject(
+          'Email đã được sử dụng, vui lòng nhập email khác'
+        );
+      return Promise.reject('Đăng ký thất bại, vui lòng thử lại');
     }
   },
 
@@ -53,7 +58,7 @@ export const AuthApi = {
       currentUser = res.data;
       return currentUser;
     } catch (err) {
-      console.error("Không lấy được thông tin user:", err);
+      console.error('Không lấy được thông tin user:', err);
       return null;
     }
   },
@@ -61,9 +66,9 @@ export const AuthApi = {
   // --- [MỚI] Hàm lấy Profile dùng cho Pricing.jsx ---
   // Tự động lấy User ID từ localStorage và gọi API
   async getProfile() {
-    const userId = localStorage.getItem("user");
+    const userId = localStorage.getItem('user');
     if (!userId) return null;
-    
+
     // Tận dụng lại hàm fetchUserInfoAfterLogin để lấy dữ liệu mới nhất (bao gồm license)
     return AuthApi.fetchUserInfoAfterLogin(userId);
   },
@@ -80,11 +85,11 @@ export const AuthApi = {
     const refreshToken = data?.session?.refresh_token;
 
     // Lưu userId để initCurrentUser biết phải fetch ai
-    localStorage.setItem("user", userId);
+    localStorage.setItem('user', userId);
 
     // Lưu token
-    setCookie("access_token", accessToken, 1);
-    setCookie("refresh_token", refreshToken, 7);
+    setCookie('access_token', accessToken, 1);
+    setCookie('refresh_token', refreshToken, 7);
 
     hasLoggedOut = false;
 
@@ -93,7 +98,7 @@ export const AuthApi = {
 
     // Lưu role vào cookie nếu cần
     if (user && user.role) {
-      setCookie("role", user.role, 1);
+      setCookie('role', user.role, 1);
     }
 
     return user; // Trả về luôn role, name,...
@@ -101,15 +106,15 @@ export const AuthApi = {
 
   /** ------------------ GET TOKEN ----------------------- */
   getAccessToken(): string | null {
-    return getCookie("access_token");
+    return getCookie('access_token');
   },
 
   getRefreshToken(): string | null {
-    return getCookie("refresh_token");
+    return getCookie('refresh_token');
   },
 
   getUserRole(): any {
-    return getCookie("role");
+    return getCookie('role');
   },
 
   getUserInfo(): any {
@@ -121,7 +126,7 @@ export const AuthApi = {
     const refreshToken = AuthApi.getRefreshToken();
     if (!refreshToken) {
       AuthApi.forceLogout();
-      throw new Error("Không có refresh token — cần đăng nhập lại");
+      throw new Error('Không có refresh token — cần đăng nhập lại');
     }
 
     if (isRefreshing && refreshPromise) return refreshPromise;
@@ -137,7 +142,7 @@ export const AuthApi = {
         const data: RefreshResponse = res.data;
 
         const newToken = data?.session?.access_token;
-        setCookie("access_token", newToken, 1);
+        setCookie('access_token', newToken, 1);
 
         return newToken;
       } catch (err) {
@@ -157,13 +162,13 @@ export const AuthApi = {
     let token = AuthApi.getAccessToken();
     if (!token) {
       AuthApi.forceLogout();
-      throw new Error("Không có access token — cần đăng nhập lại");
+      throw new Error('Không có access token — cần đăng nhập lại');
     }
 
     try {
       const res = await axiosClient({
         url,
-        method: options.method || "GET",
+        method: options.method || 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
           ...(options.headers || {}),
@@ -179,7 +184,7 @@ export const AuthApi = {
 
           return await axiosClient({
             url,
-            method: options.method || "GET",
+            method: options.method || 'GET',
             headers: {
               Authorization: `Bearer ${newToken}`,
               ...(options.headers || {}),
@@ -189,7 +194,7 @@ export const AuthApi = {
         } catch {
           AuthApi.forceLogout();
           throw new Error(
-            "Phiên đăng nhập đã hết hạn — vui lòng đăng nhập lại."
+            'Phiên đăng nhập đã hết hạn — vui lòng đăng nhập lại.'
           );
         }
       }
@@ -203,7 +208,7 @@ export const AuthApi = {
     try {
       // Logic cũ của bạn lấy ID rỗng? Mình giữ nguyên để tránh break app
       // Nhưng khuyên dùng getProfile() thay thế
-      const res = await axiosClient.get(apiEndpoints.user.getById(""));
+      const res = await axiosClient.get(apiEndpoints.user.getById(''));
       currentUser = res.data || null;
       return currentUser;
     } catch {
@@ -228,9 +233,9 @@ export const AuthApi = {
   forceLogout() {
     if (hasLoggedOut) return;
     hasLoggedOut = true;
-    localStorage.removeItem("user");
+    localStorage.removeItem('user');
     currentUser = null;
     deleteAllCookies();
-    console.warn("Token không hợp lệ — đã xóa toàn bộ cookie");
+    console.warn('Token không hợp lệ — đã xóa toàn bộ cookie');
   },
 };

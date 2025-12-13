@@ -234,7 +234,7 @@ function LayoutDefault() {
                       {/* Trigger */}
                       <div className='flex items-center gap-2'>
                         <img
-                          src='/avatar.png'
+                          src={currentUser.avatar}
                           alt=''
                           className='h-9 w-9 rounded-full object-cover bg-center'
                         />
@@ -444,7 +444,7 @@ function LayoutDefault() {
           </div>
         </header>
 
-        <main>
+        <main className='min-h-[55vh]'>
           <Outlet />
         </main>
 
