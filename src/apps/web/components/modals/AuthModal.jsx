@@ -89,9 +89,10 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
       });
 
       setMode("login");
-    } catch {
+    } catch (err) {
       api.error({
         title: "Đăng ký thất bại",
+        description: err,
       });
     } finally {
       setLoading(false);

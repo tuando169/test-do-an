@@ -9,6 +9,7 @@ const permissionMapping = new Map<string, string[]>([
       "/manage",
       "/manage/space",
       "/manage/resource",
+      "/manage/license",
     ],
   ],
   [RoleEnum.Designer, ["/manage", "/manage/space", "/manage/resource"]],

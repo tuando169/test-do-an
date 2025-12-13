@@ -235,12 +235,25 @@ function LayoutDefault() {
                       {/* Trigger */}
                       <div className="flex items-center gap-2">
                         <img
-                          src={currentUser.avatar}
+                          src="/avatar.png"
                           alt=""
                           className="h-8 w-8 rounded-full object-cover bg-center"
                         />
-                        <div className="font-semibold py-1 cursor-pointer text-xl">
-                          <p>{currentUser.name}</p>
+                        <div className="py-1 cursor-pointer ">
+                          <p className="text-sm" style={{ lineHeight: 1 }}>
+                            {currentUser.role == RoleEnum.Admin &&
+                              "Quản trị viên"}
+                            {currentUser.role == RoleEnum.Designer &&
+                              "Nhà thiết kế"}
+                            {currentUser.role == RoleEnum.Client &&
+                              "Người dùng"}
+                          </p>
+                          <p
+                            className="font-semibold text-xl"
+                            style={{ lineHeight: 1 }}
+                          >
+                            {currentUser.name}
+                          </p>
                         </div>
                       </div>
 
