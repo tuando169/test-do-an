@@ -26,6 +26,15 @@ export const UserApi = {
     );
     return Promise.resolve(res.data);
   },
+  async updateAvatar(id: string, avatar: File): Promise<UserData> {
+    const formData = new FormData();
+    formData.append('file', avatar);
+    const res = await axiosClient.patch(
+      apiEndpoints.user.updateAvatarById(id),
+      formData
+    );
+    return Promise.resolve(res.data);
+  },
   async delete(id: string): Promise<void> {
     const res = await axiosClient.delete(apiEndpoints.user.deleteById(id));
     return Promise.resolve();

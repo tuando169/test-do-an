@@ -166,6 +166,11 @@ function LayoutDefault() {
     }
   }
 
+  document.addEventListener('avatar-changed', () => {
+    console.log(123);
+
+    fetchCurrentUser();
+  });
   useEffect(() => {
     fetchCurrentUser();
     fetchSpaces();

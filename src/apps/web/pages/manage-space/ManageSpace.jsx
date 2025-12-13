@@ -33,7 +33,6 @@ export default function ManageSpace() {
   const [editForm, setEditForm] = useState({
     id: '',
     title: '',
-    owner_id: '',
     type: '',
     visibility: 'public',
     thumbnail: '',
@@ -46,7 +45,6 @@ export default function ManageSpace() {
   const [createForm, setCreateForm] = useState({
     templateId: '',
     title: '',
-    owner_id: '',
     visibility: 'public',
     thumbnail: '',
     description: '',
@@ -58,9 +56,8 @@ export default function ManageSpace() {
       setCreateForm({
         templateId: tpl.id,
         title: `Bản sao của ${tpl.title}`,
-        owner_id: tpl.owner_id,
         visibility: tpl.visibility || 'public',
-        thumbnail: '',
+        thumbnail: tpl.thumbnail || '',
         description: tpl.description || '',
         room_json: tpl.room_json,
       });
@@ -95,7 +92,6 @@ export default function ManageSpace() {
       id: space.id,
       title: space.title,
       type: space.type,
-      owner_id: space.owner_id,
       slug: space.slug,
       visibility: space.visibility,
       thumbnail: space.thumbnail,
@@ -167,25 +163,59 @@ export default function ManageSpace() {
       <PickTemplateModal
         isVisible={modalOpen}
         ownedSpaces={spaces}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+        }}
         onSubmit={pickTemplateSuccess}
       />
 
       <EditSpaceModal
         isVisible={showEditModal}
-        onClose={() => setShowEditModal(false)}
+        onClose={() => {
+          setEditForm({
+            id: '',
+            title: '',
+            type: '',
+            visibility: 'public',
+            thumbnail: '',
+            description: '',
+          });
+          setShowEditModal(false);
+        }}
         onSubmit={handleUpdateSpace}
         space={editForm}
       />
-      <CreateSpaceModal
+      <CreateSpaceInfoModal
         isVisible={showCreateFromTemplate}
-        onClose={() => setShowCreateFromTemplate(false)}
+        template={createForm}
+        onClose={() => {
+          setCreateForm({
+            templateId: '',
+            title: '',
+            visibility: 'public',
+            thumbnail: '',
+            description: '',
+            room_json: {},
+          });
+          setShowCreateFromTemplate(false);
+        }}
         onSuccess={loadSpaces}
       />
 
       <CreateSpaceInfoModal
         isVisible={showCreate}
-        onClose={() => setShowCreate(false)}
+        onClose={() => {
+          setCreateForm({
+            templateId: '',
+            title: '',
+            visibility: 'public',
+            thumbnail: '',
+            description: '',
+            room_json: {},
+          });
+
+          setShowCreate(false);
+        }}
         mode={tab === 'template' ? 'template' : 'space'}
         template={createForm.templateId ? createForm : null}
         onSuccess={loadSpaces}

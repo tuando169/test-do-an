@@ -18,25 +18,31 @@ export default function CreateSpaceInfoModal({
     description: '',
     visibility: 'public',
     thumbnail: '',
-    type: '', // để user nhập danh mục
-    room_json: {},
-    owner_id: '',
+    room_json: null,
   });
 
   const [thumbnailPreview, setThumbnailPreview] = useState('');
 
-  // ⭐ Autofill nếu tạo từ template EXHIBITION
   useEffect(() => {
-    if (!template?.title) return;
+    console.log(template);
+
+    setForm({
+      title: ``,
+      description: '',
+      visibility: 'public',
+      thumbnail: '',
+      room_json: null,
+    });
+    if (!template?.title) {
+      return;
+    }
 
     setForm({
       title: `Bản sao của ${template.title}`,
       description: template.description || '',
       visibility: 'public',
-      thumbnail: '',
+      thumbnail: template.thumbnail || '',
       room_json: template.room_json,
-      type: template.type || '',
-      owner_id: template.owner_id,
     });
   }, [template]);
 
@@ -50,7 +56,7 @@ export default function CreateSpaceInfoModal({
       await RoomApi.create({
         ...form,
         // ⭐ Nếu mode = template → tạo không gian mẫu
-        type: mode === 'template' ? 'template' :  'gallery',
+        type: mode === 'template' ? 'template' : 'gallery',
       });
 
       api.success({
@@ -152,7 +158,7 @@ export default function CreateSpaceInfoModal({
         <input
           key={form.title}
           type='file'
-          required={mode !== 'template' || !template?.thumbnail}
+          required={!form.thumbnail}
           disabled={isLoading}
           onChange={(e) => {
             const file = e.target.files?.[0];

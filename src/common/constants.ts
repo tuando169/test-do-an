@@ -45,6 +45,7 @@ export const apiEndpoints = {
     create: `${BASE_URL}/user`,
     getById: (id: string) => `${BASE_URL}/user/${id}`,
     updateById: (id: string) => `${BASE_URL}/user/${id}`,
+    updateAvatarById: (id: string) => `${BASE_URL}/user/${id}/avatar`,
     deleteById: (id: string) => `${BASE_URL}/user/${id}`,
   },
   image: {

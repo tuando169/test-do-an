@@ -185,8 +185,10 @@ export const RoomApi = {
       if (updateData.visibility)
         formData.append('visibility', updateData.visibility);
       if (updateData.status) formData.append('status', updateData.status);
-      if (updateData.thumbnail)
-        formData.append('thumbnail', updateData.thumbnail);
+      if (typeof updateData.thumbnail == 'string')
+        formData.append('thumbnailUrl', updateData.thumbnail);
+      else formData.append('thumbnail', updateData.thumbnail);
+
       if (updateData.room_json)
         formData.append('room_json', JSON.stringify(updateData.room_json));
       if (updateData.tag) formData.append('tag', updateData.tag);
