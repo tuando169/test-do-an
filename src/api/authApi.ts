@@ -58,6 +58,16 @@ export const AuthApi = {
     }
   },
 
+  // --- [MỚI] Hàm lấy Profile dùng cho Pricing.jsx ---
+  // Tự động lấy User ID từ localStorage và gọi API
+  async getProfile() {
+    const userId = localStorage.getItem("user");
+    if (!userId) return null;
+    
+    // Tận dụng lại hàm fetchUserInfoAfterLogin để lấy dữ liệu mới nhất (bao gồm license)
+    return AuthApi.fetchUserInfoAfterLogin(userId);
+  },
+
   async login(email: string, password: string): Promise<any> {
     const res = await axiosClient.post(apiEndpoints.auth.login, {
       email,
@@ -81,7 +91,10 @@ export const AuthApi = {
     //GỌI API LẤY THÔNG TIN ROLE
     const user = await AuthApi.fetchUserInfoAfterLogin(userId);
 
-    setCookie("role", user.role, 1);
+    // Lưu role vào cookie nếu cần
+    if (user && user.role) {
+      setCookie("role", user.role, 1);
+    }
 
     return user; // Trả về luôn role, name,...
   },
@@ -188,6 +201,8 @@ export const AuthApi = {
   /** ------------------ INIT CURRENT USER --------------- */
   async initCurrentUser(): Promise<any> {
     try {
+      // Logic cũ của bạn lấy ID rỗng? Mình giữ nguyên để tránh break app
+      // Nhưng khuyên dùng getProfile() thay thế
       const res = await axiosClient.get(apiEndpoints.user.getById(""));
       currentUser = res.data || null;
       return currentUser;
