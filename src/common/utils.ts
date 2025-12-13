@@ -22,8 +22,8 @@ const permissionMapping = new Map<string, string[]>([
 
 export function checkRoutePermission(path: string, role: RoleEnum) {
   const allowedPaths = permissionMapping.get(role) || [];
-  return (
-    allowedPaths.includes(path) ||
-    permissionMapping.get(RoleEnum.Guest)?.includes(path)
-  );
+  const publicPaths = permissionMapping.get(RoleEnum.Guest)
+
+  return allowedPaths.includes(path) || publicPaths.includes(path)
+
 }
