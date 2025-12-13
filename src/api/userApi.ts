@@ -1,11 +1,17 @@
-import { apiEndpoints } from '@/common/constants';
 import axiosClient from '../common/axiosClient';
-import { UserData } from '@/common/types';
+import { apiEndpoints } from '../common/constants';
+import { UserData } from '../common/types';
 
 export const UserApi = {
   async getAll(): Promise<UserData[]> {
     const res = await axiosClient.get(apiEndpoints.user.getAll);
-    return Promise.resolve(res.data);
+    const data: UserData[] = res.data;
+    return Promise.resolve(
+      data.sort((a, b) => {
+        if (!a.name || !b.name) return 0;
+        return a.name.localeCompare(b.name);
+      })
+    );
   },
 
   async getById(id: string): Promise<UserData> {
@@ -14,7 +20,10 @@ export const UserApi = {
   },
 
   async update(id: string, payload: UserData): Promise<UserData> {
-    const res = await axiosClient.patch(apiEndpoints.user.updateById(id), payload);
+    const res = await axiosClient.patch(
+      apiEndpoints.user.updateById(id),
+      payload
+    );
     return Promise.resolve(res.data);
   },
   async delete(id: string): Promise<void> {

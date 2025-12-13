@@ -4,6 +4,7 @@ import { ImageApi } from '@/api/imageApi';
 import { notification, Select } from 'antd';
 import { Object3dApi } from '@/api/object3dApi';
 import { AudioApi } from '@/api/audioApi';
+import { TextureApi } from '@/api/textureApi';
 
 export default function ModalCreateResource({
   isOpen,
@@ -16,6 +17,12 @@ export default function ModalCreateResource({
   const [form, setForm] = useState({
     title: '',
     file: null,
+    textures: {
+      alb: null,
+      nor: null,
+      orm: null,
+      textures_for: '',
+    },
   });
 
   const [preview, setPreview] = useState('');
@@ -46,10 +53,28 @@ export default function ModalCreateResource({
     onClose();
   };
 
+  const handleTextureChange = (type) => (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setForm((prev) => ({
+      ...prev,
+      textures: {
+        ...prev.textures,
+        [type]: file,
+      },
+    }));
+  };
+
   function handleClose() {
     setForm({
       title: '',
       file: null,
+      textures: {
+        alb: null,
+        nor: null,
+        orm: null,
+      },
     });
     setPreview('');
     onClose();
@@ -96,6 +121,20 @@ export default function ModalCreateResource({
       });
       return;
     }
+    if (tab === 'texture') {
+      await TextureApi.create({
+        title: form.title,
+        alb: form.textures.alb,
+        nor: form.textures.nor,
+        orm: form.textures.orm,
+        texture_for: form.textures.textures_for,
+      });
+
+      api.success({
+        title: 'Thành công',
+        description: 'Tải lên object 3D kèm texture PBR.',
+      });
+    }
   }
   async function handleUpdate() {
     if (tab === 'image') {
@@ -136,6 +175,15 @@ export default function ModalCreateResource({
       });
       return;
     }
+    if (tab === 'object') {
+      await TextureApi.update(form.id, {
+        title: form.title,
+        alb: form.textures.alb,
+        nor: form.textures.nor,
+        orm: form.textures.orm,
+        texture_for: form.textures.textures_for,
+      });
+    }
   }
 
   return (
@@ -153,7 +201,13 @@ export default function ModalCreateResource({
 
           <h2 className='text-xl font-bold mb-4 text-[#2e2e2e] uppercase'>
             Thêm{' '}
-            {tab === 'image' ? 'Ảnh' : tab === 'object' ? 'Object 3D' : 'Audio'}{' '}
+            {tab === 'image'
+              ? 'Ảnh'
+              : tab === 'object'
+              ? 'Object 3D'
+              : tab === 'audio'
+              ? 'Âm thanh'
+              : 'Texture'}{' '}
             Mới
           </h2>
 
@@ -185,15 +239,6 @@ export default function ModalCreateResource({
             )}
             {/* UPLOAD FILE */}
             <div>
-              <label className='font-medium'>
-                Upload{' '}
-                {tab === 'image'
-                  ? 'Ảnh'
-                  : tab === 'object'
-                  ? 'File .glb'
-                  : 'Audio'}
-              </label>
-
               <input
                 type='file'
                 required={form.file_url ? false : true}
@@ -226,6 +271,54 @@ export default function ModalCreateResource({
                 <p className='text-sm text-gray-600 mt-2'>
                   Đã chọn file: {form.file.name}
                 </p>
+              )}
+              {tab === 'texture' && form.textures && (
+                <div className='grid grid-cols-3 gap-3'>
+                  <div>
+                    <p className='text-sm font-medium mb-1'>Albedo</p>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleTextureChange('alb')}
+                    />
+                    {form.textures.alb && (
+                      <img
+                        src={URL.createObjectURL(form.textures.alb)}
+                        className='mt-2 h-20 w-full object-cover border'
+                      />
+                    )}
+                  </div>
+
+                  <div>
+                    <p className='text-sm font-medium mb-1'>Normal</p>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleTextureChange('nor')}
+                    />
+                    {form.textures.nor && (
+                      <img
+                        src={URL.createObjectURL(form.textures.nor)}
+                        className='mt-2 h-20 w-full object-cover border'
+                      />
+                    )}
+                  </div>
+
+                  <div>
+                    <p className='text-sm font-medium mb-1'>ORM</p>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      onChange={handleTextureChange('orm')}
+                    />
+                    {form.textures.orm && (
+                      <img
+                        src={URL.createObjectURL(form.textures.orm)}
+                        className='mt-2 h-20 w-full object-cover border'
+                      />
+                    )}
+                  </div>
+                </div>
               )}
             </div>
 

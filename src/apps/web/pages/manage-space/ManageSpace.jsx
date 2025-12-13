@@ -34,6 +34,7 @@ export default function ManageSpace() {
     id: '',
     title: '',
     owner_id: '',
+    type: '',
     visibility: 'public',
     thumbnail: '',
     description: '',
@@ -93,6 +94,7 @@ export default function ManageSpace() {
     setEditForm({
       id: space.id,
       title: space.title,
+      type: space.type,
       owner_id: space.owner_id,
       slug: space.slug,
       visibility: space.visibility,

@@ -1,28 +1,27 @@
-import axiosClient from "../common/axiosClient";
-import { apiEndpoints } from "../common/constants";
-import { LicenseData, LicenseUploadData } from "../common/types";
+import axiosClient from '../common/axiosClient';
+import { apiEndpoints } from '../common/constants';
+import { LicenseData, LicenseUploadData } from '../common/types';
 
 export const LicenseApi = {
   async getAll(): Promise<LicenseData[]> {
     try {
       const res = await axiosClient.get(apiEndpoints.license.getAll);
 
-      const data = res.data;
+      const data: LicenseData[] = res.data;
 
-      return (data as LicenseData[]) || [];
+      return Promise.resolve(data.sort((a, b) => a.price - b.price));
     } catch (err: any) {
-      console.error("TextureApi.getAll error:", err);
+      console.error('TextureApi.getAll error:', err);
       throw err;
     }
   },
 
   async create(payload: LicenseUploadData): Promise<LicenseData> {
     try {
-
       const res = await axiosClient.post(apiEndpoints.license.create, payload);
-      return res.data
+      return res.data;
     } catch (err) {
-      console.error("TextureApi.upload error:", err);
+      console.error('TextureApi.upload error:', err);
       throw err;
     }
   },
@@ -32,7 +31,7 @@ export const LicenseApi = {
     payload: LicenseUploadData
   ): Promise<LicenseData> {
     try {
-      if (!textureId) throw new Error("Thiếu texture_id");
+      if (!textureId) throw new Error('Thiếu texture_id');
 
       const res = await axiosClient.patch(
         apiEndpoints.license.updateById(textureId),
@@ -41,7 +40,7 @@ export const LicenseApi = {
 
       return res.data;
     } catch (err) {
-      console.error("TextureApi.update error:", err);
+      console.error('TextureApi.update error:', err);
       throw err;
     }
   },
@@ -51,7 +50,7 @@ export const LicenseApi = {
       await axiosClient.delete(apiEndpoints.license.deleteById(id));
       return Promise.resolve();
     } catch (err) {
-      console.error("TextureApi.delete error:", err);
+      console.error('TextureApi.delete error:', err);
       throw err;
     }
   },

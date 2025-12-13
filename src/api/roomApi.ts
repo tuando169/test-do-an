@@ -1,6 +1,6 @@
-import { apiEndpoints } from "@/common/constants";
-import axiosClient from "../common/axiosClient";
-import { RoomData, RoomUploadData } from "@/common/types";
+import axiosClient from '../common/axiosClient';
+import { apiEndpoints } from '../common/constants';
+import { RoomData, RoomUploadData } from '../common/types';
 
 export const RoomApi = {
   // Lấy danh sách phòng public
@@ -15,7 +15,7 @@ export const RoomApi = {
 
       const uniqueRooms = Object.values(uniqueRoomsMap);
       return uniqueRooms.filter(
-        (r) => r.visibility === "public" && r.type !== "template"
+        (r) => r.visibility === 'public' && r.type !== 'template'
       );
     } catch (err) {
       throw err;
@@ -46,7 +46,7 @@ export const RoomApi = {
   async getTemplateRoomList(): Promise<RoomData[]> {
     try {
       const all = await RoomApi.getAll();
-      return all.filter((r) => r.type === "template");
+      return all.filter((r) => r.type === 'template');
     } catch (err) {
       throw err;
     }
@@ -55,9 +55,9 @@ export const RoomApi = {
   // Lấy list phòng của user
   async getNormalRoomList(): Promise<RoomData[]> {
     try {
-      const userId = localStorage.getItem("user");
+      const userId = localStorage.getItem('user');
       const all = await RoomApi.getAll();
-      return all.filter((r) => r.type !== "template");
+      return all.filter((r) => r.type !== 'template');
     } catch (err) {
       throw err;
     }
@@ -75,30 +75,31 @@ export const RoomApi = {
 
       // Slug
       const slugBase = payload.title
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
         .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, "");
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '');
 
-      const finalSlug = `${localStorage.getItem("user")}-${slugBase}`;
+      const finalSlug = `${localStorage.getItem('user')}-${slugBase}`;
       const formData = new FormData();
 
-      formData.append("title", payload.title!);
-      formData.append("slug", finalSlug);
-      formData.append("description", payload.description || "");
-      formData.append("visibility", payload.visibility || "public");
-      formData.append("tags", JSON.stringify(payload.tags || []));
+      formData.append('title', payload.title!);
+      formData.append('slug', finalSlug);
+      formData.append('description', payload.description || '');
+      formData.append('visibility', payload.visibility || 'public');
+      formData.append('tags', JSON.stringify(payload.tags || []));
+      formData.append('room_json', JSON.stringify(payload.room_json || {}));
 
-      if (payload.thumbnail) formData.append("thumbnail", payload.thumbnail);
-      if (payload.type) formData.append("type", payload.type);
+      if (payload.thumbnail) formData.append('thumbnail', payload.thumbnail);
+      if (payload.type) formData.append('type', payload.type);
       console.log(payload, formData);
 
       const res = await axiosClient.post(apiEndpoints.room.create, formData);
       return res.data;
     } catch (err) {
-      console.error("RoomApi.create error:", err);
+      console.error('RoomApi.create error:', err);
       throw err;
     }
   },
@@ -138,8 +139,8 @@ export const RoomApi = {
 
         const slugBase = finalTitle
           .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9-]/g, "");
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '');
 
         finalSlug = `${updateData.owner_id}-${slugBase}`;
 
@@ -148,23 +149,23 @@ export const RoomApi = {
       }
 
       const formData = new FormData();
-      if (updateData.title) formData.append("title", updateData.title);
-      if (updateData.slug) formData.append("slug", updateData.slug);
+      if (updateData.title) formData.append('title', updateData.title);
+      if (updateData.slug) formData.append('slug', updateData.slug);
       if (updateData.description)
-        formData.append("description", updateData.description);
+        formData.append('description', updateData.description);
       if (updateData.visibility)
-        formData.append("visibility", updateData.visibility);
-      if (updateData.status) formData.append("status", updateData.status);
+        formData.append('visibility', updateData.visibility);
+      if (updateData.status) formData.append('status', updateData.status);
       if (updateData.thumbnail)
-        formData.append("thumbnail", updateData.thumbnail);
+        formData.append('thumbnail', updateData.thumbnail);
       if (updateData.room_json)
-        formData.append("room_json", JSON.stringify(updateData.room_json));
-      if (updateData.tag) formData.append("tag", updateData.tag);
+        formData.append('room_json', JSON.stringify(updateData.room_json));
+      if (updateData.tag) formData.append('tag', updateData.tag);
       if (updateData.tags)
-        formData.append("tags", JSON.stringify(updateData.tags));
-      if (updateData.type) formData.append("type", updateData.type);
-      if (updateData.owner_id) formData.append("owner_id", updateData.owner_id);
-      if (updateData.author) formData.append("author", updateData.author);
+        formData.append('tags', JSON.stringify(updateData.tags));
+      if (updateData.type) formData.append('type', updateData.type);
+      if (updateData.owner_id) formData.append('owner_id', updateData.owner_id);
+      if (updateData.author) formData.append('author', updateData.author);
 
       const res = await axiosClient.patch(
         apiEndpoints.room.updateById(updateData.id),
@@ -172,7 +173,7 @@ export const RoomApi = {
       );
       return res.data;
     } catch (err) {
-      console.error("RoomApi.update error:", err);
+      console.error('RoomApi.update error:', err);
       throw err;
     }
   },
@@ -184,7 +185,7 @@ export const RoomApi = {
       });
       return res.data;
     } catch (err) {
-      console.error("RoomApi.buyTemplate error:", err);
+      console.error('RoomApi.buyTemplate error:', err);
       throw err;
     }
   },

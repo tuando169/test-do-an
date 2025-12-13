@@ -88,11 +88,15 @@ function Space() {
                     </div>
                   </div>
                 </div>
-                <div className='flex gap-3 mt-4'>
+                <div className='flex gap-3 mt-4 justify-end'>
                   {(khongGian?.owner_id == localStorage.getItem('user') ||
                     userRole == RoleEnum.Admin) && (
                     <Link
-                      to={`/exhibition-edit/${khongGian?.slug}`}
+                      to={
+                        khongGian.type == 'template'
+                          ? `/template-edit/${khongGian?.slug}`
+                          : `/exhibition-edit/${khongGian?.slug}`
+                      }
                       className=''
                     >
                       <div className='flex gap-1 secondary-button items-center'>
@@ -104,8 +108,12 @@ function Space() {
                     </Link>
                   )}
                   <Link
-                    to={`/exhibition/${khongGian?.slug}`}
-                    className='ml-auto'
+                    to={
+                      khongGian.type == 'template'
+                        ? `/template/${khongGian?.slug}`
+                        : `/exhibition/${khongGian?.slug}`
+                    }
+                    className=''
                   >
                     <div className='flex gap-1 primary-button items-center'>
                       <p className=' uppercase  '>KHÁM PHÁ KHÔNG GIAN</p>

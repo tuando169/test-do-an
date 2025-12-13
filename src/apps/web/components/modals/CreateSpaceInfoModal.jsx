@@ -50,7 +50,7 @@ export default function CreateSpaceInfoModal({
       await RoomApi.create({
         ...form,
         // ⭐ Nếu mode = template → tạo không gian mẫu
-        type: mode === 'template' ? 'template' : form.type || 'gallery',
+        type: mode === 'template' ? 'template' :  'gallery',
       });
 
       api.success({
@@ -125,20 +125,6 @@ export default function CreateSpaceInfoModal({
           value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
         />
-
-        {/* ⭐ Chỉ nhập "Danh mục" khi tạo KHÔNG GIAN THẬT */}
-        {mode !== 'template' && (
-          <>
-            <label className='mb-2'>Danh mục</label>
-            <input
-              type='text'
-              disabled={isLoading}
-              className='bg-gray-200 p-3 mb-4 text-[16px] outline-none w-full'
-              value={form.type}
-              onChange={(e) => setForm({ ...form, type: e.target.value })}
-            />
-          </>
-        )}
 
         {/* Hiển thị */}
         <label className='mb-2'>Hiển thị</label>

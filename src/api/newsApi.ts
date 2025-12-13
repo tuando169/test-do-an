@@ -1,6 +1,6 @@
-import axiosClient from '@/common/axiosClient';
-import { apiEndpoints } from '@/common/constants';
-import { NewsData, NewsUploadData } from '@/common/types';
+import axiosClient from '../common/axiosClient';
+import { apiEndpoints } from '../common/constants';
+import { NewsData, NewsUploadData } from '../common/types';
 
 function buildNewsFormData(data: NewsUploadData) {
   const form = new FormData();
@@ -72,7 +72,13 @@ export const NewsApi = {
   },
   async getList() {
     const res = await axiosClient.get(apiEndpoints.news.getAll);
-    return res.data;
+    const data: NewsData[] = res.data;
+      return (
+        data.sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        ) || []
+      );
   },
   async getBySlug(slug) {
     const list = await NewsApi.getList();

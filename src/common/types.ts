@@ -132,6 +132,7 @@ export interface TextureData {
   nor_url?: string;
   orm_url?: string;
   texture_for: string;
+  created_at: string;
 }
 
 export interface TextureUploadData {
