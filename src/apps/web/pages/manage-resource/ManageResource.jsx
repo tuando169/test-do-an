@@ -36,21 +36,21 @@ export default function ManageResource() {
 
   const loadImages = async () => {
     const data = await ImageApi.getList();
-    setImages(data.sort((a, b) => a.title.localeCompare(b.title)));
+    setImages(data);
   };
   const loadTextures = async () => {
     const data = await TextureApi.getAll();
-    setTextures(data.sort((a, b) => a.title.localeCompare(b.title)));
+    setTextures(data);
   };
 
   const loadObjects = async () => {
     const data = await Object3dApi.getList();
-    setObjects(data.sort((a, b) => a.title.localeCompare(b.title)));
+    setObjects(data);
   };
 
   const loadAudio = async () => {
     const data = await AudioApi.getList();
-    setAudios(data.sort((a, b) => a.title.localeCompare(b.title)));
+    setAudios(data);
   };
 
   const deleteItem = async (id, type) => {
@@ -231,7 +231,7 @@ export default function ManageResource() {
             <MdAdd size={20} /> Thêm Mới
           </button>
         </div>
-        {/* ================= CARD GRID ================= */}
+
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6'>
           {displayData.map((item) => (
             <div
@@ -271,7 +271,6 @@ export default function ManageResource() {
                 )}
                 {tab === 'texture' && (
                   <div className='w-full h-full flex  overflow-hidden shadow-md cursor-pointer'>
-                    {/* Albedo */}
                     <div
                       className='w-1/3 h-full hover:brightness-75 transition-all'
                       onClick={() => window.open(item.alb_url)}
@@ -282,7 +281,6 @@ export default function ManageResource() {
                       />
                     </div>
 
-                    {/* Normal */}
                     <div
                       className='w-1/3 h-full hover:brightness-75 transition-all'
                       onClick={() => window.open(item.nor_url)}
@@ -293,7 +291,6 @@ export default function ManageResource() {
                       />
                     </div>
 
-                    {/* ORM */}
                     <div
                       className='w-1/3 h-full hover:brightness-75 transition-all'
                       onClick={() => window.open(item.orm_url)}

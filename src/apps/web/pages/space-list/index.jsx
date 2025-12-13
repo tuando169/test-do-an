@@ -95,16 +95,10 @@ function ListSpace() {
                             <div className='ListSpace__inner__content__box__info__item__item'>
                               Nghệ sĩ
                             </div>
-                            <div className='ListSpace__inner__content__box__info__item__item'>
-                              Thể loại
-                            </div>
                           </div>
                           <div className='ListSpace__inner__content__box__info__item2'>
                             <div className='ListSpace__inner__content__box__info__item2__item'>
                               {khongGian.author}
-                            </div>
-                            <div className='ListSpace__inner__content__box__info__item2__item'>
-                              {khongGian.type}
                             </div>
                           </div>
                         </div>

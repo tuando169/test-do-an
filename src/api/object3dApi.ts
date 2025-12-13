@@ -8,9 +8,10 @@ export const Object3dApi = {
       const formData = new FormData();
       formData.append('file', data.file);
       formData.append('title', data.title);
-      data.room_id.forEach((id, index) =>
-        formData.append(`room_id${index}`, id)
-      );
+      if (data.room_id)
+        data.room_id.forEach((id, index) =>
+          formData.append(`room_id${index}`, id)
+        );
 
       const res = await axiosClient.post(
         apiEndpoints.object3d.create,
@@ -29,9 +30,10 @@ export const Object3dApi = {
       const formData = new FormData();
       formData.append('file', data.file);
       formData.append('title', data.title);
-      data.room_id.forEach((id, index) =>
-        formData.append(`room_id${index}`, id)
-      );
+      if (data.room_id)
+        data.room_id.forEach((id, index) =>
+          formData.append(`room_id${index}`, id)
+        );
 
       const res = await axiosClient.patch(
         apiEndpoints.object3d.updateById(id),

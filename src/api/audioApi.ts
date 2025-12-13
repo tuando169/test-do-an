@@ -8,9 +8,11 @@ export const AudioApi = {
       const formData = new FormData();
       formData.append('file', data.file);
       formData.append('title', data.title);
-      data.room_id.forEach((id, index) =>
-        formData.append(`room_id${index}`, id)
-      );
+
+      if (data.room_id)
+        data.room_id.forEach((id, index) =>
+          formData.append(`room_id${index}`, id)
+        );
 
       const res = await axiosClient.post(apiEndpoints.audio.create, formData);
 
@@ -25,7 +27,7 @@ export const AudioApi = {
       const formData = new FormData();
       formData.append('file', data.file);
       formData.append('title', data.title);
-      data.room_id.forEach((id, index) =>
+     if (data.room_id) data.room_id.forEach((id, index) =>
         formData.append(`room_id${index}`, id)
       );
 
