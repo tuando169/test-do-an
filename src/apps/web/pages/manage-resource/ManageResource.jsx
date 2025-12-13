@@ -3,7 +3,7 @@ import { ImageApi } from '@/api/imageApi';
 import { Object3dApi } from '@/api/object3dApi';
 import { useEffect, useState } from 'react';
 import { MdDelete, MdEdit, MdAdd, MdClose } from 'react-icons/md';
-import ModalCreateResource from './modals/CreateMediaModal';
+import CreateMediaModal from './modals/CreateMediaModal';
 import { Modal as ModalAnt, notification } from 'antd';
 import { TextureApi } from '@/api/textureApi';
 import { UserApi } from '@/api/userApi';
@@ -32,6 +32,7 @@ export default function ManageResource() {
     nor: '',
     orm: '',
     texture_for: '',
+    id: '',
   });
 
   const loadImages = async () => {
@@ -160,6 +161,7 @@ export default function ManageResource() {
       nor: '',
       orm: '',
       texture_for: '',
+      id: '',
     });
     setModalOpen(true);
   };
@@ -177,15 +179,67 @@ export default function ManageResource() {
     });
   };
 
+  function onCreateMediaSuccess() {
+    if (tab === 'image') {
+      loadImages();
+      if (form.id)
+        api.success({
+          title: 'Thành công',
+          description: 'Cập nhật tranh thành công.',
+        });
+      else
+        api.success({
+          title: 'Thành công',
+          description: 'Tải lên tranh mới thành công.',
+        });
+    } else if (tab === 'object') {
+      loadObjects();
+      if (form.id)
+        api.success({
+          title: 'Thành công',
+          description: 'Cập nhật object 3D thành công.',
+        });
+      else
+        api.success({
+          title: 'Thành công',
+          description: 'Tải lên object 3D mới thành công.',
+        });
+    } else if (tab === 'audio') {
+      loadAudio();
+      if (form.id)
+        api.success({
+          title: 'Thành công',
+          description: 'Cập nhật  âm thanh thành công.',
+        });
+      else
+        api.success({
+          title: 'Thành công',
+          description: 'Tải lên âm thanh mới thành công.',
+        });
+    } else if (tab === 'texture') {
+      loadTextures();
+      if (form.id)
+        api.success({
+          title: 'Thành công',
+          description: 'Cập nhật texture thành công.',
+        });
+      else
+        api.success({
+          title: 'Thành công',
+          description: 'Tải lên texture mới thành công.',
+        });
+    }
+  }
+
   return (
     <>
       {contextHolder}
-      <ModalCreateResource
+      <CreateMediaModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         formData={form}
         tab={tab}
-        onSubmit={fetchData}
+        onSuccess={onCreateMediaSuccess}
       />
 
       <div className='container-main mx-auto flex flex-col mt-10'>

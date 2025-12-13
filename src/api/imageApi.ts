@@ -27,9 +27,10 @@ export const ImageApi = {
       const formData = new FormData();
       formData.append('file', data.file);
       formData.append('title', data.title);
-     if (data.room_id) data.room_id.forEach((id, index) =>
-        formData.append(`room_id${index}`, id)
-      );
+      if (data.room_id)
+        data.room_id.forEach((id, index) =>
+          formData.append(`room_id${index}`, id)
+        );
 
       const res = await axiosClient.patch(
         apiEndpoints.image.updateById(id),
@@ -50,7 +51,7 @@ export const ImageApi = {
       return (
         data.sort(
           (a, b) =>
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         ) || []
       );
     } catch (err: any) {

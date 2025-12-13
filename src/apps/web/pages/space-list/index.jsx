@@ -91,16 +91,20 @@ function ListSpace() {
                           {khongGian.title}
                         </div>
                         <div className='ListSpace__inner__content__box__info'>
-                          <div className='ListSpace__inner__content__box__info__item'>
-                            <div className='ListSpace__inner__content__box__info__item__item'>
-                              Nghệ sĩ
-                            </div>
-                          </div>
-                          <div className='ListSpace__inner__content__box__info__item2'>
-                            <div className='ListSpace__inner__content__box__info__item2__item'>
-                              {khongGian.author}
-                            </div>
-                          </div>
+                          {khongGian.author && (
+                            <>
+                              <div className='ListSpace__inner__content__box__info__item'>
+                                <div className='ListSpace__inner__content__box__info__item__item'>
+                                  Nghệ sĩ
+                                </div>
+                              </div>
+                              <div className='ListSpace__inner__content__box__info__item2'>
+                                <div className='ListSpace__inner__content__box__info__item2__item'>
+                                  {khongGian.author}
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
                         <div
                           className='ListSpace__inner__content__box__image'

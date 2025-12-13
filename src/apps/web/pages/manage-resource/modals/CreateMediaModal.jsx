@@ -11,24 +11,39 @@ export default function ModalCreateResource({
   onClose,
   formData,
   tab, // "image" | "object" | "audio"
-  onSubmit,
+  onSuccess,
 }) {
   const [api, contextHolder] = notification.useNotification();
+  const defaultForm = {
+    title: '',
+    file: null,
+    alb: null,
+    nor: null,
+    orm: null,
+    textures_for: '',
+    id: '',
+  };
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     title: '',
     file: null,
-    textures: {
-      alb: null,
-      nor: null,
-      orm: null,
-      textures_for: '',
-    },
+    alb: null,
+    nor: null,
+    orm: null,
+    textures_for: '',
+    id: '',
   });
 
   const [preview, setPreview] = useState('');
 
   useEffect(() => {
-    if (formData) setForm(formData);
+    if (formData) {
+      setForm({
+        ...defaultForm,
+        ...formData,
+      });
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -37,7 +52,12 @@ export default function ModalCreateResource({
     const file = e.target.files[0];
     if (!file) return;
 
-    setForm({ ...form, file });
+    setForm((prev) => ({
+      ...prev,
+      file,
+      // ✅ chỉ set title nếu chưa có
+      title: prev.title || file.name.replace(/\.[^/.]+$/, ''),
+    }));
 
     const tempUrl = URL.createObjectURL(file);
     setPreview(tempUrl);
@@ -45,12 +65,27 @@ export default function ModalCreateResource({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (form.id) {
-      await handleUpdate();
-    } else await handleCreate();
+    if (loading) return;
 
-    onSubmit();
-    onClose();
+    try {
+      setLoading(true);
+
+      if (form.id) {
+        await handleUpdate();
+      } else {
+        await handleCreate();
+      }
+
+      onSuccess();
+      handleClose();
+    } catch (err) {
+      api.error({
+        message: 'Lỗi',
+        description: err?.message || 'Có lỗi xảy ra, vui lòng thử lại',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTextureChange = (type) => (e) => {
@@ -59,10 +94,7 @@ export default function ModalCreateResource({
 
     setForm((prev) => ({
       ...prev,
-      textures: {
-        ...prev.textures,
-        [type]: file,
-      },
+      [type]: file,
     }));
   };
 
@@ -70,11 +102,11 @@ export default function ModalCreateResource({
     setForm({
       title: '',
       file: null,
-      textures: {
-        alb: null,
-        nor: null,
-        orm: null,
-      },
+      alb: null,
+      nor: null,
+      orm: null,
+      textures_for: '',
+      id: '',
     });
     setPreview('');
     onClose();
@@ -86,54 +118,56 @@ export default function ModalCreateResource({
         title: form.title,
         file: form.file,
       });
-      console.log(res);
       if (res.status == 422)
-        alert(
-          'File không hợp lệ hoặc quá lớn. Vui lòng thử lại với file khác.'
-        );
-      api.success({
-        title: 'Thành công',
-        description: 'Tải lên tranh mới',
-      });
+        api.error({
+          message: 'Lỗi',
+          description:
+            'File không hợp lệ hoặc quá lớn. Vui lòng thử lại với file khác.',
+        });
       return;
     }
     if (tab === 'object') {
-      await Object3dApi.create({
+      const res = await Object3dApi.create({
         title: form.title,
         file: form.file,
         description: form.description,
       });
-      api.success({
-        title: 'Thành công',
-        description: 'Tải lên object 3D mới.',
-      });
+      if (res.status == 422)
+        api.error({
+          message: 'Lỗi',
+          description:
+            'File không hợp lệ hoặc quá lớn. Vui lòng thử lại với file khác.',
+        });
       return;
     }
     if (tab === 'audio') {
-      await AudioApi.create({
+      const res = await AudioApi.create({
         title: form.title,
         file: form.file,
         description: form.description,
       });
-      api.success({
-        title: 'Thành công',
-        description: 'Tải lên âm thanh mới.',
-      });
+      if (res.status == 422)
+        api.error({
+          message: 'Lỗi',
+          description:
+            'File không hợp lệ hoặc quá lớn. Vui lòng thử lại với file khác.',
+        });
       return;
     }
     if (tab === 'texture') {
-      await TextureApi.create({
+      const res = await TextureApi.create({
         title: form.title,
-        alb: form.textures.alb,
-        nor: form.textures.nor,
-        orm: form.textures.orm,
-        texture_for: form.textures.textures_for,
+        alb: form.alb,
+        nor: form.nor,
+        orm: form.orm,
+        texture_for: form.textures_for,
       });
-
-      api.success({
-        title: 'Thành công',
-        description: 'Tải lên object 3D kèm texture PBR.',
-      });
+      if (res.status == 422)
+        api.error({
+          message: 'Lỗi',
+          description:
+            'File không hợp lệ hoặc quá lớn. Vui lòng thử lại với file khác.',
+        });
     }
   }
   async function handleUpdate() {
@@ -143,10 +177,6 @@ export default function ModalCreateResource({
         file: form.file,
         description: form.description,
       });
-      api.success({
-        title: 'Thành công',
-        description: 'Tải lên tranh mới',
-      });
       return;
     }
     if (tab === 'object') {
@@ -155,10 +185,6 @@ export default function ModalCreateResource({
         file: form.file,
         description: form.description,
         room_id: form.room_id,
-      });
-      api.success({
-        title: 'Thành công',
-        description: 'Tải lên object 3D mới.',
       });
       return;
     }
@@ -178,10 +204,20 @@ export default function ModalCreateResource({
     if (tab === 'object') {
       await TextureApi.update(form.id, {
         title: form.title,
-        alb: form.textures.alb,
-        nor: form.textures.nor,
-        orm: form.textures.orm,
-        texture_for: form.textures.textures_for,
+        alb: form.alb,
+        nor: form.nor,
+        orm: form.orm,
+        texture_for: form.textures_for,
+      });
+      return;
+    }
+    if (tab === 'texture') {
+      await TextureApi.update(form.id, {
+        title: form.title,
+        alb: form.alb,
+        nor: form.nor,
+        orm: form.orm,
+        texture_for: form.textures_for,
       });
     }
   }
@@ -213,7 +249,7 @@ export default function ModalCreateResource({
 
           <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
             <div>
-              <label className='font-medium'>Tên tài nguyên</label>
+              <label className='font-medium'>Tên</label>
               <input
                 type='text'
                 required={form.title ? false : true}
@@ -237,93 +273,115 @@ export default function ModalCreateResource({
                 </a>
               </div>
             )}
-            {/* UPLOAD FILE */}
-            <div>
-              <input
-                type='file'
-                required={form.file_url ? false : true}
-                accept={
-                  tab === 'image'
-                    ? 'image/*'
-                    : tab === 'object'
-                    ? '.glb'
-                    : 'audio/*'
-                }
-                className='w-full border px-3 py-2 mt-1'
-                onChange={handleFileChange}
-              />
-
-              {/* PREVIEW */}
-              {tab === 'image' && preview && (
-                <img
-                  src={preview}
-                  className='w-full h-40 object-cover border mt-3'
-                />
-              )}
-
-              {tab === 'audio' && preview && (
-                <audio controls className='mt-3 w-full'>
-                  <source src={preview} />
-                </audio>
-              )}
-
-              {tab === 'object' && form.file && (
-                <p className='text-sm text-gray-600 mt-2'>
-                  Đã chọn file: {form.file.name}
-                </p>
-              )}
-              {tab === 'texture' && form.textures && (
-                <div className='grid grid-cols-3 gap-3'>
-                  <div>
-                    <p className='text-sm font-medium mb-1'>Albedo</p>
-                    <input
-                      type='file'
-                      accept='image/*'
-                      onChange={handleTextureChange('alb')}
+            {tab === 'texture' ? (
+              <div className='flex flex-col gap-3 overflow-hidden'>
+                <div className='grid grid-cols-3'>
+                  {form.alb && (
+                    <img
+                      src={form.id ? form.alb : URL.createObjectURL(form.alb)}
+                      className='mt-2 h-20 w-full object-cover border'
                     />
-                    {form.textures.alb && (
-                      <img
-                        src={URL.createObjectURL(form.textures.alb)}
-                        className='mt-2 h-20 w-full object-cover border'
-                      />
-                    )}
-                  </div>
-
-                  <div>
-                    <p className='text-sm font-medium mb-1'>Normal</p>
-                    <input
-                      type='file'
-                      accept='image/*'
-                      onChange={handleTextureChange('nor')}
+                  )}
+                  {form.nor && (
+                    <img
+                      src={form.id ? form.nor : URL.createObjectURL(form.nor)}
+                      className='mt-2 h-20 w-full object-cover border'
                     />
-                    {form.textures.nor && (
-                      <img
-                        src={URL.createObjectURL(form.textures.nor)}
-                        className='mt-2 h-20 w-full object-cover border'
-                      />
-                    )}
-                  </div>
-
-                  <div>
-                    <p className='text-sm font-medium mb-1'>ORM</p>
-                    <input
-                      type='file'
-                      accept='image/*'
-                      onChange={handleTextureChange('orm')}
+                  )}
+                  {form.orm && (
+                    <img
+                      src={form.id ? form.orm : URL.createObjectURL(form.orm)}
+                      className='mt-2 h-20 w-full object-cover border'
                     />
-                    {form.textures.orm && (
-                      <img
-                        src={URL.createObjectURL(form.textures.orm)}
-                        className='mt-2 h-20 w-full object-cover border'
-                      />
-                    )}
-                  </div>
+                  )}
                 </div>
-              )}
-            </div>
+                <div>
+                  <p className='text-sm font-medium mb-1'>Albedo</p>
+                  <input
+                    type='file'
+                    accept='image/*'
+                    onChange={handleTextureChange('alb')}
+                  />
+                </div>
 
-            <button className='primary-button w-full' type='submit'>
-              {form.id ? 'Cập nhật' : 'Tạo mới'}
+                <div>
+                  <p className='text-sm font-medium mb-1'>Normal</p>
+                  <input
+                    type='file'
+                    accept='image/*'
+                    onChange={handleTextureChange('nor')}
+                  />
+                </div>
+
+                <div>
+                  <p className='text-sm font-medium mb-1'>ORM</p>
+                  <input
+                    type='file'
+                    accept='image/*'
+                    onChange={handleTextureChange('orm')}
+                  />
+                </div>
+                <div>
+                  <label className='font-medium'>Dành cho</label>
+                  <input
+                    type='text'
+                    required={form.textures_for ? false : true}
+                    className='w-full border px-3 py-2 mt-1'
+                    value={form.textures_for}
+                    onChange={(e) =>
+                      setForm({ ...form, textures_for: e.target.value })
+                    }
+                    placeholder='Tên hiển thị...'
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <input
+                  type='file'
+                  required={form.file_url ? false : true}
+                  accept={
+                    tab === 'image'
+                      ? 'image/*'
+                      : tab === 'object'
+                      ? '.glb'
+                      : 'audio/*'
+                  }
+                  className='w-full border px-3 py-2 mt-1'
+                  onChange={handleFileChange}
+                />
+
+                {/* PREVIEW */}
+                {tab === 'image' && preview && (
+                  <img
+                    src={preview}
+                    className='w-full h-40 object-cover border mt-3'
+                  />
+                )}
+
+                {tab === 'audio' && preview && (
+                  <audio controls className='mt-3 w-full'>
+                    <source src={preview} />
+                  </audio>
+                )}
+
+                {tab === 'object' && form.file && (
+                  <p className='text-sm text-gray-600 mt-2'>
+                    Đã chọn file: {form.file.name}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <button
+              className='primary-button w-full flex items-center justify-center gap-2'
+              type='submit'
+              disabled={loading}
+            >
+              {loading && (
+                <span className='w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin' />
+              )}
+              {loading ? 'Đang xử lý...' : form.id ? 'Cập nhật' : 'Tạo mới'}
             </button>
           </form>
         </div>

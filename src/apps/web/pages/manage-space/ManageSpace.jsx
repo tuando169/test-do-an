@@ -13,7 +13,7 @@ import {
   MdDelete,
 } from 'react-icons/md';
 import Modal from '../../components/modal/index';
-import PickTemplateModal from './modals/PickTemplateModal';
+import PickTemplateModal from './modals/BuyTemplateModal';
 import EditSpaceModal from '../../components/modals/EditSpaceModal';
 import { useNavigate } from 'react-router-dom';
 import CreateSpaceInfoModal from '../../components/modals/CreateSpaceInfoModal';
