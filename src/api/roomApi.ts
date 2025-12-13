@@ -14,8 +14,16 @@ export const RoomApi = {
       });
 
       const uniqueRooms = Object.values(uniqueRoomsMap);
-      return uniqueRooms.filter(
-        (r) => r.visibility === 'public' && r.type !== 'template'
+
+      return Promise.resolve(
+        uniqueRooms
+          .filter((r) => r.visibility === 'public' && r.type !== 'template')
+          .sort((a, b) => {
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          })
       );
     } catch (err) {
       throw err;
@@ -26,7 +34,14 @@ export const RoomApi = {
   async getAll(): Promise<RoomData[]> {
     try {
       const res = await axiosClient.get(apiEndpoints.room.getAll);
-      return res.data || [];
+      const data: RoomData[] = res.data || [];
+      return Promise.resolve(
+        res.data.sort((a: RoomData, b: RoomData) => {
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        })
+      );
     } catch (err) {
       throw err;
     }
@@ -36,7 +51,13 @@ export const RoomApi = {
   async getPublicTemplateList(): Promise<RoomData[]> {
     try {
       const res = await axiosClient.get(apiEndpoints.room.template.getPublic);
-      return Promise.resolve(res.data || []);
+      return Promise.resolve(
+        res.data.sort((a: RoomData, b: RoomData) => {
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        })
+      );
     } catch (err) {
       throw err;
     }
