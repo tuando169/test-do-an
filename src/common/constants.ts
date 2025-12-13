@@ -1,5 +1,5 @@
 // let BASE_URL = "http://localhost:8000";
-let BASE_URL = "https://3d-gallery-be.vercel.app";
+let BASE_URL = import.meta.env.VITE_API_URL || "https://3d-gallery-be.vercel.app";
 
 if (import.meta.env.MODE === "production")
   BASE_URL = "https://3d-gallery-be.vercel.app";
@@ -81,10 +81,10 @@ export const apiEndpoints = {
     updateById: (id: string) => `${BASE_URL}/news/${id}`,
     deleteById: (id: string) => `${BASE_URL}/news/${id}`,
   },
-  newsItem: {
-    create: `${BASE_URL}/news-item`,
-    getAll: `${BASE_URL}/news-item`,
-    updateById: (id: string) => `${BASE_URL}/news-item/${id}`,
-    deleteById: (id: string) => `${BASE_URL}/news-item/${id}`,
+  license: {
+    create: `${BASE_URL}/license`,
+    getAll: `${BASE_URL}/license`,
+    updateById: (id: string) => `${BASE_URL}/license/${id}`,
+    deleteById: (id: string) => `${BASE_URL}/license/${id}`,
   },
 };

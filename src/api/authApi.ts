@@ -42,12 +42,8 @@ export const AuthApi = {
 
       return Promise.resolve();
     } catch (err: any) {
-      const message =
-        err.response?.data?.message ||
-        err.message ||
-        "Đăng ký thất bại, vui lòng thử lại";
-
-      throw new Error(message);
+      if (err.status == 422) return Promise.reject("Email đã được sử dụng, vui lòng nhập email khác");
+      return Promise.reject("Đăng ký thất bại, vui lòng thử lại")
     }
   },
 

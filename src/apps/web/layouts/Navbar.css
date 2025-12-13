@@ -9,15 +9,37 @@
 .navbar-brand {
   color: var(--clr-white);
 }
+
 .hamburger-menu {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 26px;
+  position: relative;
   width: 34px;
+  height: 26px;
   cursor: pointer;
-  z-index: 10;
 }
+
+.hamburger-menu div {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #2e2e2e;
+  transition: all 0.3s ease;
+}
+
+/* vị trí ban đầu */
+.bar-top {
+  top: 0;
+}
+
+.bar-middle {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.bar-bottom {
+  bottom: 0;
+}
+
 .bar-top,
 .bar-middle,
 .bar-bottom {
@@ -30,7 +52,7 @@
   transform: rotate(42deg);
 }
 .hamburger-menu-change .bar-middle {
-  transform: translateX(1rem);
+  transform: translateX(-1rem);
   opacity: 0;
 }
 .hamburger-menu-change .bar-bottom {
@@ -84,6 +106,33 @@
 }
 .navbar-btns button:hover {
   background-color: var(--clr-robin-blue);
+}
+
+.nav-link-parent {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.nav-arrow {
+  font-size: 20px;
+  transition: transform 0.25s ease;
+}
+.nav-item.dropdown .dropdown-menu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.nav-item.dropdown.open .dropdown-menu {
+  max-height: 300px; /* đủ chứa menu */
+}
+.nav-item.dropdown .nav-arrow {
+  transition: transform 0.25s ease;
+}
+
+.nav-item.dropdown.open .nav-arrow {
+  transform: rotate(180deg);
 }
 
 @media screen and (min-width: 578px) {

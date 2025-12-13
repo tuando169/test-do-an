@@ -22,6 +22,7 @@ import PricingPage from './apps/web/pages/pricing-page/PricingPage';
 import ManageUser from './apps/web/pages/manage-user/ManageUser';
 import ManageNews from './apps/web/pages/manage-news/ManageNews';
 import NewsEditor from './apps/web/pages/news-editor/NewsEditor';
+import ManageLicense from './apps/web/pages/manage-license/ManageLicense';
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
       { path: '/manage/user', element: <ManageUser /> },
       { path: '/manage/space', element: <ManageSpace /> },
       { path: '/manage/resource', element: <ManageResource /> },
+      { path: '/manage/license', element: <ManageLicense /> },
 
       { path: 'test-api', element: <TestAPI /> },
     ],

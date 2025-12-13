@@ -8,6 +8,8 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
 
   const [mode, setMode] = useState(initMode || "login"); // login | register
   const [loading, setLoading] = useState(false); // ⭐ STATE LOADING
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -17,6 +19,19 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
     confirmPassword: "",
     phone: "",
   });
+
+  function handleAvatarChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      api.error({ title: "Vui lòng chọn ảnh hợp lệ" });
+      return;
+    }
+
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  }
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,6 +46,8 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
       confirmPassword: "",
       phone: "",
     });
+    setAvatarFile(null);
+    setAvatarPreview(null);
     setLoading(false);
     onClose();
   }
@@ -72,16 +89,25 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
       });
       return;
     }
+    if (!avatarFile) {
+      api.error({
+        title: "Vui lòng chọn ảnh đại diện",
+      });
+      return;
+    }
 
     setLoading(true);
 
     try {
-      await AuthApi.signup({
-        name: form.name,
-        role: form.role,
-        email: form.email,
-        password: form.password,
-      });
+      const formData = new FormData();
+
+      formData.append("name", form.name);
+      formData.append("role", form.role);
+      formData.append("email", form.email);
+      formData.append("password", form.password);
+      formData.append("avatar", avatarFile);
+
+      await AuthApi.signup(formData);
 
       api.success({
         title: "Đăng ký thành công",
@@ -89,9 +115,18 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
       });
 
       setMode("login");
-    } catch {
+      setForm({
+        role: "",
+        phone: "",
+        confirmPassword: "",
+        email: "",
+        name: "",
+        password: "",
+      });
+    } catch (err) {
       api.error({
         title: "Đăng ký thất bại",
+        description: err,
       });
     } finally {
       setLoading(false);
@@ -173,26 +208,50 @@ export default function AuthModal({ isVisible, onClose, onSuccess, initMode }) {
           </h2>
 
           <form className="flex flex-col gap-3" onSubmit={handleRegister}>
-            <label>Tên của bạn</label>
-            <input
-              name="name"
-              className="border p-3 w-full disabled:bg-gray-100"
-              value={form.name}
-              onChange={handleChange}
-              disabled={loading}
-            />
+            <div className="flex items-center gap-4 h-full">
+              <label className="cursor-pointer h-full">
+                <div className="aspect-square h-40 border flex items-center justify-center overflow-hidden bg-gray-100">
+                  {avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt="avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-sm text-gray-500">Chọn ảnh</span>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                  disabled={loading}
+                />
+              </label>
+              <div>
+                <label>Tên của bạn</label>
+                <input
+                  name="name"
+                  className="border p-3 w-full disabled:bg-gray-100"
+                  value={form.name}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
 
-            <label>Vai trò</label>
-            <select
-              name="role"
-              className="border p-3 w-full disabled:bg-gray-100"
-              value={form.role}
-              onChange={handleChange}
-              disabled={loading}
-            >
-              <option value="client">Người dùng</option>
-              <option value="designer">Nhà thiết kế</option>
-            </select>
+                <label>Vai trò</label>
+                <select
+                  name="role"
+                  className="border p-3 w-full disabled:bg-gray-100"
+                  value={form.role}
+                  onChange={handleChange}
+                  disabled={loading}
+                >
+                  <option value="client">Người dùng</option>
+                  <option value="designer">Nhà thiết kế</option>
+                </select>
+              </div>
+            </div>
 
             <label>Số điện thoại</label>
             <input
