@@ -90,7 +90,7 @@ export default function PickTemplateModal({
               )}
 
               <a
-                href={`/exhibition/${tpl.slug}`}
+                href={`/template/${tpl.slug}`}
                 target="_blank"
                 onClick={(e) => e.stopPropagation()}
               >
