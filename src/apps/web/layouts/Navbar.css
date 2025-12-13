@@ -120,9 +120,9 @@
   transition: transform 0.25s ease;
 }
 .nav-item.dropdown .dropdown-menu {
-  max-height: 0;
-  overflow: hidden;
+  max-height: fit-content;
   transition: max-height 0.3s ease;
+  width: 200px;
 }
 .nav-item.dropdown.open .dropdown-menu {
   max-height: 300px; /* đủ chứa menu */
