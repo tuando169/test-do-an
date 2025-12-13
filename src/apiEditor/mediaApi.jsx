@@ -52,13 +52,13 @@ export async function uploadMedia(file, metadata = {}, tags = []) {
 export async function getMediaList(params = {}) {
     try {
         const query = new URLSearchParams(params).toString();
-        const res = await fetchWithAuth(`/media${query ? `?${query}` : ""}`, { method: "GET" });
+        const res = await fetchWithAuth(`/image${query ? `?${query}` : ""}`, { method: "GET" });
         const data = await res.json();
 
-        if (!res.ok || !data.success)
+        if (!res.ok)
             throw new Error(data.message || "Lấy danh sách media thất bại");
 
-        return data.data; // <=== chuẩn nhất
+        return data; // <=== chuẩn nhất
     } catch (err) {
         console.error("getMediaList error:", err);
         throw err; // KHÔNG logout

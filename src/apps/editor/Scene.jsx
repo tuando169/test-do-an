@@ -2070,14 +2070,14 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
 
       if (typeRoom === "exhibition") {
         return {
-          environment_config: {
+          room_json: {
             room: objectJson,
             environment: environmentJson
           }
         };
       } else {
         return {
-          wall_config: {
+          room_json: {
             room: objectJson,
             environment: environmentJson
           }
@@ -2292,8 +2292,8 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
           return {
             ...o,
             src: newImage.file_url,
-            alt: newImage.metadata.tac_gia || "Không tác giả",
-            title: newImage.metadata.tieu_de || "Tranh không có tiêu đề",
+            alt: newImage.metadata?.tac_gia || "Không tác giả",
+            title: newImage.metadata?.tieu_de || "Tranh không có tiêu đề",
             description: newImage.metadata || "Tranh không có thông tin",
             type: "image",
             ...(newImage.index !== undefined && { index: newImage.index }),
@@ -2325,8 +2325,8 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
           return {
             ...o,
             src: newImage.thumbnail || newImage.file_url,
-            alt: newImage.metadata.tac_gia || "Không tác giả",
-            title: newImage.metadata.tieu_de || "Tranh không có tiêu đề",
+            alt: newImage.metadata?.tac_gia || "Không tác giả",
+            title: newImage.metadata?.tieu_de || "Tranh không có tiêu đề",
             description: newImage.metadata || "Tranh không có thông tin",
             ...(newImage.index !== undefined && { index: newImage.index }),
             ...(newImage.audio && { audio: newImage.audio }),

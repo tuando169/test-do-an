@@ -174,14 +174,15 @@ export async function createExhibition({
 }
 
 /** Lấy danh sách exhibitions (của user) */
-export async function getExhibitionByUserId(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    const url = `/room${query ? `?${query}` : ""}`;
+export async function getExhibitionByUserId() {
+    const url = `/room`;
     const res = await fetchWithAuth(url, { method: "GET" });
     const data = await res.json();
-    if (!res.ok || !data.success)
+    console.log(data);
+
+    if (!res.ok)
         throw new Error(data.message || "Không lấy được danh sách exhibitions");
-    return data.data?.results || [];
+    return data || [];
 }
 
 /** Lấy chi tiết exhibition theo ID */
@@ -197,70 +198,28 @@ export async function getExhibitionDetail(id) {
 
 /** Cập nhật exhibition */
 export async function updateExhibition(id, updateData = {}) {
-    try {
-        // Lấy thông tin user hiện tại
-        const user = getUserInfo();
-        if (!user?.id) throw new Error("Chưa đăng nhập hoặc không lấy được user info");
+  try {
+    const user = localStorage.getItem("user");
+    if (!user) throw new Error("Not logged in");
 
-        let finalTitle = updateData.title?.trim();
-        let finalSlug = updateData.slug; // mặc định giữ slug cũ nếu không đổi title
+    const res = await fetchWithAuth(`/room/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(updateData)
+    });
 
-        // Nếu có title mới, xử lý kiểm tra trùng + slug mới
-        if (finalTitle) {
-        const exhibitions = await getExhibitionByUserId({ user_id: user.id });
-        const sameTitles = exhibitions
-            .filter(
-            (ex) =>
-                ex.title?.startsWith(finalTitle) &&
-                ex.id !== id && // bỏ qua chính nó
-                ex.title?.toLowerCase() === finalTitle.toLowerCase()
-            );
+    const data = await res.json();
+    console.log("Exhibition updated:", data);
+    return data;
 
-        if (sameTitles.length > 0) {
-            // ví dụ có "My Exhibition" rồi, tạo "My Exhibition 2"
-            finalTitle = `${finalTitle} ${sameTitles.length + 1}`;
-        }
-
-        // Sinh slug mới
-        const slugBase = (finalTitle || "")
-            .toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9-]/g, "");
-        finalSlug = `${user.id}-${slugBase}`;
-
-        // Ghi đè lại vào updateData
-        updateData.title = finalTitle;
-        updateData.slug = finalSlug;
-        }
-
-        // FormData
-        const formData = new FormData();
-        for (const [key, value] of Object.entries(updateData)) {
-        if (value === undefined || value === null) continue;
-        if (typeof value === "object" && !(value instanceof File)) {
-            formData.append(key, JSON.stringify(value));
-        } else {
-            formData.append(key, value);
-        }
-        }
-
-        // Gửi request
-        const res = await fetchWithAuth(`/room/${encodeURIComponent(id)}`, {
-        method: "PUT",
-        body: formData,
-        });
-
-        const data = await res.json();
-        if (!res.ok || !data.success)
-        throw new Error(data.message || "Cập nhật exhibition thất bại");
-
-        console.log("Exhibition updated:", data);
-        return data;
-    } catch (err) {
-        console.error("updateExhibition error:", err);
-        throw err;
-    }
+  } catch (err) {
+    console.error("updateExhibition error:", err);
+    throw err;
+  }
 }
+
 
 /** Xóa exhibition */
 export async function deleteExhibition(ids) {
@@ -282,5 +241,5 @@ export async function getAllExhibitions() {
   if (!res.ok)
     throw new Error(data.message || "Không lấy được danh sách public exhibitions");
 
-  return data.data; // tùy backend: results hoặc data
+  return data; // tùy backend: results hoặc data
 }

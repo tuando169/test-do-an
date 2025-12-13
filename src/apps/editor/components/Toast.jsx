@@ -39,8 +39,10 @@ const Toast = ({ message, type = 'success', visible, onClose, duration = 3000 })
   if (!visible) return null;
 
   return (
-    <div 
-      className={`toast toast-${type}`}
+    <>
+      <div className='my-toast'>
+        <div 
+      className={`mytoast toast-${type}`}
       onClick={() => {
         onClose();
       }}
@@ -97,6 +99,8 @@ const Toast = ({ message, type = 'success', visible, onClose, duration = 3000 })
         />
       )}
     </div>
+      </div>
+    </>
   );
 };
 

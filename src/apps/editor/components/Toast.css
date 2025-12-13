@@ -1,4 +1,4 @@
-.toast {
+.my-toast .mytoast {
   position: fixed;
   top: 20px;
   left: 50%;
@@ -13,45 +13,45 @@
   overflow: hidden;
 }
 
-.toast-success {
+.my-toast .toast-success {
   background-color: #10b981;
   color: white;
 }
 
-.toast-error {
+.my-toast .toast-error {
   background-color: #ef4444;
   color: white;
 }
 
-.toast-warning {
+.my-toast .toast-warning {
   background-color: #f59e0b;
   color: white;
 }
 
-.toast-info {
+.my-toast .toast-info {
   background-color: #3b82f6;
   color: white;
 }
 
-.toast-content {
+.my-toast .toast-content {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.toast-icon {
+.my-toast .toast-icon {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
 }
 
-.toast-message {
+.my-toast .toast-message {
   font-size: 14px;
   font-weight: 500;
   flex: 1;
 }
 
-.toast-close-btn {
+.my-toast .toast-close-btn {
   background: none;
   border: none;
   color: inherit;
@@ -65,7 +65,7 @@
   justify-content: center;
 }
 
-.toast-close-btn:hover {
+.my-toast .toast-close-btn:hover {
   opacity: 1;
 }
 
@@ -103,7 +103,7 @@
 }
 
 /* Progress bar for save operations */
-.toast-progress {
+.my-toast .toast-progress {
   position: absolute;
   bottom: 0;
   left: 0;

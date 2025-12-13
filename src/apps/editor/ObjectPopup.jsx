@@ -520,7 +520,7 @@ const ObjectPopup = (props) => {
                         margin: "4px 0",
                       }}
                     >
-                      {media.metadata.tieu_de || (isVideo ? "video" : "image")}
+                      {media.metadata?.tieu_de || (isVideo ? "video" : "image")}
                     </p>
                   </div>
                 );

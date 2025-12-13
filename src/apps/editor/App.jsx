@@ -213,7 +213,6 @@ const App = () => {
   const [uploadedAudioFiles, setUploadedAudioFiles] = useState([]); // 
   const imageFrameList = objectData.imageFrameList; 
 
-  
   // Flatten the categorized objects structure into a single array for backward compatibility
   const flattenObjects = (objectsData) => {
     if (!objectsData) return [];
@@ -308,6 +307,7 @@ const App = () => {
       hasCheckedUser.current = true;
 
       const user = await initCurrentUser();
+      console.log("User authentication check:", user);
       if (!user) return navigate("/login");
     };
 
@@ -324,6 +324,7 @@ useEffect(() => {
   const loadRoomData = async () => {
     try {
       const { typeRoom, modeRoom } = parseRoomRoute(location.pathname);
+      console.log(`Loading room data for ${typeRoom} in ${modeRoom} mode...`);
       setUserStatus({
         typeRoom,
         modeRoom,
@@ -348,6 +349,7 @@ useEffect(() => {
       }
 
       const found = list.find(item => item.slug === slug);
+      console.log(`Found ${typeRoom}:`, found);
       if (!found) {
         navigate("/404");
         return;
@@ -358,8 +360,8 @@ useEffect(() => {
 
       // ------------------ ROOM PARSE ------------------
       const config = typeRoom === "template"
-        ? found.wall_config
-        : found.environment_config;
+        ? found.room_json
+        : found.room_json;
 
       const rawRoom = config?.room;
       const roomJson = rawRoom
@@ -458,7 +460,7 @@ useEffect(() => {
 
       if (!isMounted) return;
 
-      setImages(res?.results || []);
+      setImages(res || []);
       setPagination(res?.pagination);
     } catch (err) {
       console.error("Failed to load images:", err);
@@ -1354,8 +1356,7 @@ useEffect(() => {
 
       // Parse room JSON từ scene
       const roomObj = JSON.parse(
-        scenePayload.environment_config?.room ||
-        scenePayload.wall_config?.room ||
+        scenePayload.room_json?.room ||
         "{}"
       );
 
@@ -1398,16 +1399,18 @@ useEffect(() => {
 
       // Gán lại JSON đã merge
       if (userStatus.typeRoom === "exhibition") {
-        scenePayload.environment_config.room = JSON.stringify(roomObj);
-        scenePayload.environment_config.environment = JSON.stringify(environmentObj);
+        scenePayload.room_json.room = JSON.stringify(roomObj);
+        scenePayload.room_json.environment = JSON.stringify(environmentObj);
       } else {
-        scenePayload.wall_config.room = JSON.stringify(roomObj);
-        scenePayload.wall_config.environment = JSON.stringify(environmentObj);
+        scenePayload.room_json.room = JSON.stringify(roomObj);
+        scenePayload.room_json.environment = JSON.stringify(environmentObj);
       }
 
       // ======= GỬI LÊN API =======
       let result;
       if (userStatus.typeRoom === "exhibition") {
+        console.log("Saving exhibition with payload:", scenePayload);
+
         result = await updateExhibition(exhibition.id, scenePayload);
       } else {
         result = await updateRoomTemplate(exhibition.id, scenePayload);

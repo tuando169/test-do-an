@@ -1,4 +1,6 @@
 import { setCookie, getCookie, deleteAllCookies } from "./Cookies";
+import axiosClient from "../common/axiosClient";
+import { apiEndpoints } from "../common/constants";
 
 const BASE_URL = "https://3d-gallery-be.vercel.app";
 
@@ -132,13 +134,12 @@ export async function fetchWithAuth(url, options = {}) {
  */
 export async function initCurrentUser() {
   try {
-    const id = getUserInfo()?.id;
-    const res = await fetchWithAuth(`/user/${id}`, { method: "GET" });
+    const id = localStorage.getItem("user");
+    const res = await axiosClient.get(apiEndpoints.user.getById(id));
     console.log("initCurrentUser response:", res);
-    if (!res.ok) return null;
+    if (res.status !== 200) return null;
 
-    const data = await res.json();
-    const profile = data?.data?.profile || null;
+    const profile = res?.data || null;
 
     cacheUser(profile);
     return profile;
