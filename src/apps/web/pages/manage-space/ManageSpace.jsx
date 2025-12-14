@@ -12,18 +12,15 @@ import {
   MdSearch,
   MdDelete,
 } from 'react-icons/md';
-import Modal from '../../components/modal/index';
 import EditSpaceModal from '../../components/modals/EditSpaceModal';
 import { useNavigate } from 'react-router-dom';
 import CreateSpaceInfoModal from '../../components/modals/CreateSpaceInfoModal';
-import CreateSpaceModal from '../../components/modals/CreateSpaceModal';
 
 export default function ManageSpace() {
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
 
   const [spaces, setSpaces] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
   const [userRole, setUserRole] = useState(RoleEnum.Guest);
 
   const [tab, setTab] = useState('exhibition');
@@ -38,6 +35,7 @@ export default function ManageSpace() {
     description: '',
   });
 
+  const [allTemplates, setAllTemplates] = useState([]);
   const [showCreateFromTemplate, setShowCreateFromTemplate] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
 
@@ -49,6 +47,27 @@ export default function ManageSpace() {
     description: '',
     room_json: {},
   });
+
+  async function fetchPublicTemplates() {
+    const templates = await RoomApi.getPublicTemplateList();
+
+    const filteredIds = new Set(filteredSpaces.map((s) => s.id));
+
+    setAllTemplates(
+      [...templates].sort((a, b) => {
+        const aIn = filteredIds.has(a.id);
+        const bIn = filteredIds.has(b.id);
+
+        // a không có, b có → b lên trước
+        if (!aIn && bIn) return 1;
+
+        // a có, b không → a lên trước
+        if (aIn && !bIn) return -1;
+
+        return 0;
+      })
+    );
+  }
 
   const openCreate = (tpl) => {
     if (tpl.id)
@@ -85,6 +104,10 @@ export default function ManageSpace() {
     loadSpaces();
     fetchCurrentUser();
   }, []);
+
+  useEffect(() => {
+    if (tab === 'buyed-template') fetchPublicTemplates();
+  }, [tab]);
 
   const openEdit = (space) => {
     setEditForm({
@@ -272,7 +295,7 @@ export default function ManageSpace() {
             </>
           )}
           <div className='ml-auto flex items-center gap-3'>
-            {tab === 'my-template' ? (
+            {(tab === 'my-template' || tab == 'template') &&
               (userRole === RoleEnum.Admin ||
                 userRole === RoleEnum.Designer) && (
                 <div className='flex ml-auto'>
@@ -283,8 +306,8 @@ export default function ManageSpace() {
                     <MdAdd size={20} /> Tạo không gian mẫu
                   </button>
                 </div>
-              )
-            ) : (
+              )}
+            {tab === 'exhibition' && (
               <button
                 onClick={() => setShowCreateFromTemplate(true)}
                 className='flex items-center gap-2 primary-button'
@@ -295,74 +318,146 @@ export default function ManageSpace() {
           </div>
         </div>
 
-        {/* TABLE */}
-        <div className='border border-gray-300 overflow-hidden'>
-          {/* CARD GRID */}
+        <div className='overflow-hidden'>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6'>
-            {filteredSpaces.map((space) => (
-              <div
-                key={space.id}
-                className='border-8 border-transparent hover:border-[#2e2e2e] shadow-md p-4 transition cursor-pointer flex flex-col'
-                onClick={() => navigate('/space/' + space.slug)}
-              >
-                {/* PREVIEW */}
-                <div className='w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden mb-4'>
-                  <img
-                    src={space.thumbnail}
-                    className='w-full h-full object-cover'
-                  />
-                </div>
+            {tab !== 'buyed-template' &&
+              filteredSpaces.map((space) => (
+                <div
+                  key={space.id}
+                  className='border-8 border-transparent hover:border-[#2e2e2e] shadow-md p-4 transition cursor-pointer flex flex-col'
+                  onClick={() => navigate('/space/' + space.slug)}
+                >
+                  <div className='w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden mb-4'>
+                    <img
+                      src={space.thumbnail}
+                      className='w-full h-full object-cover'
+                    />
+                  </div>
 
-                {/* TITLE */}
-                <div className='text-lg font-bold text-[#2e2e2e] truncate'>
-                  {space.title}
-                </div>
+                  <div className='text-lg font-bold text-[#2e2e2e] truncate'>
+                    {space.title}
+                  </div>
 
-                {/* ACTIONS */}
-                <div className='flex flex-col gap-2 mt-auto pt-4'>
-                  {/* HÀNH ĐỘNG CHO TEMPLATE */}
-                  {tab === 'template' && (
-                    <button
-                      className='primary-button flex gap-2 justify-center'
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openCreate(space);
-                      }}
-                    >
-                      <MdAdd size={20} /> Tạo phòng
-                    </button>
-                  )}
-
-                  {/* EDIT + DELETE */}
-                  {(space.owner_id == localStorage.getItem('user') ||
-                    userRole == RoleEnum.Admin) && (
-                    <div className='grid grid-cols-2 gap-2'>
+                  <div className='flex flex-col gap-2 mt-auto pt-4'>
+                    {/* HÀNH ĐỘNG CHO TEMPLATE */}
+                    {(tab === 'buyed-template' || tab === 'my-template') && (
                       <button
-                        className='secondary-button flex gap-2 justify-center'
+                        className='primary-button flex gap-2 justify-center'
                         onClick={(e) => {
                           e.stopPropagation();
-                          openEdit(space);
+                          openCreate(space);
                         }}
                       >
-                        <MdEdit size={20} /> Chỉnh sửa
+                        <MdAdd size={20} /> Tạo phòng
                       </button>
+                    )}
 
-                      <button
-                        className='secondary-button flex gap-2 justify-center'
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(space.id);
-                        }}
-                      >
-                        <MdDelete size={20} /> Xóa
-                      </button>
+                    {/* EDIT + DELETE */}
+                    {(space.owner_id == localStorage.getItem('user') ||
+                      userRole == RoleEnum.Admin) && (
+                      <div className='grid grid-cols-2 gap-2'>
+                        <button
+                          className='secondary-button flex gap-2 justify-center'
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEdit(space);
+                          }}
+                        >
+                          <MdEdit size={20} /> Chỉnh sửa
+                        </button>
+
+                        <button
+                          className='secondary-button flex gap-2 justify-center'
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(space.id);
+                          }}
+                        >
+                          <MdDelete size={20} /> Xóa
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+            {tab == 'buyed-template' &&
+              allTemplates.map((space) => (
+                <div
+                  key={space.id}
+                  className={`
+    border-8 border-transparent shadow-md p-4 transition flex flex-col cursor-pointer hover:border-[#2e2e2e]
+    
+  `}
+                  onClick={() => navigate('/space/' + space.slug)}
+                >
+                  <div className='w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden mb-4'>
+                    <img
+                      src={space.thumbnail}
+                      className={`w-full h-full object-cover ${
+                        filteredSpaces.find((s) => s.id == space.id)
+                          ? ' '
+                          : 'opacity-50'
+                      }`}
+                    />
+                  </div>
+
+                  <div
+                    className={`text-lg font-bold text-[#2e2e2e] truncate ${
+                      filteredSpaces.find((s) => s.id == space.id)
+                        ? ' '
+                        : 'opacity-50'
+                    }`}
+                  >
+                    {space.title}
+                  </div>
+
+                  {tab == 'buyed-template' &&
+                  filteredSpaces.find((s) => s.id == space.id) ? (
+                    <div className=' text-green-600 font-semibold truncate flex items-center gap-1'>
+                      <MdCheck /> Đã mua
+                    </div>
+                  ) : (
+                    <div>
+                      {space.price && (
+                        <div className=' text-[#2e2e2e] truncate'>
+                          {space.price}
+                        </div>
+                      )}
+                      {!space.price && (
+                        <div className=' text-[#2e2e2e] truncate'>Miễn phí</div>
+                      )}
                     </div>
                   )}
-                </div>
-              </div>
-            ))}
 
-            {/* Empty */}
+                  <div className='flex flex-col gap-2 mt-auto pt-4'>
+                    {/* HÀNH ĐỘNG CHO TEMPLATE */}
+
+                    {filteredSpaces.find((s) => s.id == space.id) ? (
+                      <button
+                        className='primary-button flex gap-2 justify-center'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openCreate(space);
+                        }}
+                      >
+                        <MdAdd size={20} /> Tạo phòng
+                      </button>
+                    ) : (
+                      <button
+                        className='primary-button flex gap-2 justify-center'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openCreate(space);
+                        }}
+                      >
+                        <MdAdd size={20} /> Mua mẫu
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+
             {filteredSpaces.length === 0 && (
               <div className='col-span-full text-center text-gray-500 py-10'>
                 Không có dữ liệu.

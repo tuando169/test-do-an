@@ -20,7 +20,7 @@ export default function ModalCreateResource({
     alb: null,
     nor: null,
     orm: null,
-    textures_for: '',
+    texture_for: '',
     id: '',
   };
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ export default function ModalCreateResource({
     alb: null,
     nor: null,
     orm: null,
-    textures_for: '',
+    texture_for: '',
     id: '',
   });
 
@@ -105,7 +105,7 @@ export default function ModalCreateResource({
       alb: null,
       nor: null,
       orm: null,
-      textures_for: '',
+      texture_for: '',
       id: '',
     });
     setPreview('');
@@ -160,7 +160,7 @@ export default function ModalCreateResource({
         alb: form.alb,
         nor: form.nor,
         orm: form.orm,
-        texture_for: form.textures_for,
+        texture_for: form.texture_for,
       });
       if (res.status == 422)
         api.error({
@@ -207,7 +207,7 @@ export default function ModalCreateResource({
         alb: form.alb,
         nor: form.nor,
         orm: form.orm,
-        texture_for: form.textures_for,
+        texture_for: form.texture_for,
       });
       return;
     }
@@ -217,7 +217,7 @@ export default function ModalCreateResource({
         alb: form.alb,
         nor: form.nor,
         orm: form.orm,
-        texture_for: form.textures_for,
+        texture_for: form.texture_for,
       });
     }
   }
@@ -325,11 +325,11 @@ export default function ModalCreateResource({
                   <label className='font-medium'>Dành cho</label>
                   <input
                     type='text'
-                    required={form.textures_for ? false : true}
+                    required={form.texture_for ? false : true}
                     className='w-full border px-3 py-2 mt-1'
-                    value={form.textures_for}
+                    value={form.texture_for}
                     onChange={(e) =>
-                      setForm({ ...form, textures_for: e.target.value })
+                      setForm({ ...form, texture_for: e.target.value })
                     }
                     placeholder='Tên hiển thị...'
                   />

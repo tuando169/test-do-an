@@ -112,12 +112,10 @@ export const RoomApi = {
       formData.append('visibility', payload.visibility || 'public');
       formData.append('tags', JSON.stringify(payload.tags || []));
 
-      
       if (typeof payload.thumbnail == 'string')
         formData.append('thumbnailUrl', payload.thumbnail);
-       else formData.append('thumbnail', payload.thumbnail);
+      else formData.append('thumbnail', payload.thumbnail);
       if (payload.type) formData.append('type', payload.type);
-      console.log(payload, formData);
 
       const res = await axiosClient.post(apiEndpoints.room.create, formData);
       const updateData: RoomData = res.data;
@@ -190,7 +188,7 @@ export const RoomApi = {
       if (updateData.status) formData.append('status', updateData.status);
       if (updateData.thumbnail)
         formData.append('thumbnail', updateData.thumbnail);
-      
+
       if (updateData.room_json)
         formData.append('room_json', JSON.stringify(updateData.room_json));
       if (updateData.tag) formData.append('tag', updateData.tag);
