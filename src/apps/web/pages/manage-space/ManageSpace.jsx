@@ -13,7 +13,6 @@ import {
   MdDelete,
 } from 'react-icons/md';
 import Modal from '../../components/modal/index';
-import PickTemplateModal from './modals/BuyTemplateModal';
 import EditSpaceModal from '../../components/modals/EditSpaceModal';
 import { useNavigate } from 'react-router-dom';
 import CreateSpaceInfoModal from '../../components/modals/CreateSpaceInfoModal';
@@ -106,11 +105,6 @@ export default function ManageSpace() {
     loadSpaces();
   };
 
-  const pickTemplateSuccess = () => {
-    setModalOpen(false);
-    loadSpaces();
-  };
-
   // ⭐ Lọc theo tab
   const filteredSpaces = spaces.filter((s) => {
     if (tab === 'exhibition') {
@@ -159,15 +153,6 @@ export default function ManageSpace() {
   return (
     <>
       {contextHolder}
-
-      <PickTemplateModal
-        isVisible={modalOpen}
-        ownedSpaces={spaces}
-        onClose={() => {
-          setModalOpen(false);
-        }}
-        onSubmit={pickTemplateSuccess}
-      />
 
       <EditSpaceModal
         isVisible={showEditModal}
@@ -287,17 +272,7 @@ export default function ManageSpace() {
             </>
           )}
           <div className='ml-auto flex items-center gap-3'>
-            {tab === 'template' && userRole !== RoleEnum.Admin && (
-              <div className='flex '>
-                <button
-                  onClick={() => setModalOpen(true)}
-                  className='flex items-center gap-2 secondary-button'
-                >
-                  <MdAdd size={20} /> Lấy không gian mẫu về kho
-                </button>
-              </div>
-            )}
-            {tab === 'template' ? (
+            {tab === 'my-template' ? (
               (userRole === RoleEnum.Admin ||
                 userRole === RoleEnum.Designer) && (
                 <div className='flex ml-auto'>
