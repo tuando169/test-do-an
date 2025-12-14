@@ -89,4 +89,8 @@ export const apiEndpoints = {
     updateById: (id: string) => `${BASE_URL}/license/${id}`,
     deleteById: (id: string) => `${BASE_URL}/license/${id}`,
   },
+  payment: {
+    registerLicense: `${BASE_URL}/payment/register-license`,
+    buyTemplate: `${BASE_URL}/payment/buy-template`,
+  }
 };

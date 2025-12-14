@@ -209,10 +209,10 @@ export const RoomApi = {
     }
   },
 
-  async buyTemplates(ids: string[]) {
+  async buyTemplates(id: string) {
     try {
       const res = await axiosClient.post(apiEndpoints.room.template.buy, {
-        template_ids: ids,
+        template_id: id,
       });
       return res.data;
     } catch (err) {

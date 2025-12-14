@@ -1,16 +1,25 @@
 import axiosClient from "../common/axiosClient";
+import { apiEndpoints } from "../common/constants";
 
 export const PaymentApi = {
-  // Cập nhật hàm để nhận đủ 3 tham số từ Pricing.jsx gửi sang
-  createPaymentLink: async (licenseId: string, returnUrl: string, cancelUrl: string) => {
-    
-    // Gửi chính xác những gì nhận được lên Backend
-    const res = await axiosClient.post("/payment/create-link", {
+  createLicensePaymentLink: async (licenseId: string, returnUrl: string, cancelUrl: string) => {
+
+    const res = await axiosClient.post(apiEndpoints.payment.registerLicense, {
       licenseId,
       returnUrl,
       cancelUrl
     });
-    
-    return res.data; // Trả về { checkoutUrl, orderCode }
-  }
+
+    return res.data;
+  },
+  createTemplatePaymentLink: async (templateId: string, returnUrl: string, cancelUrl: string) => {
+
+    const res = await axiosClient.post(apiEndpoints.payment.buyTemplate, {
+      templateId,
+      returnUrl,
+      cancelUrl
+    });
+
+    return res.data;
+  },
 };
