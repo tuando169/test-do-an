@@ -624,7 +624,7 @@ const ObjectPopup = (props) => {
                     <option value="">Không có</option>
                     {props.audios?.map((audio) => (
                       <option key={audio.id} value={audio.file_url}>
-                        {audio.original_filename}
+                        {audio.title}
                       </option>
                     ))}
                   </select>
@@ -706,7 +706,7 @@ const ObjectPopup = (props) => {
                       setAudioUrl(null);
                     }}
                   >
-                    💾 Lưu Âm Thanh
+                    Lưu Âm Thanh
                   </button>
                 )}
 

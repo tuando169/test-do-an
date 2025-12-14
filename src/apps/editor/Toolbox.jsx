@@ -162,7 +162,7 @@ const calculateImageMarkerPosition = (linkedImage, objects) => {
   return [markerPos.x, CAMERA_HEIGHT, markerPos.z];
 };
 
-const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreatePhysicPlane, images, setImages, pagination, setPage, audios, setAudios, imageFrameList, onImageDragStart, onTempTourIndexChange, onCreateCameraTourMarker, onUpdateTourMarkers, setIsImageEditModalOpen, uploadMedia, deleteMedia, updateMedia, uploadAudio, deleteAudio, selectedId, setSelectedId, onTransformChange, objects, skySettings, setSkySettings, groundSettings, setGroundSettings, bloomSettings, setBloomSettings, imageFrame, physicPlane, skySettingMode, setSkySettingMode, groundSettingMode, setGroundSettingMode, wallTextureList, groundTextureList, glbTextureList, hdri, setHdri, groundTexture, setGroundTexture, onSceneChange, onSaveScene, currentSceneFile, isEditRoom, setIsEditRoom, onShowTransparentWallsChange, tourMarkers = [], tempTourIndices, setTempTourIndices, uploadedAudioFiles = [], onAddAudio, onRemoveAudio, importGLB, typeRoom, backgroundAudio, backgroundAudioLoading, onBackgroundAudioChange }) => {
+const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreatePhysicPlane, images, setImages, pagination, setPage, audios, setAudios, room3DData, imageFrameList, onImageDragStart, onTempTourIndexChange, onCreateCameraTourMarker, onUpdateTourMarkers, setIsImageEditModalOpen, uploadMedia, deleteMedia, updateMedia, uploadAudio, deleteAudio, selectedId, setSelectedId, onTransformChange, objects, skySettings, setSkySettings, groundSettings, setGroundSettings, bloomSettings, setBloomSettings, imageFrame, physicPlane, skySettingMode, setSkySettingMode, groundSettingMode, setGroundSettingMode, wallTextureList, groundTextureList, glbTextureList, hdri, setHdri, groundTexture, setGroundTexture, onSceneChange, onSaveScene, currentSceneFile, isEditRoom, setIsEditRoom, onShowTransparentWallsChange, tourMarkers = [], tempTourIndices, setTempTourIndices, uploadedAudioFiles = [], onAddAudio, onRemoveAudio, importGLB, typeRoom, backgroundAudio, backgroundAudioLoading, onBackgroundAudioChange }) => {
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('toolboxActiveTab') || 'objects');
   const [isCollapsed, setIsCollapsed] = useState(false); // Track if the toolbox is collapsed
   const [showTransparentWalls, setShowTransparentWalls] = useState(false); // Track transparent walls visibility
@@ -782,24 +782,33 @@ const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreate
       </div>
       {typeRoom === "template" && (
         <div className="light-section">
-          <div className='create-title'>
-            Tạo Phòng bằng GLB
+          <div className="create-title">
+            Chọn Phòng GLB
           </div>
-          
-          <label className="add-image-button">
-            + Nhập GLB
-            <input
-              type="file"
-              accept=".glb"
-              style={{ display: "none" }}
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file) {
-                  importGLB(file);
-                }
-              }}
-            />
-          </label>
+
+          <select
+            defaultValue=""
+            onChange={(e) => {
+              const glbUrl = e.target.value;
+              if (glbUrl) {
+                importGLB(glbUrl); 
+              }
+            }}
+            style={{
+              width: '100%',
+              padding: '8px',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="">-- Chọn phòng --</option>
+
+            {room3DData.map(room => (
+              <option key={room.id} value={room.file_url}>
+                {room.title}
+              </option>
+            ))}
+          </select>
         </div>
       )}
     </div>
@@ -941,7 +950,7 @@ const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreate
             {audios.map((audio) => (
               <div key={audio.id} className="audio-file-item">
                 <div className="audio-file-info">
-                  <span className="audio-file-name">{audio?.original_filename}</span>
+                  <span className="audio-file-name">{audio?.title}</span>
                   <div className="audio-file-controls">
                     <button
                       className="audio-preview-btn"

@@ -2053,7 +2053,6 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
       const objectJson = JSON.stringify({
         isPreset: objectData?.isPreset ?? false,
         objects,
-        images,
         imageFrameList,
         tourMarkers
       });

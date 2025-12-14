@@ -8,7 +8,7 @@ const PUBLIC_API_KEY = "3D_GALLERY_PUBLIC_API_2025_VS";
  */
 export async function getAllRoomTemplates(params = {}) {
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${PUBLIC_BASE_URL}/public-room-templates${query ? `?${query}` : ""}`, {
+    const res = await fetch(`${PUBLIC_BASE_URL}/room/template${query ? `?${query}` : ""}`, {
         method: "GET",
         headers: {
         "x-api-key": PUBLIC_API_KEY,
@@ -17,7 +17,7 @@ export async function getAllRoomTemplates(params = {}) {
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Không lấy được danh sách Public Room Templates");
-    return data.data.results;
+    return data;
 }
 
 /**
@@ -157,17 +157,14 @@ export async function createRoomTemplate({
  * Lấy danh sách room templates
  */
 export async function getRoomTemplateByUserId(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    const url = `/room-templates${query ? `?${query}` : ""}`;
-
+    const url = `/room`;
     const res = await fetchWithAuth(url, { method: "GET" });
     const data = await res.json();
+    console.log(data);
 
-    if (!res.ok || !data.success) {
-        throw new Error(data.message || "Lấy danh sách room templates thất bại");
-    }
-
-    return data.data?.results || [];
+    if (!res.ok)
+        throw new Error(data.message || "Không lấy được danh sách exhibitions");
+    return data || [];
 }
 
 /**
@@ -187,25 +184,26 @@ export async function getRoomTemplateDetail(id) {
  * Cập nhật room template
  */
 export async function updateRoomTemplate(id, updateData) {
-    const formData = new FormData();
+    try {
+        const user = localStorage.getItem("user");
+        if (!user) throw new Error("Not logged in");
 
-    for (const [key, value] of Object.entries(updateData)) {
-        if (value === undefined || value === null) continue;
-        if (typeof value === "object" && !(value instanceof File)) {
-            formData.append(key, JSON.stringify(value));
-        } else {
-            formData.append(key, value);
-        }
+        const res = await fetchWithAuth(`/room/${id}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updateData)
+        });
+
+        const data = await res.json();
+        console.log("Exhibition updated:", data);
+        return data;
+
+    } catch (err) {
+        console.error("updateExhibition error:", err);
+        throw err;
     }
-
-    const res = await fetchWithAuth(`/room-templates?template_id=${encodeURIComponent(id)}`, {
-        method: "PUT",
-        body: formData,
-    });
-
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.message || "Cập nhật room template thất bại");
-    return data;
 }
 
 /**
@@ -242,93 +240,140 @@ export async function deleteRoomTemplate(ids) {
  * 2. Dựa trên glb_url: set isPreset = true, map wall.src = glb_url
  * 3. PUT lại wall_config đã update
  */
-export async function importGlbForRoomTemplate(templateId, glbFile) {
-    try {
-        const formData = new FormData();
-        formData.append("glb", glbFile);
+function isGlbSrc(src) {
+  if (typeof src !== "string") return false;
 
-        // Upload GLB
-        const uploadRes = await fetchWithAuth(
-        `/room-templates/upload-glb?template_id=${templateId}`,
-        { method: "PUT", body: formData }
-        );
+  // bỏ query string nếu có (?token=...)
+  const cleanSrc = src.split("?")[0].toLowerCase();
 
-        const uploadData = await uploadRes.json();
-        const template = uploadData.data[0];
-        const glbUrl = template.glb_url;
+  return cleanSrc.endsWith(".glb");
+}
+export async function importGlbForRoomTemplate(templateId, glbUrl) {
+  try {
+    if (!glbUrl) throw new Error("Thiếu glbUrl");
 
-        if (!glbUrl) throw new Error("Server không trả về glb_url");
+    // Lấy room template hiện tại
+    const templateRes = await fetchWithAuth(`/room/${templateId}`, {
+      method: "GET",
+    });
+    const template = await templateRes.json();
 
-        let wallConfig = template.wall_config;
-
-        let roomObj;
-
-        // ---- CASE 1: old format (room is JSON string) ----
-        if (wallConfig.room) {
-        roomObj =
-            typeof wallConfig.room === "string"
-            ? JSON.parse(wallConfig.room)
-            : wallConfig.room;
-        }
-        // ---- CASE 2: new format ----
-        else {
-        roomObj = {
-            isPreset: wallConfig.isPreset ?? false,
-            audio: wallConfig.audio ?? [],
-            imageFrameList: wallConfig.imageFrameList ?? [],
-            objects: wallConfig.objects ?? {
-            wall: [],
-            image: [],
-            light: [],
-            spawn: {},
-            tourMarkers: [],
-            },
-        };
-        }
-
-        // Force preset ON
-        roomObj.isPreset = true;
-
-        // Update walls
-        let hasSrc = false;
-
-        roomObj.objects.wall = (roomObj.objects.wall || []).map(w => {
-        if (w.src) hasSrc = true;
-        return { ...w, src: glbUrl };
-        });
-
-        // If no wall has src → create new wall
-        if (!hasSrc) {
-        roomObj.objects.wall.push({
+    /** ===============================
+     *  DEFAULT TEMPLATE
+     *  =============================== */
+    const defaultTemplate = {
+      isPreset: false,
+      objects: {
+        spawn: {
+          id: "spawn-1",
+          type: "spawn",
+          position: [0, 0.2, 0],
+          rotation: [-90, 0, 0],
+          scale: [1.5, 1.5, 1.5],
+        },
+        wall: [
+          {
             id: `wall-${Date.now()}`,
             type: "wall",
-            position: [0, 0, 0],
-            rotation: [0, 0, 0],
-            scale: [1, 1, 1],
+            position: [0, 1.5, -3.75],
+            rotation: [0, -26.1, 0],
+            scale: [1.5, 1.5, 1.5],
             color: "#b6b898",
             albedo: "/textures/default/tex_default_alb.jpg",
             normal: "/textures/default/tex_default_nor.jpg",
             orm: "/textures/default/tex_default_orm.jpg",
             children: [],
-            src: glbUrl,
-            hdri: "/textures/room/exr_room1_texture_compressed.webp",
-        });
-        }
+            transparent: false,
+            objectRole: "user",
+          },
+        ],
+        image: [],
+        light: [],
+        tourMarkers: [],
+      },
+      imageFrameList: [
+        { id: "imageFrame-1" },
+        { id: "imageFrame-2" },
+        { id: "imageFrame-3" },
+        { id: "imageFrame-4" },
+      ],
+      audio: [],
+    };
 
-        // Build new final wall_config
-        const newWallConfig = {
-        room: JSON.stringify(roomObj),
-        environment: wallConfig.environment || "{}",
-        };
+    /** ===============================
+     *  BUILD roomObj
+     *  =============================== */
+    let roomObj;
+    let wallConfig = template.room_json;
 
-        return await updateRoomTemplate(templateId, {
-            wall_config: newWallConfig
-        }).catch(err => {
-            throw new Error("Cập nhật wall_config thất bại: " + err.message);
-        });
-
-    } catch (err) {
-        console.error("importGlbForRoomTemplate error:", err);
-        throw err;
+    // ❗ Nếu chưa có room_json → tạo mới
+    if (!wallConfig) {
+      roomObj = structuredClone(defaultTemplate);
+      wallConfig = {};
     }
+    // ---- CASE 1: old format ----
+    else if (wallConfig.room) {
+      roomObj =
+        typeof wallConfig.room === "string"
+          ? JSON.parse(wallConfig.room)
+          : wallConfig.room;
+    }
+    // ---- CASE 2: new format nhưng thiếu room ----
+    else {
+      roomObj = structuredClone(defaultTemplate);
+    }
+
+    // Force preset ON
+    roomObj.isPreset = true;
+
+    /** ===============================
+     *  UPDATE / ADD GLB WALL
+     *  =============================== */
+    let hasGlbWall = false;
+
+    roomObj.objects.wall = (roomObj.objects.wall || []).map((w) => {
+      if (isGlbSrc?.(w.src)) {
+        hasGlbWall = true;
+        return {
+          ...w,
+          src: glbUrl,
+        };
+      }
+      return w;
+    });
+
+    // Nếu chưa có wall GLB → tạo mới
+    if (!hasGlbWall) {
+      roomObj.objects.wall.push({
+        id: `wall-${Date.now()}`,
+        type: "wall",
+        position: [0, 0, 0],
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
+        color: "#b6b898",
+        albedo: "/textures/default/tex_default_alb.jpg",
+        normal: "/textures/default/tex_default_nor.jpg",
+        orm: "/textures/default/tex_default_orm.jpg",
+        children: [],
+        src: glbUrl,
+        hdri: "/textures/room/exr_room1_texture_compressed.webp",
+      });
+    }
+
+    /** ===============================
+     *  SAVE TEMPLATE
+     *  =============================== */
+    const newWallConfig = {
+      room: JSON.stringify(roomObj),
+      environment: wallConfig.environment || "{}",
+    };
+
+    return await updateRoomTemplate(templateId, {
+      room_json: newWallConfig,
+    });
+  } catch (err) {
+    console.error("importGlbForRoomTemplate error:", err);
+    throw err;
+  }
 }
+

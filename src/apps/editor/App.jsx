@@ -24,6 +24,7 @@ import { getAllRoomTemplates, updateRoomTemplate, importGlbForRoomTemplate, getR
 import { getMediaList, uploadMedia, deleteMedia, updateMedia } from "../../apiEditor/mediaApi";
 import { getAllTextures } from '../../apiEditor/textureApi';
 import { getAudioList, uploadAudio, deleteAudio } from '../../apiEditor/audioApi';
+import { getObject3DList } from '@/apiEditor/object3DApi';
 import { initCurrentUser, getUserRole } from "../../apiEditor/authApi";
 
 const App = () => {
@@ -34,12 +35,12 @@ const App = () => {
     
     return () => {
       const loadTime = performance.now() - startTime;
-      console.log(`⚡ App initialization time: ${loadTime.toFixed(2)}ms`);
+      console.log(`App initialization time: ${loadTime.toFixed(2)}ms`);
       
       if (mode === 'view') {
-        console.log('✅ View mode optimized - edit components not loaded');
+        console.log('View mode optimized - edit components not loaded');
       } else {
-        console.log('🛠️ Edit mode active - all components loaded');
+        console.log('Edit mode active - all components loaded');
       }
     };
   }, []);
@@ -210,6 +211,7 @@ const App = () => {
   const [pagination, setPagination] = useState(null);
   const [textureData, setTextureData] = useState([])
   const [audios, setAudios] = useState([])
+  const [room3DData, setRoom3DData] = useState([])
   const [uploadedAudioFiles, setUploadedAudioFiles] = useState([]); // 
   const imageFrameList = objectData.imageFrameList; 
 
@@ -288,11 +290,29 @@ const App = () => {
   const [snapEnabled, setSnapEnabled] = useState(true);
 
   function parseRoomRoute(pathname) {
-    const isEdit = pathname.includes("-edit");
-    const isTemplate = pathname.includes("template");
+    const segments = pathname.split('/').filter(Boolean);
+
+    // segments[0] là route prefix
+    // ví dụ:
+    // /template/abc         → ['template', 'abc']
+    // /template-edit/abc    → ['template-edit', 'abc']
+    // /exhibition/abc       → ['exhibition', 'abc']
+    // /exhibition-edit/abc  → ['exhibition-edit', 'abc']
+
+    const firstSegment = segments[0] || '';
+
+    const isEdit =
+      firstSegment === 'template-edit' ||
+      firstSegment === 'exhibition-edit';
+
+    const typeRoom =
+      firstSegment.startsWith('template')
+        ? 'template'
+        : 'exhibition';
+
     return {
-      typeRoom: isTemplate ? "template" : "exhibition",
-      modeRoom: isEdit ? "edit" : "view",
+      typeRoom,
+      modeRoom: isEdit ? 'edit' : 'view',
     };
   }
 
@@ -324,7 +344,7 @@ useEffect(() => {
   const loadRoomData = async () => {
     try {
       const { typeRoom, modeRoom } = parseRoomRoute(location.pathname);
-      console.log(`Loading room data for ${typeRoom} in ${modeRoom} mode...`);
+      console.log(`Loading data for ${typeRoom} in ${modeRoom} mode...`);
       setUserStatus({
         typeRoom,
         modeRoom,
@@ -417,10 +437,12 @@ useEffect(() => {
 
       // ------------------ LOAD TEXTURES + AUDIOS ------------------
       if (modeRoom === "edit") {
-        const [tex, aud] = await Promise.all([getAllTextures(), getAudioList()]);
+        console.log("hello");
+        const [tex, aud, ob3D] = await Promise.all([getAllTextures(), getAudioList(), getObject3DList()]);
         if (!isMounted) return;
         setTextureData(tex);
         setAudios(aud);
+        setRoom3DData(ob3D);
       } else {
         setTextureData([]);
         setAudios([]);
@@ -1451,9 +1473,6 @@ useEffect(() => {
     if (sceneData.objects) {
       setObjects(flattenObjects(sceneData.objects));
     }
-    if (sceneData.images) {
-      setImages(sceneData.images);
-    }
     if (sceneData.tourMarkers) {
       setTourMarkers(sceneData.tourMarkers);
     } else if (sceneData.objects?.tourMarkers) {
@@ -1480,7 +1499,6 @@ useEffect(() => {
         ...flattenToCategories(objects), // Convert flat objects back to categorized structure
         tourMarkers: tourMarkers // Store tour markers under objects
       },
-      images: images,
       imageFrameList: imageFrameList,
       metadata: {
         exportedAt: new Date().toISOString(),
@@ -1622,25 +1640,25 @@ useEffect(() => {
 
 
 
-  const importGLB = async (glbFile) => {
+  const importGLB = async (glbUrl) => {
     try {
       setToast({
         visible: true,
-        message: "Đang import GLB, vui lòng đợi...",
+        message: "Đang áp dụng phòng GLB...",
         type: "info"
       });
 
-      await importGlbForRoomTemplate(exhibition.id, glbFile);
+      await importGlbForRoomTemplate(exhibition.id, glbUrl);
 
       setToast({
         visible: true,
-        message: "Import GLB thành công! Hãy load lại trang web",
+        message: "Áp dụng phòng GLB thành công! Vui lòng tải lại trang để xem thay đổi.",
         type: "success"
       });
     } catch (err) {
       setToast({
         visible: true,
-        message: "Import GLB thất bại: " + err.message,
+        message: "Áp dụng GLB thất bại: " + err.message,
         type: "error"
       });
     }
@@ -1815,6 +1833,7 @@ useEffect(() => {
                         setPage={setPage}
                         audios={audios}
                         setAudios={setAudios}
+                        room3DData={room3DData}
                         onImageDragStart={img => setDraggedImage(img)}
                         onTempTourIndexChange={handleTempTourIndexChange}
                         onCreateCameraTourMarker={handleCreateCameraTourMarker}

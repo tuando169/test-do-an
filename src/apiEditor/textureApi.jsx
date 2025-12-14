@@ -9,7 +9,7 @@ const PUBLIC_API_KEY = "3D_GALLERY_PUBLIC_API_2025_VS";
  */
 export async function getAllTextures() {
     try {
-        const res = await fetch(`${BASE_URL}/public-textures`, {
+        const res = await fetch(`${BASE_URL}/texture`, {
         method: "GET",
         headers: {
             "x-api-key": PUBLIC_API_KEY,
@@ -18,11 +18,11 @@ export async function getAllTextures() {
 
         const data = await res.json();
 
-        if (!res.ok || !data.success) {
+        if (!res.ok) {
         throw new Error(data.message || "Lấy danh sách texture public thất bại");
         }
 
-        return data?.data?.results || [];
+        return data || [];
     } catch (err) {
         console.error("getAllTextures error:", err);
         throw err;
