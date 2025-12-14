@@ -238,6 +238,8 @@ export async function getAllExhibitions() {
 
   const data = await res.json();
 
+  console.log("Public exhibitions:", data);
+
   if (!res.ok)
     throw new Error(data.message || "Không lấy được danh sách public exhibitions");
 

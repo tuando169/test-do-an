@@ -56,11 +56,10 @@ export async function getAudioList(params = {}) {
         });
         const data = await res.json();
 
-        if (!res.ok || !data.success) {
+        if (!res.ok) {
         throw new Error(data.message || "Lấy danh sách audio thất bại");
         }
-        
-        return data?.data?.results || [];
+        return data || [];
     } catch (err) {
         console.error("getAudioList error:", err);
         forceLogout();
