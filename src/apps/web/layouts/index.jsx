@@ -269,12 +269,14 @@ function LayoutDefault() {
                         >
                           Hồ sơ
                         </div>
-                        <div
-                          className='px-4 py-2 hover:font-semibold cursor-pointer'
-                          onClick={() => navigate('/pricing')}
-                        >
-                          Nâng cấp tài khoản
-                        </div>
+                        {currentUser.role !== RoleEnum.Admin && (
+                          <div
+                            className='px-4 py-2 hover:font-semibold cursor-pointer'
+                            onClick={() => navigate('/pricing')}
+                          >
+                            Nâng cấp tài khoản
+                          </div>
+                        )}
 
                         <div
                           className='px-4 py-2   hover:font-semibold cursor-pointer'
@@ -401,12 +403,14 @@ function LayoutDefault() {
                             >
                               Hồ sơ
                             </div>
-                            <div
-                              className=' py-2 hover:font-semibold cursor-pointer'
-                              onClick={() => navigate('/pricing')}
-                            >
-                              Nâng cấp tài khoản
-                            </div>
+                            {currentUser.role !== RoleEnum.Admin && (
+                              <div
+                                className='px-4 py-2 hover:font-semibold cursor-pointer'
+                                onClick={() => navigate('/pricing')}
+                              >
+                                Nâng cấp tài khoản
+                              </div>
+                            )}
 
                             <button
                               className='secondary-button w-full'
