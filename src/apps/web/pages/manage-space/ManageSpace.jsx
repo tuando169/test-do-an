@@ -390,7 +390,9 @@ export default function ManageSpace() {
 
                   <div className="flex flex-col gap-2 mt-auto pt-4">
                     {/* HÀNH ĐỘNG CHO TEMPLATE */}
-                    {(tab === "buyed-template" || tab === "my-template") && (
+                    {(tab === "buyed-template" ||
+                      tab === "my-template" ||
+                      userRole == RoleEnum.Admin) && (
                       <button
                         className="primary-button flex gap-2 justify-center"
                         onClick={(e) => {

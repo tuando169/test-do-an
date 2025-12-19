@@ -79,7 +79,14 @@ export default function CreateSpaceInfoModal({
       onSuccess();
       handleClose();
     } catch (err) {
-      console.error(err);
+      if (err?.response?.status === 422) {
+        api.error({
+          message: "Lỗi",
+          description:
+            "Thumbnail không hợp lệ. Vui lòng thử lại với thumbnail khác.",
+        });
+        return;
+      }
       api.error({
         message: "Lỗi",
         description: "Không thể tạo không gian. Vui lòng thử lại.",
