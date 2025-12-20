@@ -87,8 +87,9 @@ export const apiEndpoints = {
     deleteById: (id: string) => `${BASE_URL}/news/${id}`,
   },
   license: {
-    create: `${BASE_URL}/license`,
     getAll: `${BASE_URL}/license`,
+    getById: (id: string) => `${BASE_URL}/license/${id}`,
+    create: `${BASE_URL}/license`,
     updateById: (id: string) => `${BASE_URL}/license/${id}`,
     deleteById: (id: string) => `${BASE_URL}/license/${id}`,
   },

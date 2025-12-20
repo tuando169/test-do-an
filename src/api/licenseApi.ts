@@ -15,7 +15,15 @@ export const LicenseApi = {
       throw err;
     }
   },
-
+  async getById(id: string): Promise<LicenseData> {
+    try {
+      const res = await axiosClient.get(apiEndpoints.license.getById(id));
+      return res.data;
+    } catch (err) {
+      console.error('TextureApi.getById error:', err);
+      throw err;
+    }
+  },
   async create(payload: LicenseUploadData): Promise<LicenseData> {
     try {
       const res = await axiosClient.post(apiEndpoints.license.create, payload);
