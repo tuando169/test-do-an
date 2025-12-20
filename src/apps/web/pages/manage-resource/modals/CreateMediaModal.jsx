@@ -58,7 +58,6 @@ export default function ModalCreateResource({
     setForm((prev) => ({
       ...prev,
       file,
-      // ✅ chỉ set title nếu chưa có
       title: prev.title || file.name.replace(/\.[^/.]+$/, ''),
     }));
 
@@ -89,6 +88,21 @@ export default function ModalCreateResource({
         api.error({
           message: 'Lỗi',
           description: 'File không hợp lệ. Vui lòng thử lại với file khác.',
+        });
+        return;
+      }
+      if (err?.response?.status === 403) {
+        api.error({
+          message: 'Lỗi',
+          description: 'Bạn cần đăng ký gói trả phí để thêm tài nguyên.',
+        });
+        return;
+      }
+      if (err?.response?.status === 429) {
+        api.error({
+          message: 'Lỗi',
+          description:
+            'Bạn đã đạt đến giới hạn tải lên của mình. Vui lòng nâng cấp tài khoản.',
         });
         return;
       }
@@ -412,6 +426,21 @@ export default function ModalCreateResource({
                     type='file'
                     accept='.glb'
                     className='w-full py-2 mt-1'
+                    onChange={handleFileChange}
+                  />
+                )}
+                {tab !== 'object' && (
+                  <input
+                    type='file'
+                    required={form.file_url ? false : true}
+                    accept={
+                      tab === 'image'
+                        ? 'image/*'
+                        : tab === 'object'
+                        ? '.glb'
+                        : 'audio/*'
+                    }
+                    className='w-full border px-3 py-2 mt-1'
                     onChange={handleFileChange}
                   />
                 )}
