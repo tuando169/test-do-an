@@ -162,7 +162,7 @@ const calculateImageMarkerPosition = (linkedImage, objects) => {
   return [markerPos.x, CAMERA_HEIGHT, markerPos.z];
 };
 
-const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreatePhysicPlane, images, setImages, pagination, setPage, audios, setAudios, room3DData, imageFrameList, onImageDragStart, onTempTourIndexChange, onCreateCameraTourMarker, onUpdateTourMarkers, setIsImageEditModalOpen, uploadMedia, deleteMedia, updateMedia, uploadAudio, deleteAudio, selectedId, setSelectedId, onTransformChange, objects, skySettings, setSkySettings, groundSettings, setGroundSettings, bloomSettings, setBloomSettings, imageFrame, physicPlane, skySettingMode, setSkySettingMode, groundSettingMode, setGroundSettingMode, wallTextureList, groundTextureList, glbTextureList, hdri, setHdri, groundTexture, setGroundTexture, onSceneChange, onSaveScene, currentSceneFile, isEditRoom, setIsEditRoom, onShowTransparentWallsChange, tourMarkers = [], tempTourIndices, setTempTourIndices, uploadedAudioFiles = [], onAddAudio, onRemoveAudio, importGLB, typeRoom, backgroundAudio, backgroundAudioLoading, onBackgroundAudioChange }) => {
+const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreatePhysicPlane, onImportModel,images, setImages, pagination, setPage, audios, setAudios, room3DData, imageFrameList, onImageDragStart, onTempTourIndexChange, onCreateCameraTourMarker, onUpdateTourMarkers, setIsImageEditModalOpen, uploadMedia, deleteMedia, updateMedia, uploadAudio, deleteAudio, selectedId, setSelectedId, onTransformChange, objects, skySettings, setSkySettings, groundSettings, setGroundSettings, bloomSettings, setBloomSettings, imageFrame, physicPlane, skySettingMode, setSkySettingMode, groundSettingMode, setGroundSettingMode, wallTextureList, groundTextureList, glbTextureList, hdri, setHdri, groundTexture, setGroundTexture, onSceneChange, onSaveScene, currentSceneFile, isEditRoom, setIsEditRoom, onShowTransparentWallsChange, tourMarkers = [], tempTourIndices, setTempTourIndices, uploadedAudioFiles = [], onAddAudio, onRemoveAudio, importGLB, typeRoom, backgroundAudio, backgroundAudioLoading, onBackgroundAudioChange }) => {
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('toolboxActiveTab') || 'objects');
   const [isCollapsed, setIsCollapsed] = useState(false); // Track if the toolbox is collapsed
   const [showTransparentWalls, setShowTransparentWalls] = useState(false); // Track transparent walls visibility
@@ -217,7 +217,8 @@ const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreate
       return [
         { id: 'walls', label: 'Cơ Bản' },
         { id: 'images', label: 'Hình Ảnh' },
-        { id: 'audio', label: 'Âm Thanh' }
+        { id: 'audio', label: 'Âm Thanh' },
+        { id: 'model', label: '3D' }
       ];
     } else if (mainTabId === 'object') {
       // Object settings - no subtabs needed, content depends on selected object
@@ -259,6 +260,8 @@ const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreate
       return renderImageTools();
     } else if (activeSubTab === 'audio') {
       return renderAudioTools();
+    } else if (activeSubTab === 'model') {
+      return renderModelTools();
     }
     return null;
   };
@@ -991,6 +994,38 @@ const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreate
     </div>
   );
 
+  const renderModelTools = () => (
+    <div>
+      
+      {audios.length > 0 && (
+        <div className="audio-files-section">
+          <div className='create-title'>
+            Tải vật thể 3D vào không gian của bạn
+          </div>
+          <div className="audio-files-list">
+            {room3DData.map((audio) => (
+              <div key={audio.id} className="audio-file-item">
+                <div className="audio-file-info">
+                  <span className="audio-file-name">{audio?.title}</span>
+                  <div className="audio-file-controls">
+                    <button
+                      className="audio-preview-btn"
+                      onClick={() => {
+                        onImportModel(audio.file_url);
+                      }}
+                    >
+                      Tải vật thể
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const renderSceneSelector = () => {
     const availableScenes = [
       { id: 'object', name: 'Default Scene', file: 'object.json' },
@@ -1392,9 +1427,9 @@ const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreate
                 setGroundTexture(prev => ({
                   ...prev,
                   id: selectedTexture.id,
-                  alb: selectedTexture.alb,
-                  nor: selectedTexture.nor,
-                  orm: selectedTexture.orm,
+                  alb: selectedTexture.alb_url,
+                  nor: selectedTexture.nor_url,
+                  orm: selectedTexture.orm_url,
                 }));
               }
             }}
@@ -1589,18 +1624,18 @@ const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreate
               value={currentTransform.albedo}
               onChange={(e) => {
                   const selectedAlb = e.target.value;
-                  const selectedTexture = wallTextureList.find(frame => frame.alb === selectedAlb);
+                  const selectedTexture = wallTextureList.find(frame => frame.alb_url === selectedAlb);
 
                   if (selectedTexture) {
-                    handleFieldChange("albedo", selectedTexture.alb)
-                    handleFieldChange("normal", selectedTexture.nor)
-                    handleFieldChange("orm", selectedTexture.orm)
+                    handleFieldChange("albedo", selectedTexture.alb_url)
+                    handleFieldChange("normal", selectedTexture.nor_url)
+                    handleFieldChange("orm", selectedTexture.orm_url)
                   }
                 }}
               style={{ padding: '5px', borderRadius: '4px', width: '100%' }}
             >
               {wallTextureList.map((frame) => (
-                <option key={frame.id} value={frame.alb}>
+                <option key={frame.id} value={frame.alb_url}>
                   {frame.title}
                 </option>
               ))}
@@ -1833,6 +1868,12 @@ const Toolbox = ({ onCreateWall, onCreateSpotLight, onCreateImageFrame, onCreate
             { field: 'imageFrameId', label: 'Khung tranh', type: 'dropdown' },
             { field: 'frameColor', label: 'Màu khung', type: 'color' },
             { field: 'canvasColor', label: 'Màu nền', type: 'color' },
+          ]);
+        } else if (currentObject.type === 'model'){
+          setEditableFields([
+            { field: 'position', label: 'Position', type: 'vector3', step: 0.01, suffix: 'm' },
+            { field: 'rotation', label: 'Rotation', type: 'vector3', step: 0.1, suffix: '°' },
+            { field: 'scale', label: 'Scale', type: 'vector3', step: 0.01 },
           ]);
         } else {
           setEditableFields([

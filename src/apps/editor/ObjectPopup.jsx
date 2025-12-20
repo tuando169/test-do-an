@@ -115,6 +115,10 @@ const ObjectPopup = (props) => {
         }
       }
 
+      case "model": {
+        return ["Vị Trí", "Xoay", "Kích Thước", "Xóa"];
+      }
+
       default:
         return [];
     }
