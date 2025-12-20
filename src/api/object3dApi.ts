@@ -54,7 +54,7 @@ export const Object3dApi = {
       return (
         data.sort(
           (a, b) =>
-             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         ) || []
       );
     } catch (err) {
@@ -73,6 +73,28 @@ export const Object3dApi = {
       return Promise.resolve();
     } catch (err) {
       throw err;
+    }
+  },
+  async generate(sample: File): Promise<File> {
+    try {
+      const formData = new FormData();
+      formData.append('image', sample);
+      const res = await axiosClient.post(
+        apiEndpoints.object3d.generate,
+        formData,
+        {
+          responseType: 'blob',
+        }
+      );
+      console.log('res.data', res.data);
+
+      return Promise.resolve(
+        new File([res.data], 'generated_object.glb', {
+          type: 'model/gltf-binary',
+        })
+      );
+    } catch {
+      return Promise.reject();
     }
   },
 };

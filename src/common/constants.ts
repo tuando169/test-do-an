@@ -5,6 +5,8 @@ let BASE_URL =
 if (import.meta.env.MODE === 'production')
   BASE_URL = 'https://3d-gallery-be.vercel.app';
 
+const AI_URL = 'https://zipppier-henry-bananas.ngrok-free.dev';
+
 export enum RoleEnum {
   Admin = 'admin',
   Designer = 'designer',
@@ -68,6 +70,7 @@ export const apiEndpoints = {
     getOne: (id: string) => `${BASE_URL}/object3d/${id}`,
     updateById: (id: string) => `${BASE_URL}/object3d/${id}`,
     deleteById: (id: string) => `${BASE_URL}/object3d/${id}`,
+    generate: `${AI_URL}/generate3d`,
   },
   texture: {
     getAll: `${BASE_URL}/texture`,
@@ -92,5 +95,5 @@ export const apiEndpoints = {
   payment: {
     registerLicense: `${BASE_URL}/payment/register-license`,
     buyTemplate: `${BASE_URL}/payment/buy-template`,
-  }
+  },
 };
