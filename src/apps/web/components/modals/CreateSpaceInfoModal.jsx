@@ -80,7 +80,7 @@ export default function CreateSpaceInfoModal({
       onSuccess();
       handleClose();
     } catch (err) {
-      if (err?.response?.status === 422) {
+      if (err?.response?.status === 444) {
         api.error({
           message: 'Lỗi',
           description:

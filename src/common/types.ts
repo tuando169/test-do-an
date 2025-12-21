@@ -19,7 +19,7 @@ export interface RoomData {
   owner_id: string;
   author: string;
   slug: string;
-
+  price?: number;
   room_json: Record<string, any>;
   visibility: string;
   status: string;
@@ -42,6 +42,7 @@ export interface RoomUploadData {
   room_json: Record<string, any>;
   visibility: string;
   status: string;
+  price?: number;
 
   type?: string;
 

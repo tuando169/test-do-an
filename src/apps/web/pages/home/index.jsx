@@ -115,10 +115,12 @@ function Home() {
 
                           <div className='text-4xl font-bold'>{item.title}</div>
 
-                          <div className='mb-3'>
-                            {item.description?.slice(0, 200) ||
-                              'Không gian triển lãm 3D.'}
-                          </div>
+                          <div
+                            className='mb-3 max-h-[9vh] overflow-hidden'
+                            dangerouslySetInnerHTML={{
+                              __html: item.description,
+                            }}
+                          ></div>
                           <div className='flex gap-3 mb-4'>
                             <div className='w-20'>
                               <p>Tác giả</p>

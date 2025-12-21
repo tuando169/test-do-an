@@ -108,6 +108,8 @@ export const RoomApi = {
 
       formData.append('title', payload.title!);
       formData.append('slug', finalSlug);
+      if (payload.price !== undefined)
+        formData.append('price', payload.price.toString());
       formData.append('description', payload.description || '');
       formData.append('visibility', payload.visibility || 'public');
       formData.append('tags', JSON.stringify(payload.tags || []));
@@ -196,6 +198,8 @@ export const RoomApi = {
       if (updateData.type) formData.append('type', updateData.type);
       if (updateData.owner_id) formData.append('owner_id', updateData.owner_id);
       if (updateData.author) formData.append('author', updateData.author);
+      if (updateData.price !== undefined)
+        formData.append('price', updateData.price.toString());
 
       const res = await axiosClient.patch(
         apiEndpoints.room.updateById(updateData.id),

@@ -18,6 +18,7 @@ export interface SignupPayload {
 export interface LoginResponse {
   user: any;
   session: {
+    user: any;
     access_token: string;
     refresh_token: string;
   };
@@ -46,6 +47,10 @@ export const AuthApi = {
       if (err.status == 422)
         return Promise.reject(
           'Email đã được sử dụng, vui lòng nhập email khác'
+        );
+      if (err.status == 444)
+        return Promise.reject(
+          'Avatar không hợp lệ, vui lòng thử lại với ảnh khác'
         );
       return Promise.reject('Đăng ký thất bại, vui lòng thử lại');
     }

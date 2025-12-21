@@ -84,7 +84,7 @@ export default function ModalCreateResource({
       onSuccess();
       handleClose();
     } catch (err) {
-      if (err?.response?.status === 422) {
+      if (err?.response?.status === 444) {
         api.error({
           message: 'Lỗi',
           description: 'File không hợp lệ. Vui lòng thử lại với file khác.',
@@ -168,7 +168,7 @@ export default function ModalCreateResource({
         title: form.title,
         file: form.file,
       });
-      if (res.status == 422)
+      if (res.status == 444)
         api.error({
           message: 'Lỗi',
           description:
@@ -182,7 +182,7 @@ export default function ModalCreateResource({
         file: form.file,
         description: form.description,
       });
-      if (res.status == 422)
+      if (res.status == 444)
         api.error({
           message: 'Lỗi',
           description:
@@ -196,7 +196,7 @@ export default function ModalCreateResource({
         file: form.file,
         description: form.description,
       });
-      if (res.status == 422)
+      if (res.status == 444)
         api.error({
           message: 'Lỗi',
           description:
@@ -212,7 +212,7 @@ export default function ModalCreateResource({
         orm: form.orm,
         texture_for: form.texture_for,
       });
-      if (res.status == 422)
+      if (res.status == 444)
         api.error({
           message: 'Lỗi',
           description:

@@ -243,7 +243,7 @@ export default function ManageSpace() {
           });
           setShowEditModal(false);
         }}
-        onSubmit={handleUpdateSpace}
+        onSuccess={handleUpdateSpace}
         space={editForm}
       />
       <CreateSpaceInfoModal
@@ -411,18 +411,20 @@ export default function ManageSpace() {
                     />
                   </div>
 
-                  <div className='text-lg font-bold text-[#2e2e2e] truncate'>
-                    {space.title}
-                  </div>
-                  <div>
-                    {space.price && (
-                      <div className=' text-[#2e2e2e] truncate'>
-                        {formatMoney(space.price)} VND
-                      </div>
-                    )}
-                    {!space.price && (
-                      <div className=' text-[#2e2e2e] truncate'>Miễn phí</div>
-                    )}
+                  <div className='flex justify-between'>
+                    <div className='text-lg font-bold text-[#2e2e2e] truncate'>
+                      {space.title}
+                    </div>
+                    <div>
+                      {space.price && tab.includes('template') && (
+                        <div className=' text-[#2e2e2e] truncate'>
+                          {formatMoney(space.price)} VND
+                        </div>
+                      )}
+                      {!space.price && tab.includes('template') && (
+                        <div className=' text-[#2e2e2e] truncate'>Miễn phí</div>
+                      )}
+                    </div>
                   </div>
 
                   <div className='flex flex-col gap-2 mt-auto pt-4'>
