@@ -91,32 +91,6 @@ const App = () => {
     ],
     objects: {
       wall: [
-        {
-          id: "wall-1762482238762",
-          orm: "/textures/default/tex_default_orm.jpg",
-          type: "wall",
-          color: "#b6b898",
-          scale: [
-            1.5,
-            1.5,
-            1.5
-          ],
-          albedo: "/textures/default/tex_default_alb.jpg",
-          normal: "/textures/default/tex_default_nor.jpg",
-          children: [],
-          position: [
-            0,
-            1.5,
-            -3.75
-          ],
-          rotation: [
-            0,
-            -26.1,
-            0
-          ],
-          objectRole: "user",
-          transparent: false
-        }
       ],
       image: [],
       light: [],
@@ -139,7 +113,29 @@ const App = () => {
           0
         ]
       },
-      tourMarkers: []
+      tourMarkers: [],
+      model: [
+        {
+          id: "model-1762482238762",
+          type: "model",
+          scale: [
+            1.5,
+            1.5,
+            1.5
+          ],
+          position: [
+            0,
+            1.5,
+            -3.75
+          ],
+          rotation: [
+            0,
+            -26.1,
+            0
+          ],
+          src: "https://sesvbrqnsrvnpgjxfwks.supabase.co/storage/v1/object/public/object3d/1766251943609_generated_object.glb"
+        }
+      ]
     }
   }
   // Default environment settings
@@ -233,7 +229,7 @@ const App = () => {
     }
     
     // Add arrays of objects
-    ['wall', 'image', 'light'].forEach(category => {
+    ['wall', 'image', 'light', 'model'].forEach(category => {
       if (Array.isArray(objectsData[category])) {
         flattened.push(...objectsData[category]);
       }
@@ -250,6 +246,7 @@ const App = () => {
       wall: [],
       image: [],
       light: [],
+      model: [],
       spawn: null
     };
     
@@ -262,7 +259,9 @@ const App = () => {
         categorized.image.push(obj);
       } else if (obj.type === 'spotLight') {
         categorized.light.push(obj);
-      }
+      } else if (obj.type === 'model') {
+        categorized.model.push(obj);
+      } 
     });
     
     return categorized;
@@ -606,7 +605,7 @@ useEffect(() => {
             import('./ObjectPopup.jsx')
           ]);
           const loadTime = performance.now() - startTime;
-          console.log(`✅ Edit mode components preloaded in ${loadTime.toFixed(2)}ms`);
+          console.log(`Edit mode components preloaded in ${loadTime.toFixed(2)}ms`);
         } catch (error) {
           console.warn('⚠️ Failed to preload edit components:', error);
         }
@@ -1402,6 +1401,7 @@ useEffect(() => {
         wall: objects.filter(o => o.type === "wall"),
         image: objects.filter(o => o.type === "image"),
         light: objects.filter(o => o.type === "spotLight"),
+        model: objects.filter(o => o.type === "model"),
         tourMarkers: updatedTourMarkers    // Use updated markers with applied index changes
       };
 
@@ -1891,6 +1891,9 @@ useEffect(() => {
                         backgroundAudio={backgroundAudio}
                         backgroundAudioLoading={backgroundAudioLoading}
                         onBackgroundAudioChange={handleBackgroundAudioChange}
+                        onImportModel={(glbUrl) => {
+                          sceneRef.current?.createModelFromGLB(glbUrl);
+                        }}
                       />
                     </Suspense>
                   )}
@@ -2007,10 +2010,11 @@ useEffect(() => {
                         }}
                         onTextureChange={(texture) => {
                           if (sceneRef.current && selectedId) {
+                            console.log(texture);
                             sceneRef.current.updateTransform(selectedId, {
-                              albedo: texture.alb,
-                              normal: texture.nor,
-                              orm: texture.orm,
+                              albedo: texture.alb_url,
+                              normal: texture.nor_url,
+                              orm: texture.orm_url,
                             });
                           }
                         }}

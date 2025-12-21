@@ -8,6 +8,7 @@ import { Image } from './Image';
 import { PhysicPlane } from "./PhysicPlane";
 import { SpawnMarker } from './SpawnMarker';
 import { Object3D } from './Object';
+import { SimpleModel3D } from "./model";
 import meshRefs from './meshRefs';
 import * as THREE from 'three';
 import {SpotLightWithHelper} from "./SpotLightWithHelper";
@@ -358,6 +359,19 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
   
     // Return the root objects (those without a parent)
     return Array.from(objectMap.values()).filter((obj) => !obj.parent);
+  }
+
+  function getPositionInFrontOfCamera(cameraState, distance = 2) {
+    const [x, y, z] = cameraState.position;
+    const [, ry] = cameraState.rotation; // Yaw (độ)
+
+    const rad = THREE.MathUtils.degToRad(ry);
+
+    return [
+      x - Math.sin(rad) * distance,
+      1.5, // khóa chiều cao model
+      z - Math.cos(rad) * distance
+    ];
   }
 
   // Rebuild the object tree whenever objs changes
@@ -2082,6 +2096,24 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
           }
         };
       }
+    },
+    createModelFromGLB: (glbUrl) => {
+      const cam = getCurrentCameraState();
+      if (!cam) return;
+
+      const pos = getPositionInFrontOfCamera(cam, 2);
+
+      const newModel = {
+        id: `model-${Date.now()}`,
+        type: "model",
+        src: glbUrl,
+        position: pos,
+        rotation: [0, cam.rotation[1], 0],
+        scale: [1.5, 1.5, 1.5],
+      };
+
+      setObjs(prev => [...prev, newModel]);
+      onObjectsChange?.([...objs, newModel]);
     }
   }));
 
@@ -2267,7 +2299,29 @@ const Scene = forwardRef(({ mode, selectedId, setSelectedId, objects, objectData
             />
           );
         }
-    }
+    } 
+    else if (object.type === "model") {
+        return (
+          <SimpleModel3D
+            key={object.id}
+            id={object.id}
+            src={object.src}
+            position={object.position}
+            rotation={object.rotation}
+            scale={object.scale}
+            mode={mode}
+            selectedId={selectedId}
+            gizmoMode={gizmoMode}
+            gizmoActive={gizmoActive}
+            snapEnabled={snapEnabled}
+            setSelectedId={setSelectedId}
+            setPopupVisible={setPopupVisible}
+            setPopupPosition={setPopupPosition}
+            setPopupData={setPopupData}
+            onTransformChange={handleTransformChange}
+          />
+        );
+      }
     return null;
   };
 
