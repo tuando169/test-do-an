@@ -1,7 +1,7 @@
 import axiosClient from '../common/axiosClient';
 import { apiEndpoints } from '../common/constants';
 import { RoomData, RoomUploadData } from '../common/types';
-import slugify from 'slugify'
+import slugify from 'slugify';
 
 export const RoomApi = {
   // Lấy danh sách phòng public
@@ -88,23 +88,10 @@ export const RoomApi = {
   // Tạo phòng
   async create(payload: RoomUploadData): Promise<RoomData> {
     try {
-      const rooms = await RoomApi.getAll();
-      const same = rooms.filter((r) => r.title?.startsWith(payload.title!));
-
-      if (same.length > 0) {
-        payload.title = `${payload.title} ${same.length + 1}`;
-      }
-
-      // Slug
-      const slugBase = payload.title
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/đ/g, 'd')
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
-
-      const finalSlug = `${localStorage.getItem('user')}-${slugBase}`;
+      const finalTitle = payload.title?.trim();
+      const finalSlug = `${slugify(finalTitle)}-${localStorage
+        .getItem('user')
+        ?.substring(0, 6)}`;
       const formData = new FormData();
 
       formData.append('title', payload.title!);
@@ -159,8 +146,7 @@ export const RoomApi = {
       let finalSlug = updateData.slug;
 
       if (finalTitle) {
-
-        finalSlug = `${slugify(finalTitle)}-${localStorage.getItem('user')}-${updateData.id.substring(0, 6)}`;
+        finalSlug = `${slugify(finalTitle)}-${updateData.id.substring(0, 6)}`;
 
         updateData.title = finalTitle;
         updateData.slug = finalSlug;
