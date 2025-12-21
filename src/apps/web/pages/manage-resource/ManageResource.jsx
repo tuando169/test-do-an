@@ -281,7 +281,7 @@ export default function ManageResource() {
               Tổng số tài nguyên:{' '}
               <span className='font-semibold text-2xl'>
                 {images.length +
-                  objects.length +
+                  (userRole == RoleEnum.Admin ? objects.length : 0) +
                   audios.length +
                   (userRole == RoleEnum.Admin ? textures.length : 0)}{' '}
                 {userRole != RoleEnum.Admin && (
