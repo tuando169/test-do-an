@@ -1,9 +1,10 @@
-// let BASE_URL = "http://localhost:8000";
+// "http://localhost:8000";
+// "https://threed-gallery-be.onrender.com";
 let BASE_URL =
-  import.meta.env.VITE_API_URL || 'https://3d-gallery-be.vercel.app';
+  import.meta.env.VITE_API_URL || 'https://threed-gallery-be.onrender.com';
 
 if (import.meta.env.MODE === 'production')
-  BASE_URL = 'https://3d-gallery-be.vercel.app';
+  BASE_URL = 'https://threed-gallery-be.onrender.com';
 
 const AI_URL = 'https://zipppier-henry-bananas.ngrok-free.dev';
 
