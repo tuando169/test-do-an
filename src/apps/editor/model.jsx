@@ -92,6 +92,15 @@ export const SimpleModel3D = ({
     initedRef.current = true;
   }, []);
 
+  useEffect(() => {
+    if (!pivotRef.current || !initedRef.current) return;
+
+    if (gizmoActive.current) return; 
+
+    pivotRef.current.position.fromArray(position);
+    pivotRef.current.scale.fromArray(scale);
+  }, [position, rotation, scale]);
+
   /**
    * AUTO PLAY ANIMATION (NẾU CÓ)
    */
@@ -131,19 +140,13 @@ export const SimpleModel3D = ({
     selectedId === id &&
     isValidGizmoMode(gizmoMode);
 
-  const handleTransformCommit = ({ position: p, rotation: r, scale: s }) => {
-    onTransformChange?.(id, {
-      position: p ? (Array.isArray(p) ? p : p.toArray()) : undefined,
-      rotation: r
-        ? [
-            THREE.MathUtils.radToDeg(r.x),
-            THREE.MathUtils.radToDeg(r.y),
-            THREE.MathUtils.radToDeg(r.z),
-          ]
-        : undefined,
-      scale: s ? (Array.isArray(s) ? s : s.toArray()) : undefined,
-    });
-  };
+  const handleTransformCommit = ({ position, rotation, scale }) => {
+  onTransformChange?.(id, {
+    position,
+    rotation,
+    scale,
+  });
+};
 
   return (
     <Fragment>
@@ -154,6 +157,7 @@ export const SimpleModel3D = ({
           mode={gizmoMode}
           gizmoActive={gizmoActive}
           snapEnabled={snapEnabled}
+          objectType="model" 
           onTransformChange={handleTransformCommit}
         />
       )}

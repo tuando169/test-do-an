@@ -130,7 +130,7 @@ const App = () => {
           ],
           rotation: [
             0,
-            -26.1,
+            90,
             0
           ],
           src: "https://sesvbrqnsrvnpgjxfwks.supabase.co/storage/v1/object/public/object3d/1766251943609_generated_object.glb"
