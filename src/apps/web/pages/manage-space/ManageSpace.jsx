@@ -509,17 +509,12 @@ export default function ManageSpace() {
                     />
                   </div>
 
-                  <div className={`text-lg font-bold text-[#2e2e2e] truncate `}>
-                    {space.title}
-                  </div>
-
-                  {tab == 'buyed-template' &&
-                    filteredSpaces.find((s) => s.id == space.id) && (
-                      <div className=' text-green-600 font-semibold truncate flex items-center gap-1'>
-                        <MdCheck /> Đã mua
-                      </div>
-                    )}
-                  <div>
+                  <div className='flex justify-between'>
+                    <div
+                      className={`text-lg font-bold text-[#2e2e2e] truncate `}
+                    >
+                      {space.title}
+                    </div>
                     {space.price && (
                       <div className=' text-[#2e2e2e] truncate'>
                         {formatMoney(space.price)} VND
@@ -529,6 +524,13 @@ export default function ManageSpace() {
                       <div className=' text-[#2e2e2e] truncate'>Miễn phí</div>
                     )}
                   </div>
+                  {tab == 'buyed-template' &&
+                    filteredSpaces.find((s) => s.id == space.id) && (
+                      <div className=' text-green-600 font-semibold truncate flex items-center gap-1'>
+                        <MdCheck /> Đã mua
+                      </div>
+                    )}
+                  <div></div>
                   <div className='flex flex-col gap-2 mt-auto pt-4'>
                     {/* HÀNH ĐỘNG CHO TEMPLATE */}
 

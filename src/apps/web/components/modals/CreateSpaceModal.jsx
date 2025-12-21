@@ -13,6 +13,7 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
 
   const [myTemplateRooms, setMyTemplateRooms] = useState([]);
   const [publicTemplateRooms, setPublicTemplateRooms] = useState([]);
+  const [templates, setTemplates] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const [showCreatePopup, setShowCreatePopup] = useState(false);
@@ -39,16 +40,16 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
         merge.push(pt);
       }
     });
-    setMyTemplateRooms(merge);
-    setPublicTemplateRooms(
-      publicTemplates.sort((a, b) => {
+    setMyTemplateRooms(myTemplates);
+    setPublicTemplateRooms(publicTemplates);
+    setTemplates(merge);
+    setTemplates(
+      merge.sort((a, b) => {
         const aIn = myTemplates.find((t) => t.id === a.id);
         const bIn = myTemplates.find((t) => t.id === b.id);
 
-        // a không có, b có → b lên trước
         if (!aIn && bIn) return 1;
 
-        // a có, b không → a lên trước
         if (aIn && !bIn) return -1;
 
         return 0;
@@ -60,7 +61,7 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
     fetchTemplates();
   }, [isVisible]);
 
-  const filteredSpaces = publicTemplateRooms.filter((item) =>
+  const filteredSpaces = templates.filter((item) =>
     item.title.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
