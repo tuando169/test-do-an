@@ -127,6 +127,7 @@ export default function ManageSpace() {
         api.success({ message: 'Đã lấy mẫu miễn phí thành công' });
         loadSpaces();
       });
+      return;
     }
     try {
       const returnUrl = window.location.href;
