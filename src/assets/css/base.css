@@ -38,3 +38,27 @@
   background-color: #2e2e2e;
   color: white;
 }
+
+/* ==== GLOBAL (Chrome/Edge/Safari) ==== */
+*::-webkit-scrollbar {
+  width: 6px; /* chiều rộng thanh cuộn dọc */
+  height: 6px; /* chiều cao thanh cuộn ngang */
+}
+
+*::-webkit-scrollbar-track {
+  background: #ccc;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #2e2e2e, #2e2e2e);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #fde047, #facc15);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}

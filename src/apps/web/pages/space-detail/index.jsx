@@ -64,28 +64,29 @@ function Space() {
                 <div className='font-bold text-[80px]'>{khongGian?.title}</div>
                 <div className='Space__inner__info text-xl gap-5'>
                   <div className='flex flex-col gap-2 font-semibold'>
-                    <div className='Space__inner__info__item__item'>
+                    <div className='Space__inner__info__item__item min-w-max'>
                       Nghệ sĩ
                     </div>
-                    <div className='Space__inner__info__item__item'>
+                    <div className='Space__inner__info__item__item min-w-max'>
                       Thể loại
                     </div>
-                    <div className='Space__inner__info__item__item'>Mô tả</div>
+                    <div className='Space__inner__info__item__item min-w-max'>
+                      Mô tả
+                    </div>
                   </div>
-                  <div className='flex flex-col gap-2'>
+                  <div className='flex flex-col gap-2 font-medium'>
                     <div className='Space__inner__info__item2__item'>
                       {khongGian?.author}
                     </div>
                     <div className='Space__inner__info__item2__item'>
                       {khongGian?.type}
                     </div>
-                    <div className='Space__inner__info__item2__item'>
-                      {descriptionParts.map((part, index) => (
-                        <div key={index} className='Space__inner__des'>
-                          {part.trim()}
-                        </div>
-                      ))}
-                    </div>
+                    <div
+                      className='max-h-[30vh] overflow-y-auto overflow-x-hidden'
+                      dangerouslySetInnerHTML={{
+                        __html: khongGian.description,
+                      }}
+                    ></div>
                   </div>
                 </div>
                 <div className='flex gap-3 mt-4 justify-end'>
