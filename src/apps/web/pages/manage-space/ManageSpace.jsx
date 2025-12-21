@@ -18,6 +18,7 @@ import CreateSpaceInfoModal from '../../components/modals/CreateSpaceInfoModal';
 import { PaymentApi } from '@/api/paymentApi';
 import { formatMoney } from '@/common/utils';
 import { LicenseApi } from '@/api/licenseApi';
+import CreateSpaceModal from '../../components/modals/CreateSpaceModal';
 
 export default function ManageSpace() {
   const [api, contextHolder] = notification.useNotification();
@@ -262,7 +263,7 @@ export default function ManageSpace() {
         onSuccess={loadSpaces}
       />
 
-      <CreateSpaceInfoModal
+      <CreateSpaceModal
         isVisible={showCreate}
         onClose={() => {
           setCreateForm({
@@ -381,7 +382,7 @@ export default function ManageSpace() {
               )}
             {tab === 'exhibition' && (
               <button
-                onClick={() => setShowCreateFromTemplate(true)}
+                onClick={() => setShowCreate(true)}
                 className='flex items-center gap-2 primary-button'
               >
                 <MdAdd size={20} /> Tạo không gian
