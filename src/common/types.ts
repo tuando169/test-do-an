@@ -146,15 +146,30 @@ export interface LicenseData {
   id: string;
   title: string;
 
-  price: number
-  media_limit: number
-  space_limit: number
+  price: number;
+  media_limit: number;
+  space_limit: number;
 }
 
 export interface LicenseUploadData {
   title: string;
 
-  price: number
-  media_limit: number
-  space_limit: number
+  price: number;
+  media_limit: number;
+  space_limit: number;
 }
+
+export type PaginationMeta = {
+  page: number;
+  page_size: number;
+  total_count: number;
+  total_pages: number;
+  current_page_count: number;
+  has_next: boolean;
+  has_prev: boolean;
+};
+
+export type PaginatedResponse<T> = {
+  results: T[];
+  pagination: PaginationMeta;
+};

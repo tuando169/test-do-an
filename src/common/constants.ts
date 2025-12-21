@@ -38,8 +38,8 @@ export const apiEndpoints = {
     deleteById: (id: string) => `${BASE_URL}/room/${id}`,
     template: {
       getPublic: `${BASE_URL}/room/template`,
+      getAll: `${BASE_URL}/room/template/all`,
       buy: `${BASE_URL}/room/buy-template`,
-      removeTemplate: (id: string) => `${BASE_URL}/room/remove-template/${id}`,
     },
   },
   user: {

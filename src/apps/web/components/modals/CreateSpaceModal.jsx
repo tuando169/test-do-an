@@ -9,6 +9,7 @@ import CreateSpaceInfoModal from './CreateSpaceInfoModal';
 export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
   const [api, contextHolder] = notification.useNotification();
 
+  const [myTemplateRooms, setMyTemplateRooms] = useState([]);
   const [templateRooms, setTemplateRooms] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
 
@@ -29,10 +30,26 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
 
   useEffect(() => {
     if (!isVisible) return;
+    const fetchTemplates = async () => {
+      const publicTemplates = await RoomApi.getPublicTemplateList();
+      const myTemplates = await RoomApi.getTemplateRoomList();
+      setMyTemplateRooms(myTemplates);
+      setTemplateRooms(
+        publicTemplates.sort((a, b) => {
+          const aIn = myTemplates.find((t) => t.id === a.id);
+          const bIn = myTemplates.find((t) => t.id === b.id);
 
-    RoomApi.getPublicTemplateList()
-      .then((data) => setTemplateRooms(data))
-      .catch((e) => console.error(e));
+          // a không có, b có → b lên trước
+          if (!aIn && bIn) return 1;
+
+          // a có, b không → a lên trước
+          if (aIn && !bIn) return -1;
+
+          return 0;
+        })
+      );
+    };
+    fetchTemplates();
   }, [isVisible]);
 
   const filteredSpaces = templateRooms.filter((item) =>
@@ -127,22 +144,41 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
                       XEM TRƯỚC
                       <MdArrowOutward className='ml-1' />
                     </div>
-                    <div
-                      className='primary-button flex items-center justify-center'
-                      onClick={() => {
-                        setFormData({
-                          title: room.title,
-                          type: room.type,
-                          visibility: 'private',
-                          thumbnail: room.thumbnail,
-                          room_json: room.room_json,
-                        });
-                        setShowCreatePopup(true);
-                      }}
-                    >
-                      TẠO TỪ MẪU
-                      <MdArrowOutward className='ml-1' />
-                    </div>
+                    {myTemplateRooms.find((t) => t.id === room.id) ? (
+                      <div
+                        className='primary-button flex items-center justify-center'
+                        onClick={() => {
+                          setFormData({
+                            title: room.title,
+                            type: room.type,
+                            visibility: 'private',
+                            thumbnail: room.thumbnail,
+                            room_json: room.room_json,
+                          });
+                          setShowCreatePopup(true);
+                        }}
+                      >
+                        TẠO TỪ MẪU
+                        <MdArrowOutward className='ml-1' />
+                      </div>
+                    ) : (
+                      <div
+                        className='primary-button flex items-center justify-center'
+                        onClick={() => {
+                          setFormData({
+                            title: room.title,
+                            type: room.type,
+                            visibility: 'private',
+                            thumbnail: room.thumbnail,
+                            room_json: room.room_json,
+                          });
+                          setShowCreatePopup(true);
+                        }}
+                      >
+                        MUA MẪU
+                        <MdArrowOutward className='ml-1' />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
