@@ -12,7 +12,7 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
   const [api, contextHolder] = notification.useNotification();
 
   const [myTemplateRooms, setMyTemplateRooms] = useState([]);
-  const [templateRooms, setTemplateRooms] = useState([]);
+  const [publicTemplateRooms, setPublicTemplateRooms] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const [showCreatePopup, setShowCreatePopup] = useState(false);
@@ -33,8 +33,14 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
   const fetchTemplates = async () => {
     const publicTemplates = await RoomApi.getPublicTemplateList();
     const myTemplates = await RoomApi.getTemplateRoomList();
-    setMyTemplateRooms(myTemplates);
-    setTemplateRooms(
+    const merge = [...myTemplates];
+    publicTemplates.forEach((pt) => {
+      if (!merge.find((mt) => mt.id === pt.id)) {
+        merge.push(pt);
+      }
+    });
+    setMyTemplateRooms(merge);
+    setPublicTemplateRooms(
       publicTemplates.sort((a, b) => {
         const aIn = myTemplates.find((t) => t.id === a.id);
         const bIn = myTemplates.find((t) => t.id === b.id);
@@ -54,7 +60,7 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
     fetchTemplates();
   }, [isVisible]);
 
-  const filteredSpaces = templateRooms.filter((item) =>
+  const filteredSpaces = publicTemplateRooms.filter((item) =>
     item.title.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 

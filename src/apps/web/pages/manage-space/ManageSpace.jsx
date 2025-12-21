@@ -43,6 +43,7 @@ export default function ManageSpace() {
   const [allTemplates, setAllTemplates] = useState([]);
   const [showCreateFromTemplate, setShowCreateFromTemplate] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  const [showCreateTemplate, setShowCreateTemplate] = useState(false);
 
   const [createForm, setCreateForm] = useState({
     templateId: '',
@@ -264,6 +265,15 @@ export default function ManageSpace() {
         onSuccess={loadSpaces}
       />
 
+      <CreateSpaceInfoModal
+        isVisible={showCreateTemplate}
+        mode='template'
+        onClose={() => {
+          setShowCreateTemplate(false);
+        }}
+        onSuccess={loadSpaces}
+      />
+
       <CreateSpaceModal
         isVisible={showCreate}
         onClose={() => {
@@ -368,7 +378,7 @@ export default function ManageSpace() {
             }
           `}
               >
-                KHÔNG GIAN MẪU ĐÃ MUA
+                CHỢ KHÔNG GIAN MẪU
               </button>
             </>
           )}
@@ -378,7 +388,7 @@ export default function ManageSpace() {
                 userRole === RoleEnum.Designer) && (
                 <div className='flex ml-auto'>
                   <button
-                    onClick={() => setShowCreate(true)}
+                    onClick={() => setShowCreateTemplate(true)}
                     className='flex items-center gap-2 primary-button'
                   >
                     <MdAdd size={20} /> Tạo không gian mẫu
