@@ -106,6 +106,13 @@ export default function ModalCreateResource({
         });
         return;
       }
+      if (err?.response?.status === 400) {
+        api.error({
+          message: 'Lỗi',
+          description: 'Vui lòng điền đầy đủ thông tin.',
+        });
+        return;
+      }
       api.error({
         message: 'Lỗi',
         description: err?.message || 'Có lỗi xảy ra, vui lòng thử lại',
