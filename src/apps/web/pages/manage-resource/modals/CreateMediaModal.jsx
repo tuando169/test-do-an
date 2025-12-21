@@ -473,7 +473,7 @@ export default function ModalCreateResource({
                         className='secondary-button text-nowrap'
                         onClick={handleGenerateObject}
                       >
-                        {loading ? 'Đang tạo...' : 'Tạo'}
+                        {loading ? 'Đang tạo...' : 'Tạo Object 3D'}
                       </div>
                     </div>
 
