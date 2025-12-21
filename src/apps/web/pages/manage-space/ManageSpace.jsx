@@ -291,11 +291,11 @@ export default function ManageSpace() {
             <p className=' text-xl'>
               Tổng không gian:{' '}
               <span className='font-semibold text-2xl'>
-                {
-                  spaces.filter(
-                    (r) => r.owner_id === localStorage.getItem('user')
-                  ).length
-                }{' '}
+                {userRole == RoleEnum.Admin
+                  ? spaces.length
+                  : spaces.filter(
+                      (r) => r.owner_id === localStorage.getItem('user')
+                    ).length}{' '}
                 {userRole != RoleEnum.Admin && (
                   <span>/ {licenses ? licenses.space_limit : 0}</span>
                 )}
