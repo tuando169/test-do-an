@@ -515,12 +515,11 @@ export default function ManageSpace() {
                     >
                       {space.title}
                     </div>
-                    {space.price && (
+                    {space.price ? (
                       <div className=' text-[#2e2e2e] truncate'>
                         {formatMoney(space.price)} VND
                       </div>
-                    )}
-                    {!space.price && (
+                    ) : (
                       <div className=' text-[#2e2e2e] truncate'>Miễn phí</div>
                     )}
                   </div>
