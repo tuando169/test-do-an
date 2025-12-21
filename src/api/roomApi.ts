@@ -180,7 +180,6 @@ export const RoomApi = {
 
       const formData = new FormData();
       if (updateData.title) formData.append('title', updateData.title);
-      if (updateData.slug) formData.append('slug', updateData.slug);
       if (updateData.description)
         formData.append('description', updateData.description);
       if (updateData.visibility)
