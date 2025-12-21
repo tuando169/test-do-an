@@ -284,15 +284,19 @@ export default function ManageResource() {
                   objects.length +
                   audios.length +
                   (userRole == RoleEnum.Admin ? textures.length : 0)}{' '}
-                / {licenses ? licenses.media_limit : 0}
+                {userRole != RoleEnum.Admin && (
+                  <span>/ {licenses ? licenses.media_limit : 0}</span>
+                )}
               </span>
             </span>
-            <button
-              className='secondary-button'
-              onClick={() => (window.location.href = '/pricing')}
-            >
-              Nâng cấp tài khoản
-            </button>
+            {userRole != RoleEnum.Admin && (
+              <button
+                className='secondary-button'
+                onClick={() => (window.location.href = '/pricing')}
+              >
+                Nâng cấp tài khoản
+              </button>
+            )}
           </div>
         </div>
         <div className='flex border-b mb-6  w-full items-end'>

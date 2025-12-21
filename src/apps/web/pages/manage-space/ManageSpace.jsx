@@ -296,15 +296,19 @@ export default function ManageSpace() {
                     (r) => r.owner_id === localStorage.getItem('user')
                   ).length
                 }{' '}
-                / {licenses ? licenses.space_limit : 0}
+                {userRole != RoleEnum.Admin && (
+                  <span>/ {licenses ? licenses.space_limit : 0}</span>
+                )}
               </span>
             </p>
-            <button
-              className='secondary-button'
-              onClick={() => (window.location.href = '/pricing')}
-            >
-              Nâng cấp tài khoản
-            </button>
+            {userRole != RoleEnum.Admin && (
+              <button
+                className='secondary-button'
+                onClick={() => (window.location.href = '/pricing')}
+              >
+                Nâng cấp tài khoản
+              </button>
+            )}
           </div>
         </div>
 
