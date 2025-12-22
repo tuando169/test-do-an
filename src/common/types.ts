@@ -117,6 +117,19 @@ export interface MediaData {
   created_at: string;
 }
 
+// dùng khi POST /image
+export interface ImageCreateData {
+  file: File;
+  title?: string;
+  room_id?: string[];
+}
+
+// dùng khi PATCH /image/:id (metadata)
+export interface ImageUpdateMetadataData {
+  title?: string;
+  metadata: Record<string, any>;
+}
+
 export interface MediaUploadData {
   title: string;
   file: File;

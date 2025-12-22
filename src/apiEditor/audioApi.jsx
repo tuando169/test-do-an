@@ -1,6 +1,6 @@
 import { fetchWithAuth, getAccessToken, forceLogout } from "./authApi.jsx";
 
-const BASE_URL = "https://3d-gallery-be.vercel.app";
+const BASE_URL = "https://threed-gallery-be.onrender.com";
 
 /**
  * Upload audio file đến server Supabase Function /audio

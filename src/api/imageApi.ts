@@ -1,47 +1,42 @@
 import axiosClient from '../common/axiosClient';
 import { apiEndpoints } from '../common/constants';
-import { MediaData, MediaUploadData } from '../common/types';
+import { ImageUpdateMetadataData, MediaData, MediaUploadData, ImageCreateData } from '../common/types';
+import { buildMediaFormData } from './helpers/buildMediaFormData';
 
 export const ImageApi = {
-  async create(data: MediaUploadData): Promise<void> {
-    try {
-      const formData = new FormData();
-      formData.append('file', data.file);
-      formData.append('title', data.title);
-      if (data.room_id)
-        data.room_id.forEach((id, index) =>
-          formData.append(`room_id${index}`, id)
-        );
+  // 1. CREATE IMAGE (chỉ upload file)
+  async create(data: ImageCreateData): Promise<MediaData> {
+    const formData = new FormData();
+    formData.append('file', data.file);
 
-      const res = await axiosClient.post(apiEndpoints.image.create, formData);
-
-      return res.data;
-    } catch (err: any) {
-      console.error('MediaApi.upload error:', err);
-      return Promise.reject(err);
+    if (data.title) formData.append('title', data.title);
+    if (data.room_id?.length) {
+      data.room_id.forEach((id, i) =>
+        formData.append(`room_id${i}`, id)
+      );
     }
+
+    const res = await axiosClient.post(
+      apiEndpoints.image.create,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+
+    return res.data;
   },
 
-  async update(id: string, data: MediaUploadData): Promise<void> {
-    try {
-      const formData = new FormData();
-      formData.append('file', data.file);
-      formData.append('title', data.title);
-      if (data.room_id)
-        data.room_id.forEach((id, index) =>
-          formData.append(`room_id${index}`, id)
-        );
+  // 2. UPDATE METADATA (KHÔNG gửi file)
+  async updateMetadata(
+    id: string,
+    data: ImageUpdateMetadataData
+  ): Promise<MediaData> {
+    const res = await axiosClient.patch(
+      apiEndpoints.image.updateById(id),
+      data, // 👈 JSON RAW
+      { headers: { 'Content-Type': 'application/json' } }
+    )
 
-      const res = await axiosClient.patch(
-        apiEndpoints.image.updateById(id),
-        formData
-      );
-
-      return res.data;
-    } catch (err: any) {
-      console.error('MediaApi.upload error:', err);
-      throw err;
-    }
+    return res.data
   },
 
   async getList() {

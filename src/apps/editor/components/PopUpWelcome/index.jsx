@@ -55,7 +55,7 @@ const PopUpWelcome = ({ open, handleClose, exhibition }) => {
                         }}
                     >
                         <div className='popUpMove__image' style={{ marginBottom: '10px' }}>
-                            <img src={exhibition?.thumbnail_url || exhibition?.cover_image_url}/>
+                            <img src={exhibition?.thumbnail || exhibition?.cover_image_url}/>
                         </div>
                         <div className='popUpMove__content title' style={{ marginBottom: '20px' }}>
                             {exhibition?.title || exhibition?.name}

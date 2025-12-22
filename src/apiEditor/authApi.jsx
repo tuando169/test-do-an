@@ -2,7 +2,7 @@ import { setCookie, getCookie, deleteAllCookies } from "./Cookies";
 import axiosClient from "../common/axiosClient";
 import { apiEndpoints } from "../common/constants";
 
-const BASE_URL = "https://3d-gallery-be.vercel.app";
+const BASE_URL = "https://threed-gallery-be.onrender.com";
 
 let currentUser = null;
 let hasLoggedOut = false;

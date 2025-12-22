@@ -1,6 +1,6 @@
 import { fetchWithAuth, getAccessToken, forceLogout } from "./authApi.jsx";
 
-const BASE_URL = "https://3d-gallery-be.vercel.app";
+const BASE_URL = "https://threed-gallery-be.onrender.com";
 
 export async function getObject3DList(params = {}) {
     try {

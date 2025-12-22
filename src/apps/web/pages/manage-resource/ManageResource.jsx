@@ -9,6 +9,8 @@ import { TextureApi } from '@/api/textureApi';
 import { UserApi } from '@/api/userApi';
 import { RoleEnum } from '@/common/constants';
 import { LicenseApi } from '@/api/licenseApi';
+import ImageCreateWithMetadataModal from './modals/ImageCreateWithMetadataModal';
+import ImageEditModal from './modals/ImageEditModal'
 
 export default function ManageResource() {
   const [api, contextHolder] = notification.useNotification();
@@ -24,6 +26,10 @@ export default function ManageResource() {
   const [displayData, setDisplayData] = useState([]);
 
   const [modalOpen, setModalOpen] = useState(false);
+
+  const [imageMetaOpen, setImageMetaOpen] = useState(false);
+  const [imageEditOpen, setImageEditOpen] = useState(false)
+  const [selectedImage, setSelectedImage] = useState(null)
 
   const [form, setForm] = useState({
     title: '',
@@ -158,6 +164,11 @@ export default function ManageResource() {
 
   // ========== POPUP ==========
   const openEdit = (item) => {
+    if (tab === 'image') {
+      setSelectedImage(item)
+      setImageEditOpen(true)
+      return
+    }
     if (tab === 'texture') {
       setForm({
         id: item.id,
@@ -271,6 +282,25 @@ export default function ManageResource() {
         onSuccess={onCreateMediaSuccess}
       />
 
+      <ImageCreateWithMetadataModal
+        open={imageMetaOpen}
+        onClose={() => setImageMetaOpen(false)}
+        onSuccess={() => {
+          loadImages();
+          api.success({
+            title: 'Thành công',
+            description: 'Tạo tranh mới kèm metadata thành công.',
+          });
+        }}
+      />
+
+      <ImageEditModal
+        open={imageEditOpen}
+        image={selectedImage}
+        onClose={() => setImageEditOpen(false)}
+        onSuccess={() => loadImages()}
+      />
+
       <div className='container-main mx-auto flex flex-col mt-10'>
         <div className='flex flex-col  mb-4'>
           <h1 className='text-3xl font-bold text-[#2e2e2e] uppercase mb-2'>
@@ -334,7 +364,13 @@ export default function ManageResource() {
           )}
 
           <button
-            onClick={openCreate}
+            onClick={() => {
+              if (tab === 'image') {
+                setImageMetaOpen(true);   // 👉 mở popup metadata ảnh
+              } else {
+                openCreate();             // 👉 modal cũ cho object/audio/texture
+              }
+            }}
             className='ml-auto flex items-center gap-2 primary-button'
           >
             <MdAdd size={20} /> Thêm Mới

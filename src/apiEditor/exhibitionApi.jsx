@@ -1,7 +1,7 @@
 import { fetchWithAuth, initCurrentUser, getUserInfo } from "./authApi";
 import { getAllRoomTemplates } from "./roomTemplateApi";
 
-const BASE_URL = "https://3d-gallery-be.vercel.app";
+const BASE_URL = "https://threed-gallery-be.onrender.com";
 const PUBLIC_API_KEY = "3D_GALLERY_PUBLIC_API_2025_VS";
 
 /**
