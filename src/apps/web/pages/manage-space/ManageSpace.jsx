@@ -43,6 +43,7 @@ export default function ManageSpace() {
   const [allTemplates, setAllTemplates] = useState([]);
   const [showCreateFromTemplate, setShowCreateFromTemplate] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  const [showCreateTemplate, setShowCreateTemplate] = useState(false);
 
   const [createForm, setCreateForm] = useState({
     templateId: '',
@@ -127,6 +128,7 @@ export default function ManageSpace() {
         api.success({ message: 'Đã lấy mẫu miễn phí thành công' });
         loadSpaces();
       });
+      return;
     }
     try {
       const returnUrl = window.location.href;
@@ -263,6 +265,15 @@ export default function ManageSpace() {
         onSuccess={loadSpaces}
       />
 
+      <CreateSpaceInfoModal
+        isVisible={showCreateTemplate}
+        mode='template'
+        onClose={() => {
+          setShowCreateTemplate(false);
+        }}
+        onSuccess={loadSpaces}
+      />
+
       <CreateSpaceModal
         isVisible={showCreate}
         onClose={() => {
@@ -367,7 +378,7 @@ export default function ManageSpace() {
             }
           `}
               >
-                KHÔNG GIAN MẪU ĐÃ MUA
+                CHỢ KHÔNG GIAN MẪU
               </button>
             </>
           )}
@@ -377,7 +388,7 @@ export default function ManageSpace() {
                 userRole === RoleEnum.Designer) && (
                 <div className='flex ml-auto'>
                   <button
-                    onClick={() => setShowCreate(true)}
+                    onClick={() => setShowCreateTemplate(true)}
                     className='flex items-center gap-2 primary-button'
                   >
                     <MdAdd size={20} /> Tạo không gian mẫu
@@ -498,26 +509,27 @@ export default function ManageSpace() {
                     />
                   </div>
 
-                  <div className={`text-lg font-bold text-[#2e2e2e] truncate `}>
-                    {space.title}
+                  <div className='flex justify-between'>
+                    <div
+                      className={`text-lg font-bold text-[#2e2e2e] truncate `}
+                    >
+                      {space.title}
+                    </div>
+                    {space.price ? (
+                      <div className=' text-[#2e2e2e] truncate'>
+                        {formatMoney(space.price)} VND
+                      </div>
+                    ) : (
+                      <div className=' text-[#2e2e2e] truncate'>Miễn phí</div>
+                    )}
                   </div>
-
                   {tab == 'buyed-template' &&
                     filteredSpaces.find((s) => s.id == space.id) && (
                       <div className=' text-green-600 font-semibold truncate flex items-center gap-1'>
                         <MdCheck /> Đã mua
                       </div>
                     )}
-                  <div>
-                    {space.price && (
-                      <div className=' text-[#2e2e2e] truncate'>
-                        {formatMoney(space.price)} VND
-                      </div>
-                    )}
-                    {!space.price && (
-                      <div className=' text-[#2e2e2e] truncate'>Miễn phí</div>
-                    )}
-                  </div>
+                  <div></div>
                   <div className='flex flex-col gap-2 mt-auto pt-4'>
                     {/* HÀNH ĐỘNG CHO TEMPLATE */}
 

@@ -5,12 +5,15 @@ import { RoomApi } from '@/api/roomApi';
 import { notification } from 'antd';
 import Modal from '@/apps/web/components/modal';
 import CreateSpaceInfoModal from './CreateSpaceInfoModal';
+import { formatMoney } from '@/common/utils';
+import { PaymentApi } from '@/api/paymentApi';
 
 export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
   const [api, contextHolder] = notification.useNotification();
 
   const [myTemplateRooms, setMyTemplateRooms] = useState([]);
-  const [templateRooms, setTemplateRooms] = useState([]);
+  const [publicTemplateRooms, setPublicTemplateRooms] = useState([]);
+  const [templates, setTemplates] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
 
   const [showCreatePopup, setShowCreatePopup] = useState(false);
@@ -28,31 +31,37 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
     handleClose();
   }
 
+  const fetchTemplates = async () => {
+    const publicTemplates = await RoomApi.getPublicTemplateList();
+    const myTemplates = await RoomApi.getTemplateRoomList();
+    const merge = [...myTemplates];
+    publicTemplates.forEach((pt) => {
+      if (!merge.find((mt) => mt.id === pt.id)) {
+        merge.push(pt);
+      }
+    });
+    setMyTemplateRooms(myTemplates);
+    setPublicTemplateRooms(publicTemplates);
+    setTemplates(merge);
+    setTemplates(
+      merge.sort((a, b) => {
+        const aIn = myTemplates.find((t) => t.id === a.id);
+        const bIn = myTemplates.find((t) => t.id === b.id);
+
+        if (!aIn && bIn) return 1;
+
+        if (aIn && !bIn) return -1;
+
+        return 0;
+      })
+    );
+  };
   useEffect(() => {
     if (!isVisible) return;
-    const fetchTemplates = async () => {
-      const publicTemplates = await RoomApi.getPublicTemplateList();
-      const myTemplates = await RoomApi.getTemplateRoomList();
-      setMyTemplateRooms(myTemplates);
-      setTemplateRooms(
-        publicTemplates.sort((a, b) => {
-          const aIn = myTemplates.find((t) => t.id === a.id);
-          const bIn = myTemplates.find((t) => t.id === b.id);
-
-          // a không có, b có → b lên trước
-          if (!aIn && bIn) return 1;
-
-          // a có, b không → a lên trước
-          if (aIn && !bIn) return -1;
-
-          return 0;
-        })
-      );
-    };
     fetchTemplates();
   }, [isVisible]);
 
-  const filteredSpaces = templateRooms.filter((item) =>
+  const filteredSpaces = templates.filter((item) =>
     item.title.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
@@ -66,6 +75,38 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
       room_json: {},
     });
     onClose();
+  }
+
+  async function openPayment(template) {
+    if (!template.price) {
+      RoomApi.buyTemplates(template.id).then(() => {
+        api.success({ message: 'Đã lấy mẫu miễn phí thành công' });
+        fetchTemplates();
+      });
+      return;
+    }
+    try {
+      const returnUrl = window.location.href;
+      const cancelUrl = window.location.href;
+
+      const data = await PaymentApi.createTemplatePaymentLink(
+        template.id,
+        returnUrl,
+        cancelUrl
+      );
+
+      if (data && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        api.error({ message: 'Không lấy được link thanh toán' });
+      }
+    } catch (error) {
+      console.error('Lỗi thanh toán:', error);
+      api.error({
+        message: 'Lỗi tạo giao dịch',
+        description: 'Vui lòng thử lại sau.',
+      });
+    }
   }
 
   return (
@@ -121,11 +162,30 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
                     <div>
                       <div>Nghệ sĩ</div>
                       <div>Thể loại</div>
+                      <div>Giá</div>
                     </div>
 
                     <div className='ml-6 font-semibold'>
                       <div>{room.author}</div>
                       <div>{room.type}</div>
+                      {myTemplateRooms.find((t) => t.id === room.id) ? (
+                        <div className='flex items-center gap-2'>
+                          <span>Đã mua</span>
+                          <span className='font-normal'>
+                            (
+                            {room.price
+                              ? formatMoney(room.price) + ' VND'
+                              : 'Miễn phí'}
+                            )
+                          </span>
+                        </div>
+                      ) : (
+                        <div>
+                          {room.price
+                            ? formatMoney(room.price) + ' VND'
+                            : 'Miễn phí'}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -163,19 +223,13 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
                       </div>
                     ) : (
                       <div
-                        className='primary-button flex items-center justify-center'
-                        onClick={() => {
-                          setFormData({
-                            title: room.title,
-                            type: room.type,
-                            visibility: 'private',
-                            thumbnail: room.thumbnail,
-                            room_json: room.room_json,
-                          });
-                          setShowCreatePopup(true);
+                        className='primary-button flex items-center justify-center uppercase'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openPayment(room);
                         }}
                       >
-                        MUA MẪU
+                        {room.price ? 'Mua mẫu' : 'Lấy miễn phí'}
                         <MdArrowOutward className='ml-1' />
                       </div>
                     )}

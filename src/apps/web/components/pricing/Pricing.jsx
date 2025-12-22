@@ -64,7 +64,6 @@ export default function Pricing() {
         setDisplayPlans([FREE_PLAN, ...mappedPaidPlans, ENTERPRISE_PLAN]);
       } catch (error) {
         console.error(error);
-        api.error({ message: 'Không thể tải dữ liệu' });
       } finally {
         setLoading(false);
       }

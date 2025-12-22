@@ -41,8 +41,8 @@
 
 /* ==== GLOBAL (Chrome/Edge/Safari) ==== */
 *::-webkit-scrollbar {
-  width: 6px; /* chiều rộng thanh cuộn dọc */
-  height: 6px; /* chiều cao thanh cuộn ngang */
+  width: 8px; /* chiều rộng thanh cuộn dọc */
+  height: 8px; /* chiều cao thanh cuộn ngang */
 }
 
 *::-webkit-scrollbar-track {
@@ -51,12 +51,12 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #2e2e2e, #2e2e2e);
+  background: linear-gradient(180deg, #707070, #707070);
   border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #fde047, #facc15);
+  background: linear-gradient(180deg, #2e2e2e, #2e2e2e);
 }
 
 *::-webkit-scrollbar-corner {

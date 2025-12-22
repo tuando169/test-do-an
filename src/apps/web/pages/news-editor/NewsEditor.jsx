@@ -115,7 +115,14 @@ export default function NewsEditor() {
         navigate('/manage/news');
       }
     } catch (err) {
-      console.error(err);
+      if (err.status == 444) {
+        api.error({
+          title: 'Lỗi khi lưu',
+          description: 'Hình ảnh không hợp lệ. Vui lòng kiểm tra lại.',
+        });
+        return;
+      }
+
       api.error({
         title: 'Lỗi khi lưu',
         description: 'Đã có lỗi xảy ra khi lưu tin tức.',

@@ -1,6 +1,7 @@
 import axiosClient from '../common/axiosClient';
 import { apiEndpoints } from '../common/constants';
 import { RoomData, RoomUploadData } from '../common/types';
+import slugify from 'slugify';
 
 export const RoomApi = {
   // Lấy danh sách phòng public
@@ -87,28 +88,15 @@ export const RoomApi = {
   // Tạo phòng
   async create(payload: RoomUploadData): Promise<RoomData> {
     try {
-      const rooms = await RoomApi.getAll();
-      const same = rooms.filter((r) => r.title?.startsWith(payload.title!));
-
-      if (same.length > 0) {
-        payload.title = `${payload.title} ${same.length + 1}`;
-      }
-
-      // Slug
-      const slugBase = payload.title
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/đ/g, 'd')
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
-
-      const finalSlug = `${localStorage.getItem('user')}-${slugBase}`;
+      const finalTitle = payload.title?.trim();
+      const finalSlug = `${slugify(finalTitle)}-${localStorage
+        .getItem('user')
+        ?.substring(0, 6)}`;
       const formData = new FormData();
 
       formData.append('title', payload.title!);
       formData.append('slug', finalSlug);
-      if (payload.price !== undefined)
+      if (payload.price !== undefined && payload.price !== null)
         formData.append('price', payload.price.toString());
       formData.append('description', payload.description || '');
       formData.append('visibility', payload.visibility || 'public');
@@ -158,23 +146,7 @@ export const RoomApi = {
       let finalSlug = updateData.slug;
 
       if (finalTitle) {
-        const rooms = await RoomApi.getAll();
-        const same = rooms.filter(
-          (r) =>
-            r.title?.toLowerCase() === finalTitle!.toLowerCase() &&
-            r.id !== updateData.id
-        );
-
-        if (same.length > 0) {
-          finalTitle = `${finalTitle} ${same.length + 1}`;
-        }
-
-        const slugBase = finalTitle
-          .toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/[^a-z0-9-]/g, '');
-
-        finalSlug = `${updateData.owner_id}-${slugBase}`;
+        finalSlug = `${slugify(finalTitle)}-${updateData.id.substring(0, 6)}`;
 
         updateData.title = finalTitle;
         updateData.slug = finalSlug;
@@ -182,6 +154,7 @@ export const RoomApi = {
 
       const formData = new FormData();
       if (updateData.title) formData.append('title', updateData.title);
+      if (updateData.slug) formData.append('slug', updateData.slug);
       if (updateData.description)
         formData.append('description', updateData.description);
       if (updateData.visibility)
@@ -198,7 +171,7 @@ export const RoomApi = {
       if (updateData.type) formData.append('type', updateData.type);
       if (updateData.owner_id) formData.append('owner_id', updateData.owner_id);
       if (updateData.author) formData.append('author', updateData.author);
-      if (updateData.price !== undefined)
+      if (updateData.price !== undefined && updateData.price !== null)
         formData.append('price', updateData.price.toString());
 
       const res = await axiosClient.patch(
