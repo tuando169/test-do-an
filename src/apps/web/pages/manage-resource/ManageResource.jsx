@@ -9,7 +9,7 @@ import { TextureApi } from '@/api/textureApi';
 import { UserApi } from '@/api/userApi';
 import { RoleEnum } from '@/common/constants';
 import { LicenseApi } from '@/api/licenseApi';
-import ImageCreateWithMetadataModal from './modals/ImageCreateWithMetadataModal';
+import ImageCreateWithMetadataModal from './modals/ImageCreateWithMetaDataModal';
 import ImageEditModal from './modals/ImageEditModal'
 
 export default function ManageResource() {
