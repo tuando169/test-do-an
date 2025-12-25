@@ -125,7 +125,7 @@ export default function ManageSpace() {
   async function openPayment(template) {
     if (!template.price) {
       RoomApi.buyTemplates(template.id).then(() => {
-        api.success({ message: 'Đã lấy mẫu miễn phí thành công' });
+        api.success({ title: 'Đã lấy mẫu miễn phí thành công' });
         loadSpaces();
       });
       return;
@@ -143,12 +143,12 @@ export default function ManageSpace() {
       if (data && data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        api.error({ message: 'Không lấy được link thanh toán' });
+        api.error({ title: 'Không lấy được link thanh toán' });
       }
     } catch (error) {
       console.error('Lỗi thanh toán:', error);
       api.error({
-        message: 'Lỗi tạo giao dịch',
+        title: 'Lỗi tạo giao dịch',
         description: 'Vui lòng thử lại sau.',
       });
     }
@@ -212,7 +212,7 @@ export default function ManageSpace() {
           await RoomApi.delete(spaceId);
 
           api.success({
-            message: 'Đã xóa',
+            title: 'Đã xóa',
             description: 'Không gian đã được xóa thành công.',
           });
 
@@ -220,7 +220,7 @@ export default function ManageSpace() {
         } catch (error) {
           console.error(error);
           api.error({
-            message: 'Lỗi',
+            title: 'Lỗi',
             description: 'Không thể xóa không gian.',
           });
         }

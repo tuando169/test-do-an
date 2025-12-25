@@ -72,7 +72,7 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
   const handleGenerateAI = async () => {
     if (!aiPrompt.trim()) {
       api.error({
-        message: 'Thiếu prompt',
+        title: 'Thiếu prompt',
         description: 'Vui lòng nhập prompt cho AI.',
       });
       return;
@@ -80,7 +80,10 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
 
     setAILoading(true);
     try {
-      const description = await generateDescriptionFromImage(image.file_url, aiPrompt);
+      const description = await generateDescriptionFromImage(
+        image.file_url,
+        aiPrompt
+      );
 
       setMetadata((prev) => ({
         rawKeys: {
@@ -94,15 +97,15 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
       }));
 
       api.success({
-        message: 'AI hoàn tất',
+        title: 'AI hoàn tất',
         description: 'Đã tạo mô tả từ ảnh.',
       });
 
       setShowAIPrompt(false);
       setAIPrompt('');
-    } catch (err) {
+    } catch {
       api.error({
-        message: 'Lỗi AI',
+        title: 'Lỗi AI',
         description: 'Không thể tạo mô tả từ AI Gateway.',
       });
     } finally {
@@ -151,7 +154,7 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
       });
 
       api.success({
-        message: 'Thành công',
+        title: 'Thành công',
         description: 'Cập nhật thông tin tranh thành công.',
       });
 
@@ -160,14 +163,15 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
     } catch (err) {
       if (err?.response?.status === 444) {
         api.error({
-          message: 'Không thể cập nhật',
-          description: 'Ảnh này vi phạm chính sách của chúng tôi (ảnh nhạy cảm).',
+          title: 'Không thể cập nhật',
+          description:
+            'Ảnh này vi phạm chính sách của chúng tôi (ảnh nhạy cảm).',
         });
         return;
       }
 
       api.error({
-        message: 'Lỗi',
+        title: 'Lỗi',
         description:
           err?.response?.data?.message ||
           err?.message ||
@@ -188,7 +192,7 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
       async onOk() {
         await ImageApi.delete(image.id);
         api.success({
-          message: 'Đã xóa',
+          title: 'Đã xóa',
           description: 'Xóa tranh thành công.',
         });
         onSuccess();
@@ -200,29 +204,35 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
   return (
     <>
       {contextHolder}
-      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-        <div className="bg-white w-[520px] p-6 relative shadow-lg">
+      <div className='fixed inset-0 bg-black/40 flex items-center justify-center z-50'>
+        <div className='bg-white w-[800px] p-6 relative shadow-lg'>
           {loading && (
-            <div className="absolute inset-0 z-20 bg-white/70 flex flex-col items-center justify-center">
-              <span className="w-8 h-8 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mb-3" />
-              <p className="text-sm text-gray-600">Đang xử lý…</p>
+            <div className='absolute inset-0 z-20 bg-white/70 flex flex-col items-center justify-center'>
+              <span className='w-8 h-8 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mb-3' />
+              <p className='text-sm text-gray-600'>Đang xử lý…</p>
             </div>
           )}
 
           <button
-            className="absolute right-3 top-3 text-gray-600 hover:text-black"
+            className='absolute right-3 top-3 text-gray-600 hover:text-black'
             onClick={onClose}
           >
             <MdClose size={22} />
           </button>
 
-          <h2 className="text-xl font-bold mb-4 uppercase">Sửa thông tin tranh</h2>
+          <h2 className='text-xl font-bold mb-4 uppercase'>
+            Sửa thông tin tranh
+          </h2>
 
-          <div className="space-y-3 max-h-[320px] overflow-auto border-t pt-4">
+          <div className='space-y-3 max-h-[320px] overflow-auto border-t pt-4'>
             {Object.keys(metadata.rawKeys).map((k) => (
-              <div key={k} className="flex gap-3 items-center">
+              <div key={k} className='flex gap-3 items-start'>
                 <input
-                  className={`w-1/3 border px-2 py-1 ${k === 'kich_thuoc_trong_khong_gian' ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                  className={`w-1/3 border px-2 py-1 ${
+                    k === 'kich_thuoc_trong_khong_gian'
+                      ? 'bg-gray-200 cursor-not-allowed'
+                      : ''
+                  }`}
                   value={metadata.rawKeys[k]}
                   disabled={k === 'kich_thuoc_trong_khong_gian'}
                   onChange={(e) =>
@@ -232,20 +242,39 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
                     }))
                   }
                 />
-                <input
-                  className={`flex-1 border px-2 py-1 ${k === 'kich_thuoc_trong_khong_gian' ? 'bg-gray-200 cursor-not-allowed' : ''}`}
-                  value={metadata.values[k]}
-                  disabled={k === 'kich_thuoc_trong_khong_gian'}
-                  onChange={(e) =>
-                    setMetadata((prev) => ({
-                      rawKeys: prev.rawKeys,
-                      values: { ...prev.values, [k]: e.target.value },
-                    }))
-                  }
-                />
+                {metadata.rawKeys[k] == 'Mô tả' ? (
+                  <textarea
+                    className='flex-1 border px-2 py-1'
+                    rows={5}
+                    value={metadata.values[k]}
+                    onChange={(e) =>
+                      setMetadata((prev) => ({
+                        rawKeys: prev.rawKeys,
+                        values: { ...prev.values, [k]: e.target.value },
+                      }))
+                    }
+                  />
+                ) : (
+                  <input
+                    className={`flex-1 border px-2 py-1 ${
+                      k === 'kich_thuoc_trong_khong_gian'
+                        ? 'bg-gray-200 cursor-not-allowed'
+                        : ''
+                    }`}
+                    value={metadata.values[k]}
+                    disabled={k === 'kich_thuoc_trong_khong_gian'}
+                    onChange={(e) =>
+                      setMetadata((prev) => ({
+                        rawKeys: prev.rawKeys,
+                        values: { ...prev.values, [k]: e.target.value },
+                      }))
+                    }
+                  />
+                )}
+
                 {!DEFAULT_KEYS.includes(k) && (
                   <button
-                    className="px-2 bg-red-500 text-white"
+                    className='px-2 bg-red-500 text-white'
                     onClick={() =>
                       setMetadata((prev) => {
                         const r = { ...prev.rawKeys };
@@ -263,38 +292,38 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
             ))}
           </div>
 
-          <button className="secondary-button mt-3" onClick={addField}>
+          <button className='secondary-button mt-3' onClick={addField}>
             + Thêm thuộc tính
           </button>
 
-          <div className="mt-4 border-t pt-4">
+          <div className='mt-4 border-t pt-4'>
             {!showAIPrompt ? (
               <button
-                className="secondary-button"
+                className='secondary-button'
                 onClick={() => setShowAIPrompt(true)}
               >
                 ✨ Tạo mô tả bằng AI
               </button>
             ) : (
-              <div className="space-y-2">
+              <div className='space-y-2'>
                 <textarea
-                  className="w-full border px-3 py-2 text-sm"
+                  className='w-full border px-3 py-2 text-sm'
                   rows={3}
-                  placeholder="Nhập prompt cho AI (ví dụ: mô tả học thuật, cảm xúc, mỹ thuật...)"
+                  placeholder='Nhập prompt cho AI (ví dụ: mô tả học thuật, cảm xúc, mỹ thuật...)'
                   value={aiPrompt}
                   onChange={(e) => setAIPrompt(e.target.value)}
                 />
 
-                <div className="flex gap-2">
+                <div className='flex gap-2'>
                   <button
-                    className="primary-button"
+                    className='primary-button'
                     disabled={aiLoading}
                     onClick={handleGenerateAI}
                   >
                     {aiLoading ? 'AI đang xử lý…' : 'Tạo mô tả'}
                   </button>
                   <button
-                    className="secondary-button"
+                    className='secondary-button'
                     onClick={() => {
                       setShowAIPrompt(false);
                       setAIPrompt('');
@@ -307,19 +336,19 @@ export default function ImageEditModal({ open, image, onClose, onSuccess }) {
             )}
           </div>
 
-          <div className="flex justify-between gap-3 mt-6">
+          <div className='flex justify-between gap-3 mt-6'>
             <button
-              className="secondary-button bg-red-600 text-black"
+              className='secondary-button bg-red-600 text-black'
               onClick={handleDelete}
             >
               Xóa
             </button>
-            <div className="flex gap-3">
-              <button className="secondary-button" onClick={onClose}>
+            <div className='flex gap-3'>
+              <button className='secondary-button' onClick={onClose}>
                 Đóng
               </button>
               <button
-                className="primary-button"
+                className='primary-button'
                 disabled={loading}
                 onClick={handleSave}
               >

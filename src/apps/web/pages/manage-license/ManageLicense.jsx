@@ -21,7 +21,7 @@ export default function ManageLicense() {
       setLicenses(data);
     } catch (e) {
       console.error(e);
-      api.error({ message: 'Không thể tải danh sách gói đăng ký' });
+      api.error({ title: 'Không thể tải danh sách gói đăng ký' });
     }
     setLoading(false);
   };

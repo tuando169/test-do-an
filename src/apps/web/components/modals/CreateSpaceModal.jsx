@@ -80,7 +80,7 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
   async function openPayment(template) {
     if (!template.price) {
       RoomApi.buyTemplates(template.id).then(() => {
-        api.success({ message: 'Đã lấy mẫu miễn phí thành công' });
+        api.success({ title: 'Đã lấy mẫu miễn phí thành công' });
         fetchTemplates();
       });
       return;
@@ -98,12 +98,12 @@ export default function CreateSpaceModal({ isVisible, onClose, onSuccess }) {
       if (data && data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        api.error({ message: 'Không lấy được link thanh toán' });
+        api.error({ title: 'Không lấy được link thanh toán' });
       }
     } catch (error) {
       console.error('Lỗi thanh toán:', error);
       api.error({
-        message: 'Lỗi tạo giao dịch',
+        title: 'Lỗi tạo giao dịch',
         description: 'Vui lòng thử lại sau.',
       });
     }

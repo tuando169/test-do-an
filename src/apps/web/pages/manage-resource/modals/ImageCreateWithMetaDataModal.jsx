@@ -3,7 +3,11 @@ import { ImageApi } from '@/api/imageApi';
 import { notification } from 'antd';
 import { MdClose } from 'react-icons/md';
 
-export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess }) {
+export default function ImageCreateWithMetadataModal({
+  open,
+  onClose,
+  onSuccess,
+}) {
   const [api, contextHolder] = notification.useNotification();
   const [file, setFile] = useState(null);
   const [imageRatio, setImageRatio] = useState(null);
@@ -14,7 +18,13 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
   const [previewUrl, setPreviewUrl] = useState(null);
 
   const DEFAULT_KEYS = [
-    'tieu_de', 'tac_gia', 'chieu_dai', 'chieu_rong', 'chat_lieu', 'nam_sang_tac', 'kich_thuoc_trong_khong_gian',
+    'tieu_de',
+    'tac_gia',
+    'chieu_dai',
+    'chieu_rong',
+    'chat_lieu',
+    'nam_sang_tac',
+    'kich_thuoc_trong_khong_gian',
   ];
 
   const [metadata, setMetadata] = useState({
@@ -56,7 +66,7 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
   const handleGenerateAI = async () => {
     if (!file) {
       api.error({
-        message: 'Chưa có ảnh',
+        title: 'Chưa có ảnh',
         description: 'Vui lòng chọn ảnh trước khi dùng AI.',
       });
       return;
@@ -64,7 +74,7 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
 
     if (!aiPrompt.trim()) {
       api.error({
-        message: 'Thiếu prompt',
+        title: 'Thiếu prompt',
         description: 'Vui lòng nhập prompt cho AI.',
       });
       return;
@@ -107,15 +117,15 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
       }));
 
       api.success({
-        message: 'AI hoàn tất',
+        title: 'AI hoàn tất',
         description: 'Đã tạo mô tả từ ảnh.',
       });
 
       setShowAIPrompt(false);
       setAIPrompt('');
-    } catch (err) {
+    } catch {
       api.error({
-        message: 'Lỗi AI',
+        title: 'Lỗi AI',
         description: 'Không thể tạo mô tả bằng AI Gateway.',
       });
     } finally {
@@ -126,7 +136,7 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
   const handleSave = async () => {
     if (!file) {
       api.error({
-        message: 'Thiếu ảnh',
+        title: 'Thiếu ảnh',
         description: 'Bạn cần chọn ảnh để tải lên.',
       });
       return;
@@ -146,7 +156,7 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
       } else {
         if (!imageRatio) {
           api.error({
-            message: 'Lỗi',
+            title: 'Lỗi',
             description: 'Không lấy được tỉ lệ ảnh.',
           });
           setLoading(false);
@@ -178,7 +188,7 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
       });
 
       api.success({
-        message: 'Thành công',
+        title: 'Thành công',
         description: 'Tạo tranh mới kèm metadata thành công.',
       });
 
@@ -187,15 +197,19 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
     } catch (err) {
       if (err?.response?.status === 444) {
         api.error({
-          message: 'Không thể tải ảnh',
-          description: 'Ảnh này vi phạm chính sách của chúng tôi (ảnh nhạy cảm).',
+          title: 'Không thể tải ảnh',
+          description:
+            'Ảnh này vi phạm chính sách của chúng tôi (ảnh nhạy cảm).',
         });
         return;
       }
 
       api.error({
-        message: 'Lỗi',
-        description: err?.response?.data?.message || err?.message || 'Không thể tạo tranh.',
+        title: 'Lỗi',
+        description:
+          err?.response?.data?.message ||
+          err?.message ||
+          'Không thể tạo tranh.',
       });
     } finally {
       setLoading(false);
@@ -214,29 +228,31 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
   return (
     <>
       {contextHolder}
-      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-        <div className="bg-white w-[520px] p-6 relative shadow-lg">
+      <div className='fixed inset-0 bg-black/40 flex items-center justify-center z-50'>
+        <div className='bg-white w-[800px] p-6 relative shadow-lg  max-h-[90vh] overflow-y-auto'>
           {loading && (
-            <div className="absolute inset-0 z-20 bg-white/70 flex flex-col items-center justify-center">
-              <span className="w-8 h-8 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mb-3" />
-              <p className="text-sm text-gray-600">Đang xử lý…</p>
+            <div className='absolute inset-0 z-20 bg-white/70 flex flex-col items-center justify-center'>
+              <span className='w-8 h-8 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mb-3' />
+              <p className='text-sm text-gray-600'>Đang xử lý…</p>
             </div>
           )}
 
           <button
-            className="absolute right-3 top-3 text-gray-600 hover:text-black"
+            className='absolute right-3 top-3 text-gray-600 hover:text-black'
             onClick={onClose}
           >
             <MdClose size={22} />
           </button>
 
-          <h2 className="text-xl font-bold mb-4 text-[#2e2e2e] uppercase">Tạo tranh mới</h2>
+          <h2 className='text-xl font-bold mb-4 text-[#2e2e2e] uppercase'>
+            Tạo tranh mới
+          </h2>
 
-          <label className="font-medium">Chọn ảnh</label>
+          <label className='font-medium'>Chọn ảnh</label>
           <input
-            type="file"
-            accept="image/*"
-            className="w-full border px-3 py-2 mt-1 mb-4"
+            type='file'
+            accept='image/*'
+            className='w-full border px-3 py-2 mt-1 mb-4'
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (!f) return;
@@ -247,26 +263,27 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
               setPreviewUrl(url);
 
               const img = new Image();
-              img.onload = () => setImageRatio(img.naturalWidth / img.naturalHeight);
+              img.onload = () =>
+                setImageRatio(img.naturalWidth / img.naturalHeight);
               img.src = url;
             }}
           />
 
           {previewUrl && (
-            <div className="mb-4 border rounded overflow-hidden">
+            <div className='mb-4 border rounded overflow-hidden'>
               <img
                 src={previewUrl}
-                alt="Preview"
-                className="w-full max-h-[300px] object-contain bg-gray-100"
+                alt='Preview'
+                className='w-full max-h-[300px] object-contain bg-gray-100'
               />
             </div>
           )}
 
-          <div className="space-y-3 max-h-[300px] overflow-auto border-t pt-4">
+          <div className='space-y-3 max-h-[300px] overflow-auto border-t pt-4'>
             {Object.keys(metadata.rawKeys).map((k) => (
-              <div key={k} className="flex gap-3 items-center">
+              <div key={k} className='flex gap-3 items-center'>
                 <input
-                  className="w-1/3 border px-2 py-1"
+                  className='w-1/3 border px-2 py-1'
                   value={metadata.rawKeys[k]}
                   onChange={(e) =>
                     setMetadata((prev) => ({
@@ -275,20 +292,38 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
                     }))
                   }
                 />
-                <input
-                  className="flex-1 border px-2 py-1"
-                  type={['chieu_dai', 'chieu_rong'].includes(k) ? 'number' : 'text'}
-                  value={metadata.values[k]}
-                  onChange={(e) =>
-                    setMetadata((prev) => ({
-                      rawKeys: prev.rawKeys,
-                      values: { ...prev.values, [k]: e.target.value },
-                    }))
-                  }
-                />
+                {metadata.rawKeys[k] == 'Mô tả' ? (
+                  <textarea
+                    className='flex-1 border px-2 py-1'
+                    rows={3}
+                    value={metadata.values[k]}
+                    onChange={(e) =>
+                      setMetadata((prev) => ({
+                        rawKeys: prev.rawKeys,
+                        values: { ...prev.values, [k]: e.target.value },
+                      }))
+                    }
+                  />
+                ) : (
+                  <input
+                    className='flex-1 border px-2 py-1'
+                    type={
+                      ['chieu_dai', 'chieu_rong'].includes(k)
+                        ? 'number'
+                        : 'text'
+                    }
+                    value={metadata.values[k]}
+                    onChange={(e) =>
+                      setMetadata((prev) => ({
+                        rawKeys: prev.rawKeys,
+                        values: { ...prev.values, [k]: e.target.value },
+                      }))
+                    }
+                  />
+                )}
                 {!DEFAULT_KEYS.includes(k) && (
                   <button
-                    className="px-2 bg-red-500 text-white"
+                    className='px-2 bg-red-500 text-white'
                     onClick={() =>
                       setMetadata((prev) => {
                         const r = { ...prev.rawKeys };
@@ -306,38 +341,38 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
             ))}
           </div>
 
-          <button className="secondary-button mt-3" onClick={addField}>
+          <button className='secondary-button mt-3' onClick={addField}>
             + Thêm thuộc tính
           </button>
 
-          <div className="mt-4 border-t pt-4">
+          <div className='mt-4 border-t pt-4'>
             {!showAIPrompt ? (
               <button
-                className="secondary-button"
+                className='secondary-button'
                 onClick={() => setShowAIPrompt(true)}
                 disabled={!file}
               >
                 ✨ Tạo mô tả bằng AI
               </button>
             ) : (
-              <div className="space-y-2">
+              <div className='space-y-2'>
                 <textarea
-                  className="w-full border px-3 py-2 text-sm"
+                  className='w-full border px-3 py-2 text-sm'
                   rows={3}
-                  placeholder="Nhập prompt cho AI (ví dụ: mô tả triển lãm, mỹ thuật, cảm xúc...)"
+                  placeholder='Nhập prompt cho AI (ví dụ: mô tả triển lãm, mỹ thuật, cảm xúc...)'
                   value={aiPrompt}
                   onChange={(e) => setAIPrompt(e.target.value)}
                 />
-                <div className="flex gap-2">
+                <div className='flex gap-2'>
                   <button
-                    className="primary-button"
+                    className='primary-button'
                     disabled={aiLoading}
                     onClick={handleGenerateAI}
                   >
                     {aiLoading ? 'AI đang xử lý…' : 'Tạo mô tả'}
                   </button>
                   <button
-                    className="secondary-button"
+                    className='secondary-button'
                     onClick={() => {
                       setShowAIPrompt(false);
                       setAIPrompt('');
@@ -350,11 +385,15 @@ export default function ImageCreateWithMetadataModal({ open, onClose, onSuccess 
             )}
           </div>
 
-          <div className="flex justify-end gap-3 mt-6">
-            <button className="secondary-button" onClick={onClose}>
+          <div className='flex justify-end gap-3 mt-6'>
+            <button className='secondary-button' onClick={onClose}>
               Hủy
             </button>
-            <button className="primary-button" onClick={handleSave} disabled={loading}>
+            <button
+              className='primary-button'
+              onClick={handleSave}
+              disabled={loading}
+            >
               {loading ? 'Đang lưu...' : 'Lưu'}
             </button>
           </div>

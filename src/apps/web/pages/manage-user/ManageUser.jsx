@@ -23,7 +23,7 @@ export default function ManageUsers() {
       setUsers(data);
     } catch (e) {
       console.error(e);
-      api.error({ message: 'Không thể tải danh sách người dùng' });
+      api.error({ title: 'Không thể tải danh sách người dùng' });
     }
     setLoading(false);
   };
@@ -59,10 +59,10 @@ export default function ManageUsers() {
       async onOk() {
         try {
           await UserApi.delete(user.id);
-          api.success({ message: 'Đã xóa người dùng' });
+          api.success({ title: 'Đã xóa người dùng' });
           fetchData();
         } catch {
-          api.error({ message: 'Không thể xóa người dùng' });
+          api.error({ title: 'Không thể xóa người dùng' });
         }
       },
     });

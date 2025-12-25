@@ -86,21 +86,21 @@ export default function ModalCreateResource({
     } catch (err) {
       if (err?.response?.status === 444) {
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description: 'File không hợp lệ. Vui lòng thử lại với file khác.',
         });
         return;
       }
       if (err?.response?.status === 403) {
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description: 'Bạn cần đăng ký gói trả phí để thêm tài nguyên.',
         });
         return;
       }
       if (err?.response?.status === 429) {
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description:
             'Bạn đã đạt đến giới hạn tải lên của mình. Vui lòng nâng cấp tài khoản.',
         });
@@ -108,13 +108,13 @@ export default function ModalCreateResource({
       }
       if (err?.response?.status === 400) {
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description: 'Vui lòng điền đầy đủ thông tin.',
         });
         return;
       }
       api.error({
-        message: 'Lỗi',
+        title: 'Lỗi',
         description: err?.message || 'Có lỗi xảy ra, vui lòng thử lại',
       });
     } finally {
@@ -149,7 +149,7 @@ export default function ModalCreateResource({
   async function handleGenerateObject() {
     if (!imageSource) {
       api.error({
-        message: 'Lỗi',
+        title: 'Lỗi',
         description: 'Vui lòng chọn ảnh để tạo Object 3D từ ảnh.',
       });
       return;
@@ -161,7 +161,7 @@ export default function ModalCreateResource({
       console.log(generatedObject);
     } catch (err) {
       api.error({
-        message: 'Lỗi',
+        title: 'Lỗi',
         description: err?.message || 'Có lỗi xảy ra, vui lòng thử lại',
       });
     } finally {
@@ -177,7 +177,7 @@ export default function ModalCreateResource({
       });
       if (res.status == 444)
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description:
             'File không hợp lệ hoặc quá lớn. Vui lòng thử lại với file khác.',
         });
@@ -191,7 +191,7 @@ export default function ModalCreateResource({
       });
       if (res.status == 444)
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description:
             'File không hợp lệ hoặc quá lớn. Vui lòng thử lại với file khác.',
         });
@@ -205,7 +205,7 @@ export default function ModalCreateResource({
       });
       if (res.status == 444)
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description:
             'File không hợp lệ hoặc quá lớn. Vui lòng thử lại với file khác.',
         });
@@ -221,7 +221,7 @@ export default function ModalCreateResource({
       });
       if (res.status == 444)
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description:
             'File không hợp lệ hoặc quá lớn. Vui lòng thử lại với file khác.',
         });

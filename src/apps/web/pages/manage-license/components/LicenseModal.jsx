@@ -74,7 +74,7 @@ export default function LicenseModal({
       onClose();
     } catch {
       api.error({
-        message: "Lỗi",
+        title: "Lỗi",
         description: isEdit
           ? "Không thể cập nhật gói đăng ký"
           : "Không thể tạo gói đăng ký",

@@ -70,7 +70,7 @@ export default function CreateSpaceInfoModal({
       await RoomApi.create(payload);
 
       api.success({
-        message: 'Thành công',
+        title: 'Thành công',
         description:
           mode === 'template'
             ? 'Đã tạo không gian mẫu.'
@@ -82,7 +82,7 @@ export default function CreateSpaceInfoModal({
     } catch (err) {
       if (err?.response?.status === 444) {
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description:
             'Thumbnail không hợp lệ. Vui lòng thử lại với thumbnail khác.',
         });
@@ -90,21 +90,21 @@ export default function CreateSpaceInfoModal({
       }
       if (err?.response?.status === 403) {
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description: 'Bạn cần đăng ký gói trả phí để thêm không gian.',
         });
         return;
       }
       if (err?.response?.status === 429) {
         api.error({
-          message: 'Lỗi',
+          title: 'Lỗi',
           description:
             'Bạn đã đạt đến giới hạn tạo không gian của mình. Vui lòng nâng cấp gói để tiếp tục.',
         });
         return;
       }
       api.error({
-        message: 'Lỗi',
+        title: 'Lỗi',
         description: 'Không thể tạo không gian. Vui lòng thử lại.',
       });
     } finally {
