@@ -4,22 +4,55 @@ import { Link } from 'react-router-dom';
 import { MdArrowOutward } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { RoomApi } from '@/api/roomApi';
+import { Skeleton } from 'antd'; // Import Skeleton
 
 function RecommendSpaces() {
   const [spaces, setSpaces] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchSpaces = async () => {
+      setLoading(true);
       try {
         const data = await RoomApi.getPublicRoomList();
-
         setSpaces(data.filter((space) => space.type != 'template'));
       } catch (error) {
         console.error('Lỗi API:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchSpaces();
   }, []);
+
+  // COMPONENT SKELETON ĐÃ FIX LỖI WIDTH
+  const CardSkeleton = () => (
+    <div className='flex flex-col w-full'>
+      <Skeleton.Button
+        active
+        block={true}
+        shape='square'
+        style={{ height: 200, marginBottom: 12 }}
+      />
+
+      {/* Title */}
+      <Skeleton.Input
+        active
+        block
+        size='small'
+        style={{ marginBottom: 8, height: 20 }}
+      />
+
+      {/* Subtitle */}
+      <Skeleton.Input
+        active
+        size='small'
+        style={{ width: '60%', height: 20 }}
+      />
+    </div>
+  );
+
   return (
     <>
       <div className='Web__home__section2'>
@@ -42,13 +75,22 @@ function RecommendSpaces() {
               </Link>
             </div>
             <WebLine />
-            {spaces.length ? (
-              <div className='Web__home__section2__inner__content'>
-                <div className='grid grid-cols-4 gap-6'>
-                  {spaces.slice(0, 4).map((khongGian) => (
+
+            <div className='Web__home__section2__inner__content'>
+              {/* Thêm class w-full vào grid để chắc chắn nó bung hết cỡ */}
+              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full'>
+                {loading ? (
+                  <>
+                    <CardSkeleton />
+                    <CardSkeleton />
+                    <CardSkeleton />
+                    <CardSkeleton />
+                  </>
+                ) : spaces.length > 0 ? (
+                  spaces.slice(0, 4).map((khongGian) => (
                     <Link
                       to={`/space/${khongGian.slug}`}
-                      className=''
+                      className='block w-full' // Thêm block w-full cho thẻ a
                       key={khongGian.id}
                     >
                       <div className='Web__home__section2__inner__content__box'>
@@ -80,12 +122,15 @@ function RecommendSpaces() {
                         </div>
                       </div>
                     </Link>
-                  ))}
-                </div>
+                  ))
+                ) : (
+                  <div className='col-span-4 text-center text-gray-500 py-10'>
+                    Không có không gian đề xuất nào.
+                  </div>
+                )}
               </div>
-            ) : (
-              <div>Đang tải ...</div>
-            )}
+            </div>
+
             <Link
               to={'/listspace'}
               className='flex md:hidden items-center justify-center mt-6 px-4 py-2 border-2 border-[#2E2E2E] text-[#2E2E2E]'

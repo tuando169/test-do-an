@@ -1,33 +1,67 @@
 import { NewsApi } from '@/api/newsApi';
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Skeleton } from 'antd';
 
 export default function NewsDetail() {
   const { slug } = useParams();
   const [news, setNews] = useState(null);
   const [latest, setLatest] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const data = await NewsApi.getBySlug(slug);
-      setNews(data);
+      setLoading(true);
+      try {
+        const data = await NewsApi.getBySlug(slug);
+        setNews(data);
 
-      // Lấy danh sách tin, loại bỏ tin hiện tại, lấy 5 tin mới nhất
-      const all = await NewsApi.getList();
-      const latestNews = all
-        .filter((n) => n.slug !== slug)
-        .sort(
-          (a, b) =>
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-        )
-        .slice(0, 5);
+        const all = await NewsApi.getList();
+        const latestNews = all
+          .filter((n) => n.slug !== slug)
+          .sort(
+            (a, b) =>
+              new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+          )
+          .slice(0, 5);
 
-      setLatest(latestNews);
+        setLatest(latestNews);
+      } catch (error) {
+        console.error("Lỗi tải tin tức:", error);
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [slug]);
 
-  if (!news) return <div className='p-10'>Đang tải...</div>;
+  const NewsDetailSkeleton = () => (
+    <div className='container-main py-10 flex gap-12 mx-auto max-w-[1300px]'>
+      <div className='flex-1'>
+        <Skeleton.Input active block size="large" style={{ height: 48, marginBottom: 16 }} />
+        <Skeleton.Input active size="small" style={{ width: 200, marginBottom: 24 }} />
+        <Skeleton.Button active block shape="square" style={{ height: 400, marginBottom: 40 }} />
+        <Skeleton active paragraph={{ rows: 8 }} />
+        <br />
+        <Skeleton.Button active block shape="square" style={{ height: 300, marginBottom: 20 }} />
+        <Skeleton active paragraph={{ rows: 4 }} />
+      </div>
+
+      <div className='w-80 shrink-0 sticky top-24 h-fit'>
+        <Skeleton.Input active size="default" style={{ width: 150, marginBottom: 16 }} />
+        <div className='space-y-6'>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i}>
+               <Skeleton.Button active block shape="square" style={{ height: 128, marginBottom: 8 }} />
+               <Skeleton active paragraph={{ rows: 2 }} title={false} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (loading || !news) return <NewsDetailSkeleton />;
 
   return (
     <div className='container-main py-10 flex gap-12 mx-auto max-w-[1300px]'>

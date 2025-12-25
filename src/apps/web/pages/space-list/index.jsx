@@ -1,14 +1,16 @@
 import './ListSpace.scss';
 import { FaSearch } from 'react-icons/fa';
-import { MdAdd, MdArrowOutward } from 'react-icons/md';
+import { MdArrowOutward } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { RoomApi } from '@/api/roomApi';
 import AuthModal from '../../components/modals/AuthModal';
 import CreateSpaceModal from '../../components/modals/CreateSpaceModal';
+import { Skeleton } from 'antd';
 
 function ListSpace() {
   const [publicRooms, setPublicRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [searchKeyword, setSearchKeyword] = useState('');
   const [showLoginPopup, setShowLoginPopup] = useState(false);
@@ -34,16 +36,51 @@ function ListSpace() {
   }
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const data = await RoomApi.getPublicRoomList();
       setPublicRooms(data);
     } catch (err) {
       console.error('Lỗi khi tải danh sách exhibition:', err);
+    } finally {
+      setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, []);
+
+  const SpaceItemSkeleton = () => (
+    <div className='col-md-6 mb-8'>
+      <div className='ListSpace__inner__content__box'>
+        <Skeleton.Input
+          active
+          block
+          size='large'
+          style={{ marginBottom: 8, height: 28 }}
+        />
+
+        <div className='flex items-center gap-2 mb-4'>
+          <Skeleton.Input active size='small' style={{ width: 60 }} />
+          <Skeleton.Input active size='small' style={{ width: 100 }} />
+        </div>
+
+        <Skeleton.Button
+          active
+          block
+          shape='square'
+          style={{ height: 250, marginBottom: 16 }}
+        />
+
+        <Skeleton.Button
+          active
+          size='default'
+          style={{ width: 120, height: 40 }}
+        />
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -77,8 +114,15 @@ function ListSpace() {
             />
             <input type='radio' name='khonggian' id='khonggiansangtao' />
 
-            {filteredSpaces.length ? (
-              <div className='ListSpace__inner__content'>
+            <div className='ListSpace__inner__content'>
+              {loading ? (
+                <div className='row'>
+                  <SpaceItemSkeleton />
+                  <SpaceItemSkeleton />
+                  <SpaceItemSkeleton />
+                  <SpaceItemSkeleton />
+                </div>
+              ) : filteredSpaces.length > 0 ? (
                 <div className='row'>
                   {filteredSpaces.map((khongGian) => (
                     <Link
@@ -126,10 +170,12 @@ function ListSpace() {
                     </Link>
                   ))}
                 </div>
-              </div>
-            ) : (
-              <div className='text-center'>Đang tải...</div>
-            )}
+              ) : (
+                <div className='text-center py-10 text-gray-500'>
+                  Không tìm thấy không gian phù hợp.
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

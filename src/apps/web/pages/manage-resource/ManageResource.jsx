@@ -2,9 +2,9 @@ import { AudioApi } from '@/api/audioApi';
 import { ImageApi } from '@/api/imageApi';
 import { Object3dApi } from '@/api/object3dApi';
 import { useEffect, useState } from 'react';
-import { MdDelete, MdEdit, MdAdd, MdClose, MdDownload } from 'react-icons/md';
+import { MdDelete, MdEdit, MdAdd, MdDownload } from 'react-icons/md';
 import CreateMediaModal from './modals/CreateMediaModal';
-import { Modal as ModalAnt, notification } from 'antd';
+import { Modal as ModalAnt, notification, Skeleton } from 'antd';
 import { TextureApi } from '@/api/textureApi';
 import { UserApi } from '@/api/userApi';
 import { RoleEnum } from '@/common/constants';
@@ -24,7 +24,8 @@ export default function ManageResource() {
   const [objects, setObjects] = useState([]);
   const [audios, setAudios] = useState([]);
   const [displayData, setDisplayData] = useState([]);
-
+  
+  const [loading, setLoading] = useState(true); // Mặc định là true để vào là load ngay
   const [modalOpen, setModalOpen] = useState(false);
 
   const [imageMetaOpen, setImageMetaOpen] = useState(false);
@@ -43,23 +44,61 @@ export default function ManageResource() {
     id: '',
   });
 
-  const loadImages = async () => {
-    const data = await ImageApi.getList();
-    setImages(data);
-  };
-  const loadTextures = async () => {
-    const data = await TextureApi.getAll();
-    setTextures(data);
+  // Hàm load lại dữ liệu của tab hiện tại (dùng khi thêm/sửa/xóa)
+  const fetchCurrentTabData = async (currentTab) => {
+    setLoading(true);
+    try {
+       if (currentTab === 'image') {
+          const data = await ImageApi.getList();
+          setImages(data);
+       } else if (currentTab === 'object') {
+          const data = await Object3dApi.getList();
+          setObjects(data);
+       } else if (currentTab === 'audio') {
+          const data = await AudioApi.getList();
+          setAudios(data);
+       } else if (currentTab === 'texture') {
+          const data = await TextureApi.getAll();
+          setTextures(data);
+       }
+    } catch(err) {
+       console.error(err);
+    } finally {
+       setLoading(false);
+    }
   };
 
-  const loadObjects = async () => {
-    const data = await Object3dApi.getList();
-    setObjects(data);
-  };
+  // FETCH ALL DATA LÚC KHỞI TẠO
+  useEffect(() => {
+     const initData = async () => {
+        setLoading(true); // Bắt đầu loading
+        try {
+            await fetchUserRole();
+            const [imgs, objs, auds, texs] = await Promise.all([
+                ImageApi.getList(),
+                Object3dApi.getList(),
+                AudioApi.getList(),
+                TextureApi.getAll()
+            ]);
+            setImages(imgs);
+            setObjects(objs);
+            setAudios(auds);
+            setTextures(texs);
+        } catch (error) {
+            console.error("Lỗi tải dữ liệu:", error);
+        } finally {
+            setLoading(false); // Tắt loading khi xong hết
+        }
+     };
 
-  const loadAudio = async () => {
-    const data = await AudioApi.getList();
-    setAudios(data);
+     initData();
+  }, []);
+
+  const fetchUserRole = async () => {
+    const userId = localStorage.getItem('user');
+    const data = await UserApi.getById(userId);
+    setUserRole(data.role);
+    fetchLicense(data.license);
   };
 
   const fetchLicense = async (id) => {
@@ -71,98 +110,58 @@ export default function ManageResource() {
     }
   };
 
-  const deleteItem = async (id, type) => {
-    if (type === 'texture') {
-      await TextureApi.delete(id);
-      setTextures(textures.filter((item) => item.id !== id));
-      api.success({
-        title: 'Thành công',
-        description: 'Xóa texture thành công',
-      });
-      return;
-    }
-
-    if (type === 'image') {
-      await ImageApi.delete(id);
-      setImages(images.filter((item) => item.id !== id));
-      api.success({
-        title: 'Thành công',
-        description: 'Xóa tranh thành công',
-      });
-      return;
-    }
-    if (type === 'object') {
-      await Object3dApi.delete(id);
-      setObjects(objects.filter((item) => item.id !== id));
-      api.success({
-        title: 'Thành công',
-        description: 'Xóa object 3D thành công',
-      });
-      return;
-    }
-    if (type === 'audio') {
-      await AudioApi.delete(id);
-      setAudios(audios.filter((item) => item.id !== id));
-      api.success({
-        title: 'Thành công',
-        description: 'Xóa âm thanh thành công',
-      });
-      return;
-    }
-  };
-
-  function fetchData() {
-    loadImages();
-    loadObjects();
-    loadAudio();
-    loadTextures();
-  }
-
-  async function fetchUserRole() {
-    const userId = localStorage.getItem('user');
-    const data = await UserApi.getById(userId);
-    setUserRole(data.role);
-    fetchLicense(data.license);
-  }
-
+  // Cập nhật displayData khi tab đổi hoặc data nguồn đổi
   useEffect(() => {
-    fetchData();
-    fetchUserRole();
-  }, []);
-
-  useEffect(() => {
-    fetchDisplayData();
-  }, [tab]);
-
-  useEffect(() => {
-    fetchDisplayData();
-  }, [images, objects, audios, textures]);
-
-  function fetchDisplayData() {
     if (tab === 'image') setDisplayData(images);
     else if (tab === 'object') setDisplayData(objects);
     else if (tab === 'audio') setDisplayData(audios);
     else if (tab === 'texture') setDisplayData(textures);
-  }
+  }, [tab, images, objects, audios, textures]);
+
+  const deleteItem = async (id, type) => {
+    if (type === 'texture') {
+      await TextureApi.delete(id);
+      setTextures(textures.filter((item) => item.id !== id));
+      api.success({ title: 'Thành công', description: 'Xóa texture thành công' });
+    } else if (type === 'image') {
+      await ImageApi.delete(id);
+      setImages(images.filter((item) => item.id !== id));
+      api.success({ title: 'Thành công', description: 'Xóa tranh thành công' });
+    } else if (type === 'object') {
+      await Object3dApi.delete(id);
+      setObjects(objects.filter((item) => item.id !== id));
+      api.success({ title: 'Thành công', description: 'Xóa object 3D thành công' });
+    } else if (type === 'audio') {
+      await AudioApi.delete(id);
+      setAudios(audios.filter((item) => item.id !== id));
+      api.success({ title: 'Thành công', description: 'Xóa âm thanh thành công' });
+    }
+  };
 
   async function downloadFile(url, filename) {
     const res = await fetch(url);
     if (!res.ok) throw new Error('Download failed');
-
     const blob = await res.blob();
     const blobUrl = window.URL.createObjectURL(blob);
-
     const a = document.createElement('a');
     a.href = blobUrl;
     a.download = tab == 'object' ? filename + '.glb' : filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-
     window.URL.revokeObjectURL(blobUrl);
   }
 
-  // ========== POPUP ==========
+  const handleDelete = async (id, type) => {
+    ModalAnt.confirm({
+      title: 'Xóa',
+      content: 'Bạn có chắc muốn xoá mục này?',
+      okText: 'Xác nhận',
+      cancelText: 'Hủy',
+      onOk() { deleteItem(id, type); },
+    });
+  };
+
   const openEdit = (item) => {
     if (tab === 'image') {
       setSelectedImage(item)
@@ -186,8 +185,6 @@ export default function ManageResource() {
         file: null,
         room_id: item.room_id,
       });
-    console.log('form', form);
-
     setModalOpen(true);
   };
 
@@ -206,70 +203,24 @@ export default function ManageResource() {
     setModalOpen(true);
   };
 
-  const handleDelete = async (id, type) => {
-    ModalAnt.confirm({
-      title: 'Xóa',
-      content: 'Bạn có chắc muốn xoá mục này?',
-      okText: 'Xác nhận',
-      cancelText: 'Hủy',
-      onOk() {
-        deleteItem(id, type);
-      },
-      onCancel() {},
-    });
+  const onCreateMediaSuccess = () => {
+     fetchCurrentTabData(tab);
+     api.success({ title: 'Thành công', description: 'Cập nhật dữ liệu thành công.' });
   };
 
-  function onCreateMediaSuccess() {
-    if (tab === 'image') {
-      loadImages();
-      if (form.id)
-        api.success({
-          title: 'Thành công',
-          description: 'Cập nhật tranh thành công.',
-        });
-      else
-        api.success({
-          title: 'Thành công',
-          description: 'Tải lên tranh mới thành công.',
-        });
-    } else if (tab === 'object') {
-      loadObjects();
-      if (form.id)
-        api.success({
-          title: 'Thành công',
-          description: 'Cập nhật object 3D thành công.',
-        });
-      else
-        api.success({
-          title: 'Thành công',
-          description: 'Tải lên object 3D mới thành công.',
-        });
-    } else if (tab === 'audio') {
-      loadAudio();
-      if (form.id)
-        api.success({
-          title: 'Thành công',
-          description: 'Cập nhật  âm thanh thành công.',
-        });
-      else
-        api.success({
-          title: 'Thành công',
-          description: 'Tải lên âm thanh mới thành công.',
-        });
-    } else if (tab === 'texture') {
-      loadTextures();
-      if (form.id)
-        api.success({
-          title: 'Thành công',
-          description: 'Cập nhật texture thành công.',
-        });
-      else
-        api.success({
-          title: 'Thành công',
-          description: 'Tải lên texture mới thành công.',
-        });
-    }
-  }
+  const CardSkeleton = () => (
+    <div className='border-2 border-transparent shadow-md p-4 flex flex-col'>
+       <Skeleton.Button active block shape="square" style={{ height: '12rem', marginBottom: 16 }} />
+       <Skeleton.Input active block size="small" style={{ marginBottom: 16 }} />
+       <div className='grid grid-cols-2 gap-2 mt-auto'>
+          <Skeleton.Button active block />
+          <Skeleton.Button active block />
+       </div>
+       <div className='w-full pt-2'>
+          <Skeleton.Button active block size="large" />
+       </div>
+    </div>
+  );
 
   return (
     <>
@@ -329,40 +280,19 @@ export default function ManageResource() {
             )}
           </div>
         </div>
+        
         <div className='flex border-b mb-6  w-full items-end'>
-          <button
-            onClick={() => setTab('image')}
-            className={`px-6 py-2 font-semibold tracking-wide 
-      ${tab === 'image' ? 'bg-[#2e2e2e] text-white' : 'text-[#2e2e2e]'}`}
-          >
-            Thư Viện Tranh
-          </button>
-
-          <button
-            onClick={() => setTab('object')}
-            className={`px-6 py-2 font-semibold tracking-wide 
-      ${tab === 'object' ? 'bg-[#2e2e2e] text-white' : 'text-[#2e2e2e]'}`}
-          >
-            Thư Viện Object 3D
-          </button>
-
-          <button
-            onClick={() => setTab('audio')}
-            className={`px-6 py-2 font-semibold tracking-wide 
-      ${tab === 'audio' ? 'bg-[#2e2e2e] text-white' : 'text-[#2e2e2e]'}`}
-          >
-            Thư Viện Audio
-          </button>
-          {userRole == RoleEnum.Admin && (
-            <button
-              onClick={() => setTab('texture')}
-              className={`px-6 py-2 font-semibold tracking-wide 
-  ${tab === 'texture' ? 'bg-[#2e2e2e] text-white' : 'text-[#2e2e2e]'}`}
-            >
-              Thư Viện Texture
-            </button>
-          )}
-
+          {['image', 'object', 'audio', ...(userRole == RoleEnum.Admin ? ['texture'] : [])].map(type => (
+              <button
+                key={type}
+                onClick={() => setTab(type)}
+                className={`px-6 py-2 font-semibold tracking-wide capitalize
+                  ${tab === type ? 'bg-[#2e2e2e] text-white' : 'text-[#2e2e2e]'}`}
+              >
+                Thư Viện {type === 'object' ? 'Object 3D' : type}
+              </button>
+          ))}
+          
           <button
             onClick={() => {
               if (tab === 'image') {
@@ -377,117 +307,102 @@ export default function ManageResource() {
           </button>
         </div>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6'>
-          {displayData.map((item) => (
-            <div
-              key={item.id}
-              className='border-2 border-transparent hover:border-[#2e2e2e] shadow-md p-4 transition cursor-pointer flex flex-col'
-            >
-              {/* PREVIEW */}
-              <div className='w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden mb-4'>
-                {tab === 'image' && (
-                  <img
-                    src={item.file_url}
-                    className='w-full h-full object-cover'
-                    onClick={() => window.open(item.file_url)}
-                  />
-                )}
-
-                {tab === 'object' && (
-                  <model-viewer
-                    src={item.file_url}
-                    style={{ width: '100%', height: '100%' }}
-                    camera-controls
-                    auto-rotate
-                    shadow-intensity='1'
-                    exposure='1'
-                  />
-                )}
-
-                {tab === 'audio' && (
-                  <audio
-                    controls
-                    className='w-full'
-                    onClick={() => window.open(item.file_url)}
-                  >
-                    <source src={item.file_url} />
-                  </audio>
-                )}
-                {tab === 'texture' && (
-                  <div className='w-full h-full flex  overflow-hidden shadow-md cursor-pointer'>
-                    <div
-                      className='w-1/3 h-full hover:brightness-75 transition-all'
-                      onClick={() => window.open(item.alb_url)}
-                    >
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 pb-20'>
+          {loading ? (
+             <>
+               <CardSkeleton />
+               <CardSkeleton />
+               <CardSkeleton />
+             </>
+          ) : displayData.length > 0 ? (
+             displayData.map((item) => (
+                <div
+                  key={item.id}
+                  className='border-2 border-transparent hover:border-[#2e2e2e] shadow-md p-4 transition cursor-pointer flex flex-col'
+                >
+                  <div className='w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden mb-4'>
+                    {tab === 'image' && (
                       <img
-                        src={item.alb_url}
+                        src={item.file_url}
                         className='w-full h-full object-cover'
+                        onClick={() => window.open(item.file_url)}
                       />
-                    </div>
+                    )}
 
-                    <div
-                      className='w-1/3 h-full hover:brightness-75 transition-all'
-                      onClick={() => window.open(item.nor_url)}
-                    >
-                      <img
-                        src={item.nor_url}
-                        className='w-full h-full object-cover'
+                    {tab === 'object' && (
+                      <model-viewer
+                        src={item.file_url}
+                        style={{ width: '100%', height: '100%' }}
+                        camera-controls
+                        auto-rotate
+                        shadow-intensity='1'
+                        exposure='1'
                       />
-                    </div>
+                    )}
 
-                    <div
-                      className='w-1/3 h-full hover:brightness-75 transition-all'
-                      onClick={() => window.open(item.orm_url)}
-                    >
-                      <img
-                        src={item.orm_url}
-                        className='w-full h-full object-cover'
-                      />
-                    </div>
+                    {tab === 'audio' && (
+                      <audio
+                        controls
+                        className='w-full'
+                        onClick={() => window.open(item.file_url)}
+                      >
+                        <source src={item.file_url} />
+                      </audio>
+                    )}
+                    
+                    {tab === 'texture' && (
+                      <div className='w-full h-full flex  overflow-hidden shadow-md cursor-pointer'>
+                        <div className='w-1/3 h-full hover:brightness-75 transition-all' onClick={() => window.open(item.alb_url)}>
+                          <img src={item.alb_url} className='w-full h-full object-cover' />
+                        </div>
+                        <div className='w-1/3 h-full hover:brightness-75 transition-all' onClick={() => window.open(item.nor_url)}>
+                          <img src={item.nor_url} className='w-full h-full object-cover' />
+                        </div>
+                        <div className='w-1/3 h-full hover:brightness-75 transition-all' onClick={() => window.open(item.orm_url)}>
+                          <img src={item.orm_url} className='w-full h-full object-cover' />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
 
-              {/* TITLE */}
-              <div className='text-lg font-bold text-[#2e2e2e] truncate'>
-                {item.title}
-              </div>
+                  <div className='text-lg font-bold text-[#2e2e2e] truncate'>
+                    {item.title}
+                  </div>
 
-              {/* ACTIONS */}
-              <div className='grid grid-cols-2 gap-2 mt-auto pt-4'>
-                <button
-                  className='secondary-button flex gap-2 justify-center'
-                  onClick={() => openEdit(item)}
-                >
-                  <MdEdit size={22} /> Chỉnh sửa
-                </button>
-                <button
-                  className='secondary-button flex gap-2 justify-center'
-                  onClick={() => handleDelete(item.id, tab)}
-                >
-                  <MdDelete size={22} /> Xóa
-                </button>
-              </div>
-              {tab !== 'texture' && (
-                <div className='w-full pt-2'>
-                  <button
-                    className='primary-button flex gap-2 justify-center w-full'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      downloadFile(item.file_url, item.title);
-                    }}
-                  >
-                    <MdDownload size={22} /> Tải xuống
-                  </button>
+                  <div className='grid grid-cols-2 gap-2 mt-auto pt-4'>
+                    <button
+                      className='secondary-button flex gap-2 justify-center'
+                      onClick={() => openEdit(item)}
+                    >
+                      <MdEdit size={22} /> Chỉnh sửa
+                    </button>
+                    <button
+                      className='secondary-button flex gap-2 justify-center'
+                      onClick={() => handleDelete(item.id, tab)}
+                    >
+                      <MdDelete size={22} /> Xóa
+                    </button>
+                  </div>
+                  
+                  {tab !== 'texture' && (
+                    <div className='w-full pt-2'>
+                      <button
+                        className='primary-button flex gap-2 justify-center w-full'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          downloadFile(item.file_url, item.title);
+                        }}
+                      >
+                        <MdDownload size={22} /> Tải xuống
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
-
-          {displayData.length === 0 && (
-            <div className='col-span-full text-center text-gray-500 py-10'>
-              Không có dữ liệu.
-            </div>
+             ))
+          ) : (
+             <div className='col-span-full text-center text-gray-500 py-10'>
+               Không có dữ liệu.
+             </div>
           )}
         </div>
       </div>

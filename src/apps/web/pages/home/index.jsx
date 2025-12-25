@@ -1,28 +1,66 @@
-import './Home.scss';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { MdArrowOutward } from 'react-icons/md';
+import { Skeleton } from 'antd';
+import './Home.scss';
 import WebLine from '../../components/web-line';
 import RecommendSpaces from '../../components/recommend-spaces';
-import { Link } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
 import AboutInfo from '../../components/about-info/AboutInfo';
 import Pricing from '../../components/pricing/Pricing';
 import { RoomApi } from '@/api/roomApi';
 
 function Home() {
   const [spaces, setSpaces] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchSpaces = async () => {
+      setLoading(true);
       try {
         const data = await RoomApi.getPublicRoomList();
-
         setSpaces(data.slice(0, 3));
       } catch (error) {
         console.error('Lỗi API:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchSpaces();
   }, []);
+
+  const SpaceSkeleton = () => (
+    <div className='row mb-4'>
+      <div className='w-1/2'>
+        <Skeleton.Image active style={{ width: '40vw', height: '40vh' }} />
+      </div>
+
+      <div className='w-1/2 flex flex-col justify-center pl-md-5 mt-4 mt-md-0'>
+        <Skeleton.Input
+          active
+          size='small'
+          style={{ width: 150, marginBottom: 10 }}
+        />
+        <Skeleton.Input
+          active
+          size='large'
+          block
+          style={{ height: 40, marginBottom: 20 }}
+        />
+        <Skeleton active paragraph={{ rows: 3 }} title={false} />
+        <div className='flex gap-10 mt-4 mb-4'>
+          <Skeleton.Input active size='small' style={{ width: 100 }} />
+          <Skeleton.Input active size='small' style={{ width: 100 }} />
+        </div>
+        <Skeleton.Button
+          active
+          size='large'
+          style={{ width: 250, marginTop: 'auto' }}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <>
       <div className='Web__home'>
@@ -48,10 +86,7 @@ function Home() {
                   <div className='Web__home__sectionMain__inner__button__text'>
                     KHÁM PHÁ
                   </div>
-                  <div
-                    div
-                    className='Web__home__sectionMain__inner__button__icon'
-                  >
+                  <div className='Web__home__sectionMain__inner__button__icon'>
                     <MdArrowOutward />
                   </div>
                 </Link>
@@ -59,15 +94,16 @@ function Home() {
             </div>
           </div>
         </div>
+
         <div className='Web__home__section1'>
           <div className='container-main'>
             <div className='Web__home__section1__inner'>
-              <div className=' text-center px-5 pt-20 pb-10'>
-                <h1 className='      text-[48px] md:text-[52px]      font-semibold      mb-6    '>
+              <div className='text-center px-5 pt-20 pb-10'>
+                <h1 className='text-[48px] md:text-[52px] font-semibold mb-6'>
                   VEXPO – NỀN TẢNG TRIỂN LÃM ẢO HÀNG ĐẦU VIỆT NAM
                 </h1>
                 <WebLine />
-                <p className='      text-[18px]       max-w-[1000px]      mx-auto      font-normal    '>
+                <p className='text-[18px] max-w-[1000px] mx-auto font-normal'>
                   VEXPO là nền tảng triển lãm ảo giúp người dùng tự thiết kế –
                   tùy biến – xuất bản các không gian trưng bày 3D ngay trên
                   trình duyệt. Với giao diện trực quan và bộ công cụ mạnh mẽ,
@@ -83,7 +119,9 @@ function Home() {
             </div>
           </div>
         </div>
+
         <WebLine />
+
         <div className='Web__home__section1'>
           <div className='container-main'>
             <div className='Web__home__section1__inner'>
@@ -91,9 +129,22 @@ function Home() {
                 KHÁM PHÁ KHÔNG GIAN
               </div>
               <WebLine />
-              {spaces.length ? (
-                <div className='Web__home__section1__inner__content'>
-                  {spaces.map((item, index) => (
+
+              <div className='Web__home__section1__inner__content'>
+                {loading ? (
+                  <>
+                    <SpaceSkeleton />
+                    <div className='my-8'>
+                      <WebLine />
+                    </div>
+                    <SpaceSkeleton />
+                    <div className='my-8'>
+                      <WebLine />
+                    </div>
+                    <SpaceSkeleton />
+                  </>
+                ) : spaces.length > 0 ? (
+                  spaces.map((item, index) => (
                     <React.Fragment key={item.id}>
                       <div className={`row ${index % 2 === 0 ? 'r1' : 'r2'}`}>
                         <div className='col-md-6 col-12'>
@@ -148,17 +199,19 @@ function Home() {
                         </div>
                       </div>
 
-                      {/* Divider */}
                       <WebLine />
                     </React.Fragment>
-                  ))}
-                </div>
-              ) : (
-                <div className='text-center'>Đang tải...</div>
-              )}
+                  ))
+                ) : (
+                  <div className='text-center py-10 text-gray-500'>
+                    Hiện chưa có không gian nào được hiển thị.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
+
         <AboutInfo />
         <RecommendSpaces />
         <WebLine />

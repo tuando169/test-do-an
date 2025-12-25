@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { UserApi } from '@/api/userApi';
 import { RoleEnum } from '@/common/constants';
-import { notification } from 'antd';
+import { notification, Skeleton } from 'antd'; // 1. Import Skeleton
 
 export default function UserProfile() {
   const [api, contextHolder] = notification.useNotification();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading khi update data
+  const [fetching, setFetching] = useState(true); // 2. Loading khi mới vào trang
 
   const [editing, setEditing] = useState({
     name: false,
@@ -19,6 +20,7 @@ export default function UserProfile() {
   });
 
   async function loadUser() {
+    setFetching(true);
     try {
       const userId = localStorage.getItem('user');
       const data = await UserApi.getById(userId);
@@ -29,6 +31,8 @@ export default function UserProfile() {
       });
     } catch (err) {
       console.error('Lỗi tải user:', err);
+    } finally {
+      setFetching(false);
     }
   }
 
@@ -43,14 +47,16 @@ export default function UserProfile() {
 
     try {
       setLoading(true);
-
       await UserApi.updateAvatar(user.id, file);
       document.dispatchEvent(new Event('avatar-changed'));
       api.success({
         title: 'Thành công',
         description: 'Cập nhật avatar thành công!',
       });
-      await loadUser();
+      // Gọi lại API nhưng không set fetching để tránh nháy toàn bộ trang
+      const userId = localStorage.getItem('user');
+      const data = await UserApi.getById(userId);
+      setUser(data);
     } catch (err) {
       console.error('Lỗi upload avatar:', err);
     } finally {
@@ -68,7 +74,12 @@ export default function UserProfile() {
         [field]: draft[field],
       });
       setEditing((prev) => ({ ...prev, [field]: false }));
-      await loadUser();
+
+      // Reload data background
+      const userId = localStorage.getItem('user');
+      const data = await UserApi.getById(userId);
+      setUser(data);
+
       api.success({
         title: 'Thành công',
         description: 'Cập nhật thông tin thành công!',
@@ -80,11 +91,38 @@ export default function UserProfile() {
     }
   };
 
-  if (!user) {
-    return (
-      <div className='text-center text-gray-600 py-10 text-lg'>
-        Đang tải hồ sơ...
+  // 3. Component Skeleton mô phỏng trang Profile
+  const ProfileSkeleton = () => (
+    <div className='container-main max-w-2xl flex flex-col mx-auto mt-10 p-6'>
+      {/* Title */}
+      <div className='flex justify-center mb-6'>
+        <Skeleton.Input active style={{ width: 250, height: 40 }} />
       </div>
+
+      {/* Avatar Circle */}
+      <div className='flex flex-col items-center gap-3 mb-8'>
+        <Skeleton.Avatar active size={112} shape='circle' />
+      </div>
+
+      {/* Rows */}
+      <div className='space-y-6'>
+        {[1, 2, 3, 4, 5].map((item) => (
+          <div key={item} className='flex justify-between border-b pb-3'>
+            <Skeleton.Input active size='small' style={{ width: 100 }} />
+            <Skeleton.Input active size='small' style={{ width: 200 }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // 4. Render Logic: Nếu đang fetching hoặc chưa có user thì hiện Skeleton
+  if (fetching || !user) {
+    return (
+      <>
+        {contextHolder}
+        <ProfileSkeleton />
+      </>
     );
   }
 
@@ -165,12 +203,6 @@ export default function UserProfile() {
               ? 'Nhà thiết kế'
               : 'Người dùng'
           }
-        />
-
-        {/* CREATED */}
-        <ProfileRow
-          label='Ngày tạo'
-          value={new Date(user.created_at).toLocaleString('vi-VN')}
         />
       </div>
     </div>
